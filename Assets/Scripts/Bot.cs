@@ -4,42 +4,27 @@ using UnityEngine;
 
 public class Bot : MonoBehaviour
 {
-    public Field playerFieldPrefab;
+    public Field botFieldPrefab;
 
     // This will hold the instantiated Field component
     private Field field;
 
     void Start()
     {
-        // Instantiate the player's field from the prefab
-        if (playerFieldPrefab == null)
-        {
-            Debug.LogError("playerFieldPrefab is not assigned in the inspector.");
-            return;
-        }
 
-        // Instantiate the player's field from the prefab
-        field = Instantiate(playerFieldPrefab, transform.position, Quaternion.identity);
+        field = Instantiate(botFieldPrefab, transform.position, Quaternion.identity);
+        field.transform.SetParent(transform);
         field.CreateField();
-        if (field == null)
-        {
-            Debug.LogError("Failed to instantiate playerFieldPrefab.");
-            return;
-        }
-        RandomPositionGenerator();
+        field.SpawnAllShips();
     }
 
-    // Call this method from GameManager or other classes to get the instantiated Field
-    public Field GetFieldInstance()
-    {
-        return field;
-    }
 
     public void Kill(int x1, int y1)
     {
         field.Kill(x1, y1);
     }
      
+    /*
     public void RandomPositionGenerator()
     {
         Debug.Log("Button pressed and RandomPositionGenerator called.");
@@ -50,53 +35,51 @@ public class Bot : MonoBehaviour
             return;
         }
         field.CreateField();
-        for (int i = 1; i <= 4; i++)
+        for (int i = 4; i >= 1; i--)
         {
-            for (int j = i; j <= 4; j++)
+            int count = 5 - i;
+            int operationCount = 0;
+            while(count > 0 && operationCount < 300)
             {
-                int count = 0;
-                while (true)
+                bool horizontal = false;
+                if (Random.Range(0, 2).Equals(1))
                 {
-                    bool horizontal = false;
-                    if (Random.Range(0, 2).Equals(1))
-                    {
-                        horizontal = true;
-                    }
-                    int startP = Random.Range(0, 10);
-                    int endP = startP + i;
-                    if (horizontal)
-                    {
-                        int yAxis = Random.Range(0, 10);
-                        if (field.IsPlaceValid(startP, yAxis, endP, yAxis, horizontal))
-                        {
-                            field.EnterShip1(startP, yAxis, horizontal, i);
-                            break;
-                        }
+                    horizontal = true;
+                }
+                int startP = 0;
 
-                    }
-                    else
+                startP = Random.Range(0, 10);
+                
+
+                int endP = startP + i;
+                if (horizontal)
+                {
+                    int yAxis = Random.Range(0, 10);
+                    if (field.IsPlaceValid(startP, yAxis, endP, yAxis, horizontal))
                     {
-                        int xAxis = Random.Range(0, 10);
-                        if (field.IsPlaceValid(xAxis, startP, xAxis, endP, horizontal))
-                        {
-                            field.EnterShip1(xAxis, startP, horizontal, i);
-                            break;
-                        }
-
+                        field.EnterShip1(startP, yAxis, horizontal, i);
+                        count--;
                     }
-                    count++;
-
-                    if (count > 300)
-                        break;
 
                 }
+                else
+                {
+                    int xAxis = Random.Range(0, 10);
+                    if (field.IsPlaceValid(xAxis, startP, xAxis, endP, horizontal))
+                    {
+                        field.EnterShip1(xAxis, startP, horizontal, i);
+                        count--;
+                    }
 
+                }
+                operationCount++;
             }
-
 
         }
 
-    }
+    }*/
+
+
     // Update is called once per frame
     void Update()
     {

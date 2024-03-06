@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,28 +11,37 @@ public class GameManager : MonoBehaviour
     private Player playerFieldInstance;
     private Bot botFieldInstance;
 
-    void Start()
-    {
-        // Instantiate the player's field
-        if (playerFieldPrefab != null)
-        {
-            playerFieldInstance = Instantiate(playerFieldPrefab, new Vector3(-12, 5, 0), Quaternion.identity);
-        }
-        else
-        {
-            Debug.LogError("Player Field Prefab is not assigned in the GameManager!");
-        }
+    public static GameManager instance;
 
-        // Instantiate the bot's field
-        if (botFieldPrefab != null)
+    void Awake()
+    {
+        if (instance == null)
         {
-            botFieldInstance = Instantiate(botFieldPrefab, new Vector3(2, 5, 0), Quaternion.identity);
+            instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (instance != this)
         {
-            Debug.LogError("Bot Field Prefab is not assigned in the GameManager!");
+            Destroy(gameObject);
         }
     }
+
+    void Start()
+    {
+        // Attempt to find an existing player instance.
+        playerFieldInstance = FindObjectOfType<Player>();
+        botFieldInstance = FindObjectOfType<Bot>();
+
+        // If no player exists, instantiate one.
+
+        playerFieldInstance = Instantiate(playerFieldPrefab, new Vector3(-5, 5, 0), Quaternion.identity);
+        playerFieldInstance.transform.SetParent(transform);
+
+        botFieldInstance = Instantiate(botFieldPrefab, new Vector3(2, 5, 0), Quaternion.identity);
+        botFieldInstance.transform.SetParent(transform);
+        botFieldInstance.gameObject.SetActive(false);
+    }
+
 
 
     void Update()
@@ -63,6 +73,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void GeneratePosition()
+    {
+        Debug.Log("Trigg");
+        playerFieldInstance.RandomPositionGenerator();
+    }
+
     void Kill(string coordinates)
     {
         botFieldInstance.Kill(int.Parse(coordinates.Split(' ')[0]), int.Parse(coordinates.Split(' ')[1]));
@@ -72,6 +88,36 @@ public class GameManager : MonoBehaviour
     {
         // This function logs the clicked tile's name and position.
         Debug.Log($"Tile clicked: {tile.name} at position {clickPosition}");
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        switch (scene.name)
+        {
+            case "BattleScene":
+                if (botFieldInstance != null)
+                {
+                    botFieldInstance.gameObject.SetActive(true); // Activate bot
+                }
+                if (playerFieldInstance != null)
+                {
+                    // Set player's position to a different vector in the third scene
+                    playerFieldInstance.transform.position = new Vector3(-12, 5, 0);
+                }
+                break;
+
+            // Switch for future scenes.
+        }
     }
 }
 

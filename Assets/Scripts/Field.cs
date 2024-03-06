@@ -17,6 +17,7 @@ public class Field : MonoBehaviour
     public int[,] fieldArray;
 
     public int[] shipsCount = new int[] { 4, 3, 2, 1};
+
     public void CreateField()
     {
         if (letters != null)
@@ -59,12 +60,12 @@ public class Field : MonoBehaviour
 
         for (int i = 0; i < fieldLength; i++)
         {
-            letters[i] = Instantiate(letter);
+            letters[i] = Instantiate(letter, new Vector3(X, Y, startPos.z), Quaternion.identity, transform);
             letters[i].transform.position = new Vector3(X, startPos.y, startPos.z);
             letters[i].GetComponent<Chunks>().index = i;
             X++;
 
-            numbers[i] = Instantiate(number);
+            numbers[i] = Instantiate(number, new Vector3(X, Y, startPos.z), Quaternion.identity, transform);
             numbers[i].transform.position = new Vector3(startPos.x, Y, startPos.z);
             numbers[i].GetComponent<Chunks>().index = i;
             Y--;
@@ -79,7 +80,7 @@ public class Field : MonoBehaviour
         {
             for (int i = 0; i < fieldLength; i++)
             {
-                field[i, j] = Instantiate(square);
+                field[i, j] = Instantiate(square, new Vector3(X, Y, startPos.z), Quaternion.identity, transform);
                 field[i, j].GetComponent<Chunks>().index = 0;
                 field[i, j].transform.position = new Vector3(X, Y, startPos.z);
                 field[i, j].name = $"{i} {j}"; // Name for easier identification
@@ -94,7 +95,7 @@ public class Field : MonoBehaviour
         }
     }
 
-    
+    /*
     public bool IsPlaceValid(int x1, int y1, int x2, int y2, bool horizontal)
     {
         List<int> index = new List<int> {1,3,5,7,2,4,6,8};
@@ -202,6 +203,7 @@ public class Field : MonoBehaviour
         }
         field[x1, y1].GetComponent<Chunks>().UpdateLetter();
     }
+    */
 
     public bool IsWrongPlace(int x1, int y1, int x2, int y2)
     {
@@ -213,17 +215,6 @@ public class Field : MonoBehaviour
         }
         return true;
     }
-
-   
-    /*
-    private void IsShip(int x1, int y1, List<int> index)
-    {
-        for (int i = 0; i < index.Count; i++)
-        {
-            if(index.Contains(field[x1, y1].GetComponent<Chunks>().index) ==)
-        }
-    }
-    */
 
 
 
@@ -353,12 +344,16 @@ public class Field : MonoBehaviour
 
         int count = 0;
 
-        string[] variations = new string[] { "1234", "1243", "1324", "1342", "1423", "1432", "2134", "2143", "2314", "2341", "2413", "2431", "3124", "3142", "3214", "3241", "3412", "3421", "4123", "4132", "4231", "4213", "4312", "4321" };
+        string[] variations = new string[] { "1234", "1243", "1324", "1342", "1423", "1432", "2134", "2143",
+            "2314", "2341", "2413", "2431", "3124", "3142", "3214", "3241", "3412", "3421", "4123", "4132", 
+            "4231", "4213", "4312", "4321" };
 
         while (true)
         {
             if (AreAllSpawned() || count >= 500)
+            {
                 return;
+            }
             int x = Random.Range(0, 9);
             int y = Random.Range(0, 9);
             int index = Random.Range(0, variations.Length - 1);
@@ -373,7 +368,7 @@ public class Field : MonoBehaviour
                 {
                     EnterShip(x, y, x + currShip, y, ref spawned);
                     if (spawned)
-                        break; ;
+                        break; 
                 }
                 if (num.Equals('2'))
                 {
@@ -395,7 +390,7 @@ public class Field : MonoBehaviour
                 }
             }
         }
-
+        
     }
 
 
