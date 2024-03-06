@@ -7,6 +7,12 @@ public class ReturnToMenuButton : MonoBehaviour
 {
     public void ReturnToMenu()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        if (GameManager.instance != null)
+        {
+            // Destroy the instance of GameManager
+            Destroy(GameManager.instance.gameObject); 
+            GameManager.instance = null; 
+        }
+        SceneManager.LoadScene("MainMenu");
     }
 }

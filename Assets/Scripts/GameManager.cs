@@ -46,6 +46,12 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (SceneManager.GetActiveScene().name.Equals("BattleScene"))
+            MouseTrajectory();
+    }
+
+    void MouseTrajectory()
+    {
         if (Input.GetMouseButtonDown(0)) // Check for left click
         {
             Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
