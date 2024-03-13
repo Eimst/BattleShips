@@ -18,6 +18,7 @@ public class Field : MonoBehaviour
 
     public int[] shipsCount = new int[] { 4, 3, 2, 1};
 
+
     public void CreateField()
     {
         if (letters != null)
@@ -94,6 +95,7 @@ public class Field : MonoBehaviour
             Y--;
         }
     }
+
 
     /*
     public bool IsPlaceValid(int x1, int y1, int x2, int y2, bool horizontal)
@@ -204,6 +206,7 @@ public class Field : MonoBehaviour
         field[x1, y1].GetComponent<Chunks>().UpdateLetter();
     }
     */
+
 
     public bool IsWrongPlace(int x1, int y1, int x2, int y2)
     {
@@ -325,6 +328,7 @@ public class Field : MonoBehaviour
         }
     }
 
+
     public bool AreAllSpawned()
     {
         bool spawned = true;
@@ -335,6 +339,7 @@ public class Field : MonoBehaviour
         }
         return spawned;
     }
+
 
     public void SpawnAllShips()
     {
@@ -394,27 +399,31 @@ public class Field : MonoBehaviour
     }
 
 
-     public void Kill(int x1, int y1)
-    {
-        /*List<int> index = new List<int> { 1, 3, 5, 7, 2, 4, 6, 8 };
-        if (index.Contains(field[x1, y1].GetComponent<Chunks>().index))
-        {
-            return;
-        }
-        field[x1, y1].GetComponent<Chunks>().index = 9;
-        field[x1, y1].GetComponent<Chunks>().UpdateLetter();*/
+     public bool Kill(int x1, int y1)
+     {
+        
         if (field[x1, y1].GetComponent<Chunks>().index == 9)
-            return;
+            return false;
         if (field[x1, y1].GetComponent<Chunks>().index == 0)
+        {
             field[x1, y1].GetComponent<Chunks>().index = 9;
+            return false;
+        }
+            
         else 
+        {
             field[x1, y1].GetComponent<Chunks>().index = 10;
+            return true;
+        }
+            
     }
+    
 
     void Start()
     {
 
     }
+
 
     // Update is called once per frame
     void Update()
