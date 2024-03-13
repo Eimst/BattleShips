@@ -354,9 +354,9 @@ public class Field : MonoBehaviour
             {
                 return;
             }
-            int x = Random.Range(0, 9);
-            int y = Random.Range(0, 9);
-            int index = Random.Range(0, variations.Length - 1);
+            int x = Random.Range(0, 10);
+            int y = Random.Range(0, 10);
+            int index = Random.Range(0, variations.Length);
             string var = variations[index];
             count++;
             bool spawned = false;
