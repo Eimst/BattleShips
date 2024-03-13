@@ -1001,8 +1001,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1162449843}
-        m_TargetAssemblyTypeName: BattleButton, Assembly-CSharp
+      - m_Target: {fileID: 1017683199}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: GoToBattle
         m_Mode: 1
         m_Arguments:
@@ -1062,50 +1062,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34e054052ecf8254581ceff262ae6880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1162449842
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1162449844}
-  - component: {fileID: 1162449843}
-  m_Layer: 0
-  m_Name: ButtonController2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1162449843
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162449842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2feadde2afdae0f4eb6e54498f26322c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1162449844
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162449842}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 632.72217, y: 215.07419, z: -2.3717072}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1221343508
 GameObject:
   m_ObjectHideFlags: 0
@@ -1696,5 +1652,4 @@ SceneRoots:
   - {fileID: 1366731308}
   - {fileID: 612085080}
   - {fileID: 778478152}
-  - {fileID: 1162449844}
   - {fileID: 624125658}
