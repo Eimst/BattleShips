@@ -1,9 +1,11 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKillable
 {
     public Field playerFieldPrefab;
     private Field field;
+
+    public bool ship4Tiles { get; set; }
 
     void Awake()
     {
@@ -32,6 +34,11 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("Field is not instantiated.");
         }
+    }
+
+    public void Kill(int x1, int y1)
+    {
+        field.Kill(x1, y1);
     }
 
 }
