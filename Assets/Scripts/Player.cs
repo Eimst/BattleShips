@@ -37,9 +37,7 @@ public class Player : MonoBehaviour, IKillable
     }
     public bool AreAllSpawned()
     {
-        if (field.AreAllSpawned())
-            return true;
-        else return false;
+        return field.AreAllSpawned();
     }
 
     public void Kill(int x1, int y1)
