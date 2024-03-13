@@ -359,9 +359,9 @@ public class Field : MonoBehaviour
             {
                 return;
             }
-            int x = Random.Range(0, 9);
-            int y = Random.Range(0, 9);
-            int index = Random.Range(0, variations.Length - 1);
+            int x = Random.Range(0, 10);
+            int y = Random.Range(0, 10);
+            int index = Random.Range(0, variations.Length);
             string var = variations[index];
             count++;
             bool spawned = false;
@@ -401,18 +401,23 @@ public class Field : MonoBehaviour
 
      public bool Kill(int x1, int y1)
      {
-        List<int> index = new List<int> { 1, 3, 5, 7, 2, 4, 6, 8 };
-        if (index.Contains(field[x1, y1].GetComponent<Chunks>().index))
+        
+        if (field[x1, y1].GetComponent<Chunks>().index == 9)
+            return false;
+        if (field[x1, y1].GetComponent<Chunks>().index == 0)
         {
-            field[x1, y1].GetComponent<Chunks>().index = 13;
-            field[x1, y1].GetComponent<Chunks>().UpdateLetter();
+            field[x1, y1].GetComponent<Chunks>().index = 9;
+            return false;
+        }
+            
+        else 
+        {
+            field[x1, y1].GetComponent<Chunks>().index = 10;
             return true;
         }
-        field[x1, y1].GetComponent<Chunks>().index = 13;
-        field[x1, y1].GetComponent<Chunks>().UpdateLetter();
-        return false;
-     }
-
+            
+    }
+    
 
     void Start()
     {
