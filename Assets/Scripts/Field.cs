@@ -325,7 +325,7 @@ public class Field : MonoBehaviour
         }
     }
 
-    private bool AreAllSpawned()
+    public bool AreAllSpawned()
     {
         bool spawned = true;
         for (int i = 0; i < 4; i++)

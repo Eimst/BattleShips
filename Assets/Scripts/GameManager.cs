@@ -147,5 +147,11 @@ public class GameManager : MonoBehaviour
             // Switch for future scenes.
         }
     }
+    public void GoToBattle()
+    {
+
+        if (playerFieldInstance.AreAllSpawned())
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
 }
 

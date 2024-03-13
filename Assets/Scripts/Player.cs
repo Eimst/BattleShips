@@ -35,6 +35,12 @@ public class Player : MonoBehaviour, IKillable
             Debug.LogError("Field is not instantiated.");
         }
     }
+    public bool AreAllSpawned()
+    {
+        if (field.AreAllSpawned())
+            return true;
+        else return false;
+    }
 
     public void Kill(int x1, int y1)
     {

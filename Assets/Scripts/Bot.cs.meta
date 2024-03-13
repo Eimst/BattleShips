@@ -3,7 +3,8 @@ guid: 73c0490764d32c34797585c4d35d4dd1
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - botFieldPrefab: {fileID: -6864802533775985414, guid: 580f18ce438f38a408f7fd7f119092c4, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
