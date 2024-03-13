@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour 
 {
     public Player playerFieldPrefab;
     public Bot botFieldPrefab;
@@ -40,55 +40,54 @@ public class GameManager : MonoBehaviour
         botFieldInstance = Instantiate(botFieldPrefab, new Vector3(2, 5, 0), Quaternion.identity);
         botFieldInstance.transform.SetParent(transform);
         botFieldInstance.gameObject.SetActive(false);
+
     }
 
 
 
     void Update()
     {
-        if (SceneManager.GetActiveScene().name.Equals("BattleScene"))
-            MouseTrajectory();
+        if(SceneManager.GetActiveScene().name.Equals("ShipSelectionScene") && playerFieldInstance.ship4Tiles) // jei paspaustas laivas galima slankioti ir padejus nusispalvina langelis
+            MouseTrajectory(-5, 5, true);
+        else if(SceneManager.GetActiveScene().name.Equals("BattleScene"))
+            MouseTrajectory(2, 12, false);
     }
 
-    void MouseTrajectory()
+
+    void MouseTrajectory(int boadStartX, int boardEndX, bool isSelectionScene) //  Y pozicija visada tokia pati
     {
-        if (Input.GetMouseButtonDown(0)) // Check for left click
+        Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero);
+        bool active = false;
+        if (hit.collider != null)
         {
-            Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero);
 
-            if (hit.collider != null)
+            if (hit.collider.transform.position.x >= boadStartX && hit.collider.transform.position.x <= boardEndX &&
+                hit.collider.transform.position.y <= 5 && hit.collider.transform.position.y >= -5)
             {
-                Debug.Log($"Hit: {hit.collider.gameObject.name} at {hit.collider.gameObject.transform.position}");
-
-                if (hit.collider.transform.position.x >= 2 && hit.collider.transform.position.x <= 12 &&
-                    hit.collider.transform.position.y <= 5 && hit.collider.transform.position.y >= -5)
-                {
-                    TileClicked(hit.collider.gameObject, rayPos);
-                    Kill(hit.collider.gameObject.name);
-                }
-                else
-                {
-                    Debug.Log("Click outside bot's field");
-                }
-            }
-            else
-            {
-                Debug.Log($"Missed: Ray Position {rayPos}");
+                active = true;
             }
         }
+
+        if (active && !isSelectionScene && Input.GetMouseButtonDown(0)) // Check for left click
+        {
+            TileClicked(hit.collider.gameObject, rayPos);
+            Kill(hit.collider.gameObject.name, botFieldInstance);
+        }
+        else if(active && isSelectionScene)
+        {
+            TileClicked(hit.collider.gameObject, rayPos); // 
+            if (Input.GetMouseButtonDown(0))
+            {
+                Kill(hit.collider.gameObject.name, playerFieldInstance);
+                playerFieldInstance.ship4Tiles = false;
+                // Laivo istatymo algoritmas vietoj kill
+            }
+                
+        }
+        
     }
 
-    public void GeneratePosition()
-    {
-        Debug.Log("Trigg");
-        playerFieldInstance.RandomPositionGenerator();
-    }
-
-    void Kill(string coordinates)
-    {
-        botFieldInstance.Kill(int.Parse(coordinates.Split(' ')[0]), int.Parse(coordinates.Split(' ')[1]));
-    }
 
     void TileClicked(GameObject tile, Vector2 clickPosition)
     {
@@ -96,15 +95,38 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Tile clicked: {tile.name} at position {clickPosition}");
     }
 
+
+    public void setShip4Tiles()
+    {
+        playerFieldInstance.ship4Tiles = true;
+    }
+
+    public void GeneratePosition()
+    {
+        playerFieldInstance.ship4Tiles = false;
+        playerFieldInstance.RandomPositionGenerator();
+    }
+
+
+    void Kill(string coordinates, IKillable instance)
+    {
+        int x = int.Parse(coordinates.Split(' ')[0]);
+        int y = int.Parse(coordinates.Split(' ')[1]);
+        instance.Kill(x, y);
+    }
+
+
     void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
+
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
