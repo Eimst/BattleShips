@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Threading;
+using TMPro;
 
 public class GameManager : MonoBehaviour 
 {
@@ -12,6 +14,19 @@ public class GameManager : MonoBehaviour
     private Bot botFieldInstance;
 
     public static GameManager instance;
+
+    public TextMeshProUGUI textMeshProUGUI;
+
+    public enum GameState
+    {
+        Setup,
+        PlayerTurn,
+        BotTurn,
+        GameOver
+    }
+
+    public GameState currentState = GameState.Setup;
+
 
     void Awake()
     {
@@ -40,29 +55,58 @@ public class GameManager : MonoBehaviour
         botFieldInstance = Instantiate(botFieldPrefab, new Vector3(2, 5, 0), Quaternion.identity);
         botFieldInstance.transform.SetParent(transform);
         botFieldInstance.gameObject.SetActive(false);
+        textMeshProUGUI.transform.SetParent(transform);
+        textMeshProUGUI.gameObject.SetActive(false);
 
     }
-
 
 
     void Update()
     {
-        if(SceneManager.GetActiveScene().name.Equals("ShipSelectionScene") && playerFieldInstance.ship4Tiles) // jei paspaustas laivas galima slankioti ir padejus nusispalvina langelis
-            MouseTrajectory(-5, 5, true);
-        else if(SceneManager.GetActiveScene().name.Equals("BattleScene"))
-            MouseTrajectory(2, 12, false);
+        if(playerFieldInstance.GetRemainingBoats() == 0 || botFieldInstance.GetRemainingBoats() == 0)
+            currentState = GameState.GameOver;
+
+        switch (currentState)
+        {
+            case GameState.Setup:
+                if (SceneManager.GetActiveScene().name.Equals("ShipSelectionScene") && playerFieldInstance.ship4Tiles) // jei paspaustas laivas galima slankioti ir padejus nusispalvina langelis
+                    MouseTrajectory(true);
+                break;
+
+            case GameState.PlayerTurn:
+                MouseTrajectory(false);
+                break;
+
+            case GameState.BotTurn:
+                if (!isBotTurnHandled)
+                {
+                    StartCoroutine(HandleBotTurn());
+                    isBotTurnHandled = true; // Ensure it's not repeatedly called
+                }
+                break;
+             case GameState.GameOver:
+                textMeshProUGUI.text = playerFieldInstance.GetRemainingBoats() == 0 ? "You lost!" : "You Win!";
+                textMeshProUGUI.gameObject.SetActive(true);
+                break;
+        }
     }
 
 
-    void MouseTrajectory(int boadStartX, int boardEndX, bool isSelectionScene) //  Y pozicija visada tokia pati
+    void MouseTrajectory(bool isSelectionScene) //  Y pozicija visada tokia pati
     {
+        int boardStartX;
+        int boardEndX;
+
+        boardStartX = isSelectionScene ? -5 : 2;
+        boardEndX = isSelectionScene ? 5 : 12;
+
         Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero);
         bool active = false;
         if (hit.collider != null)
         {
 
-            if (hit.collider.transform.position.x >= boadStartX && hit.collider.transform.position.x <= boardEndX &&
+            if (hit.collider.transform.position.x >= boardStartX && hit.collider.transform.position.x <= boardEndX &&
                 hit.collider.transform.position.y <= 5 && hit.collider.transform.position.y >= -5)
             {
                 active = true;
@@ -72,7 +116,8 @@ public class GameManager : MonoBehaviour
         if (active && !isSelectionScene && Input.GetMouseButtonDown(0)) // Check for left click
         {
             TileClicked(hit.collider.gameObject, rayPos);
-            Kill(hit.collider.gameObject.name, botFieldInstance);
+            if (!Kill(hit.collider.gameObject.name, botFieldInstance))
+                currentState = GameState.BotTurn;
         }
         else if(active && isSelectionScene)
         {
@@ -85,7 +130,6 @@ public class GameManager : MonoBehaviour
             }
                 
         }
-        
     }
 
 
@@ -101,6 +145,7 @@ public class GameManager : MonoBehaviour
         playerFieldInstance.ship4Tiles = true;
     }
 
+
     public void GeneratePosition()
     {
         playerFieldInstance.ship4Tiles = false;
@@ -108,11 +153,26 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void Kill(string coordinates, IKillable instance)
+    bool isBotTurnHandled = false; 
+
+    IEnumerator HandleBotTurn()
+    {
+        yield return new WaitForSeconds(1); 
+
+        if (!Kill(botFieldInstance.ApplyShot(), playerFieldInstance))
+        {
+            currentState = GameState.PlayerTurn;
+        }
+
+        isBotTurnHandled = false; 
+    }
+
+
+    bool Kill(string coordinates, IKillable instance)
     {
         int x = int.Parse(coordinates.Split(' ')[0]);
         int y = int.Parse(coordinates.Split(' ')[1]);
-        instance.Kill(x, y);
+        return instance.Kill(x, y);
     }
 
 
@@ -142,14 +202,24 @@ public class GameManager : MonoBehaviour
                     // Set player's position to a different vector in the third scene
                     playerFieldInstance.transform.position = new Vector3(-12, 5, 0);
                 }
+
+                currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
+
+                Canvas canvas = FindObjectOfType<Canvas>(); // Find the active canvas
+                if (canvas != null && textMeshProUGUI != null)
+                {
+                    textMeshProUGUI.transform.position = new Vector3(-210, 150, 0);
+                    textMeshProUGUI.transform.SetParent(canvas.transform, false); // False to keep local orientation
+                }
                 break;
 
             // Switch for future scenes.
         }
     }
+
+
     public void GoToBattle()
     {
-
         if (playerFieldInstance.AreAllSpawned())
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 using UnityEngine;
 
 public class Bot : MonoBehaviour, IKillable
@@ -8,6 +10,9 @@ public class Bot : MonoBehaviour, IKillable
 
     // This will hold the instantiated Field component
     private Field field;
+
+    private int remainingBoats = 20;
+
 
     void Start()
     {
@@ -19,9 +24,28 @@ public class Bot : MonoBehaviour, IKillable
     }
 
 
-    public void Kill(int x1, int y1)
+    public string ApplyShot()
     {
-        field.Kill(x1, y1);
+        int x = Random.Range(0, 10);
+        int y = Random.Range(0, 10);
+        return x + " " + y;
+    }
+
+    
+    public bool Kill(int x1, int y1)
+    {
+        if (field.Kill(x1, y1))
+        {
+            remainingBoats--;
+            return true;
+        }
+        return false;
+    }
+
+   
+    public int GetRemainingBoats()
+    {
+        return remainingBoats;
     }
 
 
