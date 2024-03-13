@@ -396,13 +396,19 @@ public class Field : MonoBehaviour
 
      public void Kill(int x1, int y1)
     {
-        List<int> index = new List<int> { 1, 3, 5, 7, 2, 4, 6, 8 };
+        /*List<int> index = new List<int> { 1, 3, 5, 7, 2, 4, 6, 8 };
         if (index.Contains(field[x1, y1].GetComponent<Chunks>().index))
         {
             return;
         }
-        field[x1, y1].GetComponent<Chunks>().index = 13;
-        field[x1, y1].GetComponent<Chunks>().UpdateLetter();
+        field[x1, y1].GetComponent<Chunks>().index = 9;
+        field[x1, y1].GetComponent<Chunks>().UpdateLetter();*/
+        if (field[x1, y1].GetComponent<Chunks>().index == 9)
+            return;
+        if (field[x1, y1].GetComponent<Chunks>().index == 0)
+            field[x1, y1].GetComponent<Chunks>().index = 9;
+        else 
+            field[x1, y1].GetComponent<Chunks>().index = 10;
     }
 
     void Start()
