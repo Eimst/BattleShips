@@ -45,16 +45,16 @@ public class Player : MonoBehaviour, IKillable
     {
         return field.AreAllSpawned();
     }
-    
 
-    public bool Kill(int x1, int y1)
+
+    public Field.DestroyResult Destroy(int x, int y)
     {
-        if(field.Kill(x1, y1))
+        Field.DestroyResult result = field.Destroy(x, y);
+        if (result == Field.DestroyResult.Success)
         {
             remainingBoats--;
-            return true;
         }
-        return false;
+        return result;
     }
 
 

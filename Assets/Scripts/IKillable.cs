@@ -5,5 +5,5 @@ using UnityEngine;
 
 public interface IKillable 
 {
-    bool Kill(int x, int y);
+    Field.DestroyResult Destroy(int x, int y);
 }

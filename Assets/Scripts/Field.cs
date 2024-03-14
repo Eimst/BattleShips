@@ -18,6 +18,13 @@ public class Field : MonoBehaviour
 
     public int[] shipsCount = new int[] { 4, 3, 2, 1};
 
+    public enum DestroyResult
+    {
+        Success,
+        Failure,
+        IllegalMove
+    }
+
 
     public void CreateField()
     {
@@ -399,21 +406,21 @@ public class Field : MonoBehaviour
     }
 
 
-     public bool Kill(int x1, int y1)
+     public DestroyResult Destroy(int x1, int y1)
      {
-        
-        if (field[x1, y1].GetComponent<Chunks>().index == 9)
-            return false;
+        if (field[x1, y1].GetComponent<Chunks>().index == 9 || field[x1, y1].GetComponent<Chunks>().index == 10)
+            return DestroyResult.IllegalMove;
+
         if (field[x1, y1].GetComponent<Chunks>().index == 0)
         {
             field[x1, y1].GetComponent<Chunks>().index = 9;
-            return false;
+            return DestroyResult.Failure;
         }
             
         else 
         {
             field[x1, y1].GetComponent<Chunks>().index = 10;
-            return true;
+            return DestroyResult.Success;
         }
             
     }
