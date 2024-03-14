@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,6 +14,9 @@ public class Field : MonoBehaviour
     public GameObject[,] field; 
 
     int fieldLength = 10;
+
+    public int currShipNum = 1;
+    public int[,] shipsArray;
 
     public int[,] fieldArray;
 
@@ -51,6 +55,7 @@ public class Field : MonoBehaviour
         field = new GameObject[fieldLength, fieldLength];
         // Reset the fieldArray to a new, empty state
         fieldArray = new int[fieldLength, fieldLength];
+        shipsArray = new int[fieldLength, fieldLength];
         Vector3 startPos = transform.position;
         float X = startPos.x + 1;
         float Y = startPos.y - 1;
@@ -246,6 +251,7 @@ public class Field : MonoBehaviour
         {
             for (int k = 0; k < x2 - x1 + 1; k++)
             {
+                shipsArray[x1 + k, y1] = currShipNum;
                 fieldArray[x1 + k, y1] = 1;
                 for (int i = 0; i < 8; i++)
                 {
@@ -281,6 +287,7 @@ public class Field : MonoBehaviour
         {
             for (int k = 0; k < y2 - y1 + 1; k++)
             {
+                shipsArray[x1, y1 + k] = currShipNum;
                 fieldArray[x1, y1 + k] = 1;
                 for (int i = 0; i < 8; i++)
                 {
@@ -314,6 +321,7 @@ public class Field : MonoBehaviour
         }
         else if (x2 - x1 == 0 && y2 - y1 == 0)
         {
+            shipsArray[x1, y1] = currShipNum;
             fieldArray[x1, y1] = 1;
             for (int i = 0; i < 8; i++)
             {
@@ -323,6 +331,7 @@ public class Field : MonoBehaviour
             field[x1, y1].GetComponent<Chunks>().index = 1;
             shipsCount[0]--;
         }
+        currShipNum++;
     }
 
     public bool AreAllSpawned()
@@ -394,6 +403,7 @@ public class Field : MonoBehaviour
     }
 
 
+<<<<<<< Updated upstream
      public void Kill(int x1, int y1)
     {
         /*List<int> index = new List<int> { 1, 3, 5, 7, 2, 4, 6, 8 };
@@ -405,11 +415,156 @@ public class Field : MonoBehaviour
         field[x1, y1].GetComponent<Chunks>().UpdateLetter();*/
         if (field[x1, y1].GetComponent<Chunks>().index == 9)
             return;
+=======
+     public DestroyResult Destroy(int x1, int y1)
+     {
+        int[] illegalIndexes = new int[] { 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 };
+        if (illegalIndexes.Contains(field[x1, y1].GetComponent<Chunks>().index))
+            return DestroyResult.IllegalMove;
+
+>>>>>>> Stashed changes
         if (field[x1, y1].GetComponent<Chunks>().index == 0)
             field[x1, y1].GetComponent<Chunks>().index = 9;
+<<<<<<< Updated upstream
         else 
             field[x1, y1].GetComponent<Chunks>().index = 10;
     }
+=======
+            return DestroyResult.Failure;
+        }
+            
+        else
+        {
+            field[x1, y1].GetComponent<Chunks>().index = 10;
+            if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
+                DestroyAllShip(x1, y1, shipsArray[x1, y1]);
+            shipsArray[x1, y1] *= -1;
+            return DestroyResult.Success;
+        }
+            
+     }
+    public bool IsAllShipDestroyed(int shipNum, int x, int y)
+    {
+        for (int i = 0; i < fieldLength; i++)
+        {
+            for (int j = 0; j < fieldLength; j++)
+            {
+                if (shipsArray[i, j] == shipNum && (i != x || j != y))
+                    return false;
+            }
+        }
+        return true;
+    }
+    
+    public void DestroyAllShip(int x, int y, int shipNum)
+    {
+        int[][] dir = {
+            new int[] { -1, 0 },
+            new int[] { -1, 1 },
+            new int[] { 0, 1 },
+            new int[] { 1, 1 },
+            new int[] { 1, 0 },
+            new int[] { 1, -1 },
+            new int[] { 0, -1 },
+            new int[] { -1, -1 }
+        };
+        shipsArray[x, y] *= -1;
+        int size = -1;
+        string type = "";
+        int startX = 10;
+        int startY = 10;
+        for (int j = 0; j < fieldLength; j++)
+        {
+            for (int i = 0; i < fieldLength; i++)
+            {
+                if (shipsArray[i, j] == shipNum * (-1))
+                {
+                    if (startX == 10 && startY == 10)
+                    { 
+                        startX = i;
+                        startY = j;
+                        if ((i + 1) <= 9)
+                            if (shipsArray[i + 1, j] == shipNum * (-1))
+                                type = "h";
+                            else type = "v";
+                    }
+                    size++;
+                }
+            }
+        }
+        if (size == 0)
+        {
+            field[x, y].GetComponent<Chunks>().index = 12;
+            for (int i = 0; i < 8; i++)
+            {
+                if (x + dir[i][0] >= 0 && x + dir[i][0] <= 9 && y + dir[i][1] >= 0 && y + dir[i][1] <= 9)
+                    if (field[x + dir[i][0], y + dir[i][1]].GetComponent<Chunks>().index == 0)
+                        field[x + dir[i][0], y + dir[i][1]].GetComponent<Chunks>().index = 9;
+            }
+
+        }
+        else
+        {
+            for (int i = 0; i <= size; i++)
+            {
+                if (type == "h")
+                {
+                    if (i == 0)
+                    {
+                        field[startX + i, startY].GetComponent<Chunks>().index = 12;
+                    }
+                    else if (i == 1)
+                    {
+                        if (i == size)
+                            field[startX + i, startY].GetComponent<Chunks>().index = 18;
+                        else field[startX + i, startY].GetComponent<Chunks>().index = 14;
+                    }
+                    else if (i == 2)
+                    {
+                        if (i == size)
+                            field[startX + i, startY].GetComponent<Chunks>().index = 18;
+                        else field[startX + i, startY].GetComponent<Chunks>().index = 16;
+                    }
+                    else if (i == 3)
+                    {
+                        field[startX + i, startY].GetComponent<Chunks>().index = 18;
+                    }
+                    for (int j = 0; j < 8; j++)
+                        if (startX + i + dir[j][0] >= 0 && startX + i + dir[j][0] <= 9 && startY + dir[j][1] >= 0 && startY + dir[j][1] <= 9)
+                            if (field[startX + i + dir[j][0], startY + dir[j][1]].GetComponent<Chunks>().index == 0)
+                                field[startX + i + dir[j][0], startY + dir[j][1]].GetComponent<Chunks>().index = 9;
+                }
+                if (type == "v")
+                {
+                    if (i == 0)
+                    {
+                        field[startX, startY + i].GetComponent<Chunks>().index = 13;
+                    }
+                    else if (i == 1)
+                    {
+                        if (i == size)
+                            field[startX, startY + i].GetComponent<Chunks>().index = 19;
+                        else field[startX, startY + i].GetComponent<Chunks>().index = 15;
+                    }
+                    else if (i == 2)
+                    {
+                        if (i == size)
+                            field[startX, startY + i].GetComponent<Chunks>().index = 19;
+                        else field[startX, startY + i].GetComponent<Chunks>().index = 17;
+                    }
+                    else if (i == 3)
+                    {
+                        field[startX, startY + i].GetComponent<Chunks>().index = 19;
+                    }
+                    for (int j = 0; j < 8; j++)
+                        if (startX + dir[j][0] >= 0 && startX + dir[j][0] <= 9 && startY + i + dir[j][1] >= 0 && startY + i + dir[j][1] <= 9)
+                            if (field[startX + dir[j][0], startY + i + dir[j][1]].GetComponent<Chunks>().index == 0)
+                                field[startX + dir[j][0], startY + i + dir[j][1]].GetComponent<Chunks>().index = 9;
+                }
+            }
+        }
+    }
+>>>>>>> Stashed changes
 
     void Start()
     {
