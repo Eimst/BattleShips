@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading;
+using Random = UnityEngine.Random;
 using TMPro;
+using System;
+using static Field;
 
 public class GameManager : MonoBehaviour 
 {
@@ -26,6 +29,8 @@ public class GameManager : MonoBehaviour
     }
 
     public GameState currentState = GameState.Setup;
+
+    bool isBotTurnHandled = false;
 
 
     void Awake()
@@ -79,11 +84,9 @@ public class GameManager : MonoBehaviour
 
             case GameState.BotTurn:
                 if (!isBotTurnHandled)
-                {
                     StartCoroutine(HandleBotTurn());
-                    isBotTurnHandled = true; // Ensure it's not repeatedly called
-                }
                 break;
+
              case GameState.GameOver:
                 textMeshProUGUI.text = playerFieldInstance.GetRemainingBoats() == 0 ? "You lost!" : "You Win!";
                 textMeshProUGUI.gameObject.SetActive(true);
@@ -116,17 +119,16 @@ public class GameManager : MonoBehaviour
         if (active && !isSelectionScene && Input.GetMouseButtonDown(0)) // Check for left click
         {
             TileClicked(hit.collider.gameObject, rayPos);
-            if (!Kill(hit.collider.gameObject.name, botFieldInstance))
-                currentState = GameState.BotTurn;
+            StateHandler(Destroy(hit.collider.gameObject.name, botFieldInstance), true); 
         }
         else if(active && isSelectionScene)
         {
-            TileClicked(hit.collider.gameObject, rayPos); // 
+            TileClicked(hit.collider.gameObject, rayPos); 
             if (Input.GetMouseButtonDown(0))
             {
-                Kill(hit.collider.gameObject.name, playerFieldInstance);
+                Destroy(hit.collider.gameObject.name, playerFieldInstance);
                 playerFieldInstance.ship4Tiles = false;
-                // Laivo istatymo algoritmas vietoj kill
+                // Laivo istatymo algoritmas vietoj destroy
             }
                 
         }
@@ -153,26 +155,57 @@ public class GameManager : MonoBehaviour
     }
 
 
-    bool isBotTurnHandled = false; 
-
     IEnumerator HandleBotTurn()
     {
-        yield return new WaitForSeconds(1); 
-
-        if (!Kill(botFieldInstance.ApplyShot(), playerFieldInstance))
+        isBotTurnHandled = true;
+        yield return new WaitForSeconds(0.7f);
+        Field.DestroyResult result;
+        do
         {
-            currentState = GameState.PlayerTurn;
-        }
+            result = Destroy(botFieldInstance.ApplyShot(), playerFieldInstance);
 
-        isBotTurnHandled = false; 
+        } while (result == Field.DestroyResult.IllegalMove);
+
+        StateHandler(result, false);
+
+        isBotTurnHandled = false;
+
     }
 
 
-    bool Kill(string coordinates, IKillable instance)
+    void StateHandler(Field.DestroyResult result, bool isPlayer)
+    {
+        switch (result)
+        {
+            case DestroyResult.Success:
+                // Handle success (move hit something)
+                break;
+
+            case DestroyResult.Failure:
+                // Handle failure (move hit water)
+                if(isPlayer)
+                    currentState = GameState.BotTurn;
+                else
+                    currentState = GameState.PlayerTurn;
+                break;
+
+            case DestroyResult.IllegalMove:
+                // Handle illegal move
+                Debug.Log("Illegal move attempted.");
+                if (isPlayer)
+                    currentState = GameState.PlayerTurn;
+                else
+                    currentState = GameState.BotTurn;
+                break;
+        }
+    }
+
+
+    Field.DestroyResult Destroy(string coordinates, IKillable instance)
     {
         int x = int.Parse(coordinates.Split(' ')[0]);
         int y = int.Parse(coordinates.Split(' ')[1]);
-        return instance.Kill(x, y);
+        return instance.Destroy(x, y);
     }
 
 
