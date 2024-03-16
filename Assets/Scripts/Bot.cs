@@ -48,7 +48,6 @@ public class Bot : MonoBehaviour, IKillable
         return remainingBoats;
     }
 
-
     // Update is called once per frame
     void Update()
     {
