@@ -563,6 +563,111 @@ public class Field : MonoBehaviour
         }
     }
 
+    public bool DespawnShip(int x, int y, ref int size, ref bool isVert)
+    {
+        if (field[x, y].GetComponent<Chunks>().index == 0)
+        {
+            return false;
+        }
+        DespawnShipRecursive(0, x, y, ref size, ref isVert);
+        shipsCount[size - 1]++;
+        int revovedNum = shipsArray[x, y];
+        int xstart = x - size < 0 ? 0 : x - size;
+        int ystart = y - size < 0 ? 0 : y - size;
+        int xend = x + size > 10 ? 10 : x + size;
+        int yend = y + size > 10 ? 10 : y + size;
+        int xEndBou = -1;
+        int xStartBou = 11;
+        int yEndBou = -1;
+        int yStartBou = 11;
+        for (int i = xstart; i < xend; i++)
+        {
+            for (int j = ystart; j < yend; j++)
+            {
+                if (shipsArray[i, j] == revovedNum) 
+                { 
+                    shipsArray[i, j] = 0;
+                    fieldArray[i, j] = 0;
+                    if (xStartBou > i - 1) { xStartBou = i - 1; }
+                    if (yStartBou > j - 1) { yStartBou = j - 1; }
+                    if (xEndBou < i + 1) { xEndBou = i + 1; }
+                    if (yEndBou < j + 1) { yEndBou = j + 1; }
+                };
+            }
+        }
+        xEndBou = xEndBou + 1 > 10 ? 10 : xEndBou + 1;
+        yEndBou = yEndBou + 1 > 10 ? 10 : yEndBou + 1;
+        for (int i = xStartBou < 0 ? 0 : xStartBou; i < xEndBou; i++)
+        {
+            for (int j = yStartBou < 0 ? 0 : yStartBou; j < yEndBou; j++)
+            {
+                xstart = i - 1 < 0 ? 0 : i - 1;
+                ystart = j - 1 < 0 ? 0 : j - 1;
+                xend = i + 2 > 10 ? 10 : i + 2;
+                yend = j + 2 > 10 ? 10 : j + 2;
+                fieldArray[i, j] = Update9x9(shipsArray, xstart, ystart, xend, yend);
+            }
+        }
+        return true;
+    }
+
+    private int Update9x9(int[,] array, int sx, int sy, int ex, int ey)
+    {
+        int num = 0;
+        for (int i = sx; i < ex; i++)
+        {
+            for (int j = sy; j < ey; j++)
+            {
+                if (array[i, j] > 0) { return 1; }
+            }
+        }
+        return num;
+    }
+
+
+    private void DespawnShipRecursive(int direction, int x, int y, ref int size, ref bool isVert)
+    {
+
+        if(x<0 || x>9 || y < 0 || y> 9)
+        {
+            return;
+        }
+        Chunks chunk = field[x, y].GetComponent<Chunks>();
+        if (chunk.index == 0)
+        {
+            return;
+        }
+
+        if (direction == 1 || direction == 3) { isVert = false; }
+        if (direction == 2 || direction == 4) { isVert = true; }
+        size++;
+        chunk.index = 0;
+
+        switch (direction)
+        {
+            case 0:
+                DespawnShipRecursive(1, x-1, y, ref size, ref isVert);
+                DespawnShipRecursive(2, x, y-1, ref size, ref isVert);
+                DespawnShipRecursive(3, x+1, y, ref size, ref isVert);
+                DespawnShipRecursive(4, x, y+1, ref size, ref isVert);
+                break;
+            case 1:
+                DespawnShipRecursive(1, x - 1, y, ref size, ref isVert);
+                break;
+            case 2:
+                DespawnShipRecursive(2, x, y - 1, ref size, ref isVert);
+                break;
+            case 3:
+                DespawnShipRecursive(3, x + 1, y, ref size, ref isVert);
+                break;
+            case 4:
+                DespawnShipRecursive(4, x, y + 1, ref size, ref isVert);
+                break;
+            default:
+                break;
+        }
+        return;
+    }
 
     void Start()
     {
