@@ -60,13 +60,8 @@
     <Analyzer Include="D:\2022.3.20f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< Updated upstream
-    <Compile Include="Assets\Scripts\ChangeLayerPriority.cs" />
-=======
-    <Compile Include="Assets\Scripts\SpriteScripts\BackgroundScrolling.cs" />
-    <Compile Include="Assets\Scripts\ImageChangers\ImageChanger1.cs" />
     <Compile Include="Assets\Scripts\SpriteScripts\Scroller.cs" />
->>>>>>> Stashed changes
+    <Compile Include="Assets\Scripts\ChangeLayerPriority.cs" />
     <Compile Include="Assets\Scripts\MainMenuButtons.cs" />
     <Compile Include="Assets\Scripts\Field.cs" />
     <Compile Include="Assets\Scripts\Chunks.cs" />
@@ -75,16 +70,9 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\BackgroundMovement.cs" />
     <Compile Include="Assets\Scripts\Bot.cs" />
-<<<<<<< Updated upstream
     <Compile Include="Assets\Scripts\BackgroundScrolling.cs" />
     <Compile Include="Assets\Scripts\BgScroll.cs" />
-=======
-    <Compile Include="Assets\Scripts\ImageChangers\ImageChanger2.cs" />
-    <Compile Include="Assets\Scripts\SpriteScripts\BackgroundMovement.cs" />
-    <Compile Include="Assets\Scripts\SpriteChanger.cs" />
->>>>>>> Stashed changes
     <Compile Include="Assets\Scripts\IKillable.cs" />
-    <Compile Include="Assets\Scripts\SpriteScripts\BgScroll.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
