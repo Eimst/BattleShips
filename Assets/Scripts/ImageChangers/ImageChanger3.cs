@@ -27,7 +27,7 @@ public class ImageChanger3 : MonoBehaviour
         {
             if (currentImageIndex < 1)
             {
-                if (field.shipsCount[2] - correc == 0)
+                if (field.shipsCount[2] - correc < 1)
                 {
                     currentImageIndex = 1;
                     ChangeSprite(1);
@@ -51,9 +51,13 @@ public class ImageChanger3 : MonoBehaviour
 
     public void OnClick()
     {
-        SpriteChanger script = FindObjectOfType<SpriteChanger>();
-        script.currentSpriteIndex = 5;
-        script.ChangeSprite(5);
-        script.isRotated = false;
+        Field field = FindObjectOfType<Field>();
+        if (field.shipsCount[2] > 0)
+        {
+            SpriteChanger script = FindObjectOfType<SpriteChanger>();
+            script.currentSpriteIndex = 5;
+            script.ChangeSprite(5);
+            script.isRotated = false;
+        }
     }
 }
