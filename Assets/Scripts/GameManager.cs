@@ -62,7 +62,6 @@ public class GameManager : MonoBehaviour
         botFieldInstance.gameObject.SetActive(false);
         textMeshProUGUI.transform.SetParent(transform);
         textMeshProUGUI.gameObject.SetActive(false);
-
     }
 
 
@@ -88,7 +87,8 @@ public class GameManager : MonoBehaviour
                 break;
 
              case GameState.GameOver:
-                textMeshProUGUI.text = playerFieldInstance.GetRemainingBoats() == 0 ? "You lost!" : "You Win!";
+                textMeshProUGUI.text = playerFieldInstance.GetRemainingBoats() == 0 ? "You Lost!" : "You Won!";
+                textMeshProUGUI.gameObject.transform.localPosition = new Vector3(-500, 135, 0);
                 textMeshProUGUI.gameObject.SetActive(true);
                 break;
         }
@@ -228,12 +228,13 @@ public class GameManager : MonoBehaviour
             case "BattleScene":
                 if (botFieldInstance != null)
                 {
+                    botFieldInstance.transform.position = new Vector3(1, 6, 0);
                     botFieldInstance.gameObject.SetActive(true); // Activate bot
                 }
                 if (playerFieldInstance != null)
                 {
                     // Set player's position to a different vector in the third scene
-                    playerFieldInstance.transform.position = new Vector3(-12, 5, 0);
+                    playerFieldInstance.transform.position = new Vector3(-11, 6, 0);
                 }
 
                 currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
@@ -254,7 +255,9 @@ public class GameManager : MonoBehaviour
     public void GoToBattle()
     {
         if (playerFieldInstance.AreAllSpawned())
+        {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
     }
 }
 
