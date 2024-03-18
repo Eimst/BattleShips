@@ -22,7 +22,7 @@ public class SpriteChanger : MonoBehaviour
     void Update()
     {
         // if left mouse button pressed changes sprite
-        if (Input.GetMouseButtonDown(1) && currentSpriteIndex>0)
+        if (Input.GetMouseButtonDown(1) && currentSpriteIndex > 0)
         {
             if (isRotated)
             {
@@ -34,8 +34,14 @@ public class SpriteChanger : MonoBehaviour
             {
                 currentSpriteIndex++;
                 ChangeSprite(currentSpriteIndex);
-                isRotated=true;
+                isRotated = true;
             }
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) && currentSpriteIndex > 0)
+        {
+            currentSpriteIndex = 0;
+            ChangeSprite(currentSpriteIndex);
+            isRotated = false;
         }
     }
 
