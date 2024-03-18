@@ -89,7 +89,15 @@ public class Mouse : MonoBehaviour
             else { script.isRotated = false; }
             script.ChangeSprite(script.currentSpriteIndex);
         }
-        Debug.Log(size);
+        //Debug.Log(size);
+    }
+
+    public void onClick()
+    {
+        SpriteChanger script = FindObjectOfType<SpriteChanger>();
+        script.currentSpriteIndex = 0;
+        script.ChangeSprite(0);
+        script.isRotated = false;
     }
 
     //Changes mouse coordinates to world coordinates
