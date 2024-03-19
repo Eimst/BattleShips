@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger1.cs" />
     <Compile Include="Assets\Scripts\SpriteScripts\Scroller.cs" />
+    <Compile Include="Assets\Scripts\ChangeLayerPriority.cs" />
     <Compile Include="Assets\Scripts\MainMenuButtons.cs" />
     <Compile Include="Assets\Scripts\Field.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger4.cs" />
@@ -72,8 +73,11 @@
     <Compile Include="Assets\Scripts\ReturnToMenuButton.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\BackgroundMovement.cs" />
     <Compile Include="Assets\Scripts\Bot.cs" />
+    <Compile Include="Assets\Scripts\BackgroundScrolling.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger2.cs" />
+    <Compile Include="Assets\Scripts\BgScroll.cs" />
     <Compile Include="Assets\Scripts\SpriteChanger.cs" />
     <Compile Include="Assets\Scripts\IKillable.cs" />
   </ItemGroup>

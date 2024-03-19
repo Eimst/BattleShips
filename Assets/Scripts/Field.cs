@@ -20,7 +20,7 @@ public class Field : MonoBehaviour
     public int currShipNum = 1;
     public int[,] shipsArray;
 
-    public int[] shipsCount = new int[] { 4, 3, 2, 1};
+    public int[] shipsCount;
 
     public enum DestroyResult
     {
@@ -58,6 +58,7 @@ public class Field : MonoBehaviour
                 }
             }
         }
+        shipsCount = new int[] { 4, 3, 2, 1 };
         letters = new GameObject[fieldLength];
         numbers = new GameObject[fieldLength];
         field = new GameObject[fieldLength, fieldLength];

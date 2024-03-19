@@ -28,7 +28,7 @@ public class Player : MonoBehaviour, IKillable
         Debug.Log("Triggered");
         if (field != null)
         {
-            field.CreateField();
+            ResetField();
             field.SpawnAllShips();
             Debug.Log("RandomPositionGenerator called.");
         }
@@ -38,6 +38,11 @@ public class Player : MonoBehaviour, IKillable
         }
     }
 
+
+    public void ResetField()
+    {
+        field.CreateField();
+    }
 
     public bool AreAllSpawned()
     {
