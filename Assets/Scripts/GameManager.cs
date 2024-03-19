@@ -67,23 +67,18 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if(playerFieldInstance.GetRemainingBoats() == 0 || botFieldInstance.GetRemainingBoats() == 0)
-            currentState = GameState.GameOver;
 
         switch (currentState)
         {
-            case GameState.Setup:
-                if (SceneManager.GetActiveScene().name.Equals("ShipSelectionScene") && playerFieldInstance.ship4Tiles) // jei paspaustas laivas galima slankioti ir padejus nusispalvina langelis
-                    MouseTrajectory(true);
-                break;
-
             case GameState.PlayerTurn:
-                MouseTrajectory(false);
+                MouseTrajectory();
+                IsGameOver();
                 break;
 
             case GameState.BotTurn:
                 if (!isBotTurnHandled)
                     StartCoroutine(HandleBotTurn());
+                IsGameOver();
                 break;
 
              case GameState.GameOver:
@@ -95,42 +90,36 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void MouseTrajectory(bool isSelectionScene) //  Y pozicija visada tokia pati
+    void IsGameOver()
+    {
+        if (playerFieldInstance.GetRemainingBoats() == 0 || botFieldInstance.GetRemainingBoats() == 0)
+            currentState = GameState.GameOver;
+    }
+
+
+    void MouseTrajectory() //  Y pozicija visada tokia pati
     {
         int boardStartX;
         int boardEndX;
 
-        boardStartX = isSelectionScene ? -5 : 2;
-        boardEndX = isSelectionScene ? 5 : 12;
+        boardStartX = 2;
+        boardEndX = 12;
 
         Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero);
-        bool active = false;
         if (hit.collider != null)
         {
 
             if (hit.collider.transform.position.x >= boardStartX && hit.collider.transform.position.x <= boardEndX &&
                 hit.collider.transform.position.y <= 5 && hit.collider.transform.position.y >= -5)
             {
-                active = true;
-            }
-        }
-
-        if (active && !isSelectionScene && Input.GetMouseButtonDown(0)) // Check for left click
-        {
-            TileClicked(hit.collider.gameObject, rayPos);
-            StateHandler(Destroy(hit.collider.gameObject.name, botFieldInstance), true); 
-        }
-        else if(active && isSelectionScene)
-        {
-            TileClicked(hit.collider.gameObject, rayPos); 
-            if (Input.GetMouseButtonDown(0))
-            {
-                Destroy(hit.collider.gameObject.name, playerFieldInstance);
-                playerFieldInstance.ship4Tiles = false;
-                // Laivo istatymo algoritmas vietoj destroy
-            }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    TileClicked(hit.collider.gameObject, rayPos);
+                    StateHandler(Destroy(hit.collider.gameObject.name, botFieldInstance), true);
+                }
                 
+            }
         }
     }
 
@@ -142,15 +131,8 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void setShip4Tiles()
-    {
-        playerFieldInstance.ship4Tiles = true;
-    }
-
-
     public void GeneratePosition()
     {
-        playerFieldInstance.ship4Tiles = false;
         playerFieldInstance.RandomPositionGenerator();
     }
 

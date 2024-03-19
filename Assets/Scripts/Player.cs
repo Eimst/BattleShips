@@ -8,8 +8,6 @@ public class Player : MonoBehaviour, IKillable
 
     public int remainingBoats = 20;
 
-    public bool ship4Tiles { get; set; }
-
 
     void Awake()
     {
