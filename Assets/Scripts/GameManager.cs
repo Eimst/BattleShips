@@ -137,6 +137,12 @@ public class GameManager : MonoBehaviour
     }
 
 
+    public void ResetField()
+    {
+        playerFieldInstance.ResetField();
+    }
+
+
     IEnumerator HandleBotTurn()
     {
         isBotTurnHandled = true;
