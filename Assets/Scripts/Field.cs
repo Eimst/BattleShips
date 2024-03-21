@@ -109,117 +109,36 @@ public class Field : MonoBehaviour
         }
     }
 
-
-    /*
-    public bool IsPlaceValid(int x1, int y1, int x2, int y2, bool horizontal)
+    public bool ChangeSprite(GameObject coordinates)
     {
-        List<int> index = new List<int> {1,3,5,7,2,4,6,8};
-        int startP;
-        int endP;
-
-        if (horizontal)
+        int x = int.Parse(coordinates.name.Split(' ')[0]);
+        int y = int.Parse(coordinates.name.Split(' ')[1]);
+        if (field[x, y].GetComponent<Chunks>().index == 20)
         {
-            if (x1 + x2 > 9 || y1 > 9) return false;
-            startP = x1 - 1 >= 0 ? x1 - 1 : x1;
-            endP = x2 + 1 < 10 ? x2 + 1 : x2;
+            field[x, y].GetComponent<Chunks>().index = 0;
         }
-        else
-        {
-            if (y1 + y2 > 9 || x1 > 9) return false;
-            startP = y1 - 1 >= 0 ? y1 - 1 : y1;
-            endP = y2 + 1 < 10 ? y2 + 1 : y2;
-        }
-        for (int i = startP; i <= endP; i++)
-        {
-            for (int j = -1; j <= 1; j++)
-            {
-                if (horizontal)
-                {
-                    if (y1 + j < 0 || y1 + j > 9)
-                        continue;
-
-                    if (index.Contains(field[i, y1 + j].GetComponent<Chunks>().index))
-                        return false;
-                }
-                else
-                {
-                    if (x1 + j < 0 || x1 + j > 9)
-                        continue;
-
-                    if (index.Contains(field[x1 + j, i].GetComponent<Chunks>().index))
-                        return false;
-                }
-            }
            
+        else if (field[x, y].GetComponent<Chunks>().index == 0)
+        {
+            field[x, y].GetComponent<Chunks>().index = 20;
+            return true;
         }
-        return true;
+        return false;    
     }
 
 
-    public void EnterShip1(int x1, int y1, bool horizontal, int k)
+    public void MaskField()
     {
-        if (k == 4)
+        for (int i = 0; i < fieldLength; i++)
         {
-            if(horizontal)
+            for (int j = 0; j < fieldLength; j++)
             {
-                field[x1, y1].GetComponent<Chunks>().index = 1;
-                field[x1 + 1, y1].GetComponent<Chunks>().index = 3;
-                field[x1 + 2, y1].GetComponent<Chunks>().index = 5;
-                field[x1 + 3, y1].GetComponent<Chunks>().index = 7;
-            }
-            else
-            {
-                field[x1, y1].GetComponent<Chunks>().index = 2;
-                field[x1, y1 + 1].GetComponent<Chunks>().index = 4;
-                field[x1, y1 + 2].GetComponent<Chunks>().index = 6;
-                field[x1, y1 + 3].GetComponent<Chunks>().index = 8;
-            }
-            
-        }
-        else if(k == 3)
-        {
-            if (horizontal)
-            {
-                field[x1, y1].GetComponent<Chunks>().index = 1;
-                field[x1 + 1, y1].GetComponent<Chunks>().index = 5;
-                field[x1 + 2, y1].GetComponent<Chunks>().index = 7;
-            }
-            else
-            {
-                field[x1, y1].GetComponent<Chunks>().index = 2;
-                field[x1, y1 + 1].GetComponent<Chunks>().index = 6;
-                field[x1, y1 + 2].GetComponent<Chunks>().index = 8;
-            }
-
-        }
-        else if(k == 2)
-        {
-            if (horizontal)
-            {
-                field[x1, y1].GetComponent<Chunks>().index = 1;
-                field[x1 + 1, y1].GetComponent<Chunks>().index = 7;
-            }
-            else
-            {
-                field[x1, y1].GetComponent<Chunks>().index = 2;
-                field[x1, y1 + 1].GetComponent<Chunks>().index = 8;
+                field[i, j].GetComponent<Chunks>().index = 0;
             }
         }
-        else
-        {
-            if (horizontal)
-            {
-                field[x1, y1].GetComponent<Chunks>().index = 1;
-            }
-            else
-            {
-                field[x1, y1].GetComponent<Chunks>().index = 2;
-            }
-        }
-        field[x1, y1].GetComponent<Chunks>().UpdateLetter();
     }
-    */
 
+   
 
     public bool IsWrongPlace(int x1, int y1, int x2, int y2)
     {
@@ -421,15 +340,14 @@ public class Field : MonoBehaviour
         int[] illegalIndexes = new int[] { 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 };
         if (illegalIndexes.Contains(field[x1, y1].GetComponent<Chunks>().index))
             return DestroyResult.IllegalMove;
-
-        if (field[x1, y1].GetComponent<Chunks>().index == 0)
-        {
-            field[x1, y1].GetComponent<Chunks>().index = 9;
-            return DestroyResult.Failure;
-        }
             
         else 
         {
+            if (shipsArray[x1, y1] == 0)
+            {
+                field[x1, y1].GetComponent<Chunks>().index = 9;
+                return DestroyResult.Failure;
+            }
             field[x1, y1].GetComponent<Chunks>().index = 10;
             if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
                 DestroyAllShip(x1, y1, shipsArray[x1, y1]);
