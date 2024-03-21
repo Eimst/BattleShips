@@ -21,6 +21,7 @@ public class Bot : MonoBehaviour, IKillable
         field.transform.SetParent(transform);
         field.CreateField();
         field.SpawnAllShips();
+        field.MaskField();
     }
 
 
@@ -46,6 +47,12 @@ public class Bot : MonoBehaviour, IKillable
     public int GetRemainingBoats()
     {
         return remainingBoats;
+    }
+
+
+    public Field GetField()
+    {
+        return field;
     }
 
     // Update is called once per frame

@@ -78,6 +78,7 @@
     <Compile Include="Assets\Scripts\BackgroundScrolling.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger2.cs" />
     <Compile Include="Assets\Scripts\BgScroll.cs" />
+    <Compile Include="Assets\Scripts\CursorChanger.cs" />
     <Compile Include="Assets\Scripts\SpriteChanger.cs" />
     <Compile Include="Assets\Scripts\IKillable.cs" />
   </ItemGroup>

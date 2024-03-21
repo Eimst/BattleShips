@@ -20,6 +20,10 @@ public class GameManager : MonoBehaviour
 
     public TextMeshProUGUI textMeshProUGUI;
 
+    private GameObject lastHoveredTile = null;
+
+    CursorChanger cursor;
+
     public enum GameState
     {
         Setup,
@@ -62,6 +66,8 @@ public class GameManager : MonoBehaviour
         botFieldInstance.gameObject.SetActive(false);
         textMeshProUGUI.transform.SetParent(transform);
         textMeshProUGUI.gameObject.SetActive(false);
+
+        cursor = FindObjectOfType<CursorChanger>();
     }
 
 
@@ -113,21 +119,40 @@ public class GameManager : MonoBehaviour
             if (hit.collider.transform.position.x >= boardStartX && hit.collider.transform.position.x <= boardEndX &&
                 hit.collider.transform.position.y <= 5 && hit.collider.transform.position.y >= -5)
             {
+                GameObject currentTile = hit.collider.gameObject;
+
+                if (currentTile != lastHoveredTile)
+                {
+                    if (lastHoveredTile != null)
+                    {
+                        botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+                    }
+
+                    if (botFieldInstance.GetField().ChangeSprite(currentTile))
+                        cursor.ChangeCursor(true);
+                    else
+                        cursor.ChangeCursor(false);
+
+                    lastHoveredTile = currentTile;
+                }
+
+
                 if (Input.GetMouseButtonDown(0))
                 {
-                    TileClicked(hit.collider.gameObject, rayPos);
-                    StateHandler(Destroy(hit.collider.gameObject.name, botFieldInstance), true);
+                    cursor.ChangeCursor(false);
+                    botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+                    StateHandler(Destroy(currentTile.name, botFieldInstance), true);
+                    return;
                 }
-                
+
             }
         }
-    }
-
-
-    void TileClicked(GameObject tile, Vector2 clickPosition)
-    {
-        // This function logs the clicked tile's name and position.
-        Debug.Log($"Tile clicked: {tile.name} at position {clickPosition}");
+        else if (lastHoveredTile != null)
+        {
+            botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+            lastHoveredTile = null;
+            cursor.ChangeCursor(false);
+        }
     }
 
 
