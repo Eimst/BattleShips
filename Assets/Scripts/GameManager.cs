@@ -173,7 +173,7 @@ public class GameManager : MonoBehaviour
     IEnumerator HandleBotTurn()
     {
         isBotTurnHandled = true;
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.2f);
         Field.DestroyResult result;
         do
         {
@@ -193,7 +193,6 @@ public class GameManager : MonoBehaviour
         switch (result)
         {
             case DestroyResult.Success:
-                SpawnText();
                 break;
 
             case DestroyResult.Failure:
@@ -221,11 +220,11 @@ public class GameManager : MonoBehaviour
     {
         if (currentState == GameState.PlayerTurn && previousState == GameState.BotTurn)
         {
-            textUIM.FadeInTextPlayerTurn(1.2f);
+            textUIM.FadeInTextPlayerTurn(0.6f);
         }
         else if (currentState == GameState.BotTurn && previousState == GameState.PlayerTurn)
         {
-            textUIM.FadeOutTextPlayerTurn(1f);
+            textUIM.FadeOutTextPlayerTurn(0.6f);
         }
     }
 
