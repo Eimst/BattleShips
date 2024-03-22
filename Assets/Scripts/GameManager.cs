@@ -18,11 +18,12 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
-    public TextMeshProUGUI textMeshProUGUI;
+    private UIManager textUIM;
 
     private GameObject lastHoveredTile = null;
 
     CursorChanger cursor;
+
 
     public enum GameState
     {
@@ -33,6 +34,8 @@ public class GameManager : MonoBehaviour
     }
 
     public GameState currentState = GameState.Setup;
+
+    private GameState previousState;
 
     bool isBotTurnHandled = false;
 
@@ -64,8 +67,6 @@ public class GameManager : MonoBehaviour
         botFieldInstance = Instantiate(botFieldPrefab, new Vector3(2, 5, 0), Quaternion.identity);
         botFieldInstance.transform.SetParent(transform);
         botFieldInstance.gameObject.SetActive(false);
-        textMeshProUGUI.transform.SetParent(transform);
-        textMeshProUGUI.gameObject.SetActive(false);
 
         cursor = FindObjectOfType<CursorChanger>();
     }
@@ -73,7 +74,6 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-
         switch (currentState)
         {
             case GameState.PlayerTurn:
@@ -88,12 +88,15 @@ public class GameManager : MonoBehaviour
                 break;
 
              case GameState.GameOver:
-                textMeshProUGUI.text = playerFieldInstance.GetRemainingBoats() == 0 ? "You Lost!" : "You Won!";
-                textMeshProUGUI.gameObject.transform.localPosition = new Vector3(-500, 135, 0);
-                textMeshProUGUI.gameObject.SetActive(true);
+                if (playerFieldInstance.GetRemainingBoats() == 0)
+                    StartCoroutine(LoadSceneWithDelay("DefeatScene"));
+                else
+                    StartCoroutine(LoadSceneWithDelay("VictoryScene"));
                 break;
         }
+        previousState = currentState;
     }
+
 
 
     void IsGameOver()
@@ -142,7 +145,6 @@ public class GameManager : MonoBehaviour
                     cursor.ChangeCursor(false);
                     botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
                     StateHandler(Destroy(currentTile.name, botFieldInstance), true);
-                    return;
                 }
 
             }
@@ -171,7 +173,7 @@ public class GameManager : MonoBehaviour
     IEnumerator HandleBotTurn()
     {
         isBotTurnHandled = true;
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(1f);
         Field.DestroyResult result;
         do
         {
@@ -191,15 +193,16 @@ public class GameManager : MonoBehaviour
         switch (result)
         {
             case DestroyResult.Success:
-                // Handle success (move hit something)
+                SpawnText();
                 break;
 
             case DestroyResult.Failure:
                 // Handle failure (move hit water)
-                if(isPlayer)
+                if (isPlayer)
                     currentState = GameState.BotTurn;
                 else
                     currentState = GameState.PlayerTurn;
+                SpawnText();
                 break;
 
             case DestroyResult.IllegalMove:
@@ -212,6 +215,20 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+
+
+    void SpawnText()
+    {
+        if (currentState == GameState.PlayerTurn && previousState == GameState.BotTurn)
+        {
+            textUIM.FadeInTextPlayerTurn(1.2f);
+        }
+        else if (currentState == GameState.BotTurn && previousState == GameState.PlayerTurn)
+        {
+            textUIM.FadeOutTextPlayerTurn(1f);
+        }
+    }
+
 
 
     Field.DestroyResult Destroy(string coordinates, IKillable instance)
@@ -236,32 +253,38 @@ public class GameManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        switch (scene.name)
+        if (scene.name.Equals("BattleScene"))
         {
-            case "BattleScene":
-                if (botFieldInstance != null)
-                {
-                    botFieldInstance.transform.position = new Vector3(1, 6, 0);
-                    botFieldInstance.gameObject.SetActive(true); // Activate bot
-                }
-                if (playerFieldInstance != null)
-                {
-                    // Set player's position to a different vector in the third scene
-                    playerFieldInstance.transform.position = new Vector3(-11, 6, 0);
-                }
+            if (botFieldInstance != null)
+            {
+                botFieldInstance.transform.position = new Vector3(1, 6, 0);
+                botFieldInstance.gameObject.SetActive(true); // Activate bot
+            }
+            if (playerFieldInstance != null)
+            {
+                // Set player's position to a different vector in the third scene
+                playerFieldInstance.transform.position = new Vector3(-11, 6, 0);
+            }
 
-                currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
-
-                Canvas canvas = FindObjectOfType<Canvas>(); // Find the active canvas
-                if (canvas != null && textMeshProUGUI != null)
-                {
-                    textMeshProUGUI.transform.position = new Vector3(-210, 150, 0);
-                    textMeshProUGUI.transform.SetParent(canvas.transform, false); // False to keep local orientation
-                }
-                break;
-
-            // Switch for future scenes.
+            currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
+            previousState = currentState == GameState.PlayerTurn ? GameState.BotTurn : GameState.PlayerTurn;
+            textUIM = FindObjectOfType<UIManager>();
+            SpawnText();
         }
+    }
+
+
+    IEnumerator LoadSceneWithDelay(string sceneName)
+    {
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+
+        Destroy(instance.gameObject);
+        instance = null;
     }
 
 
