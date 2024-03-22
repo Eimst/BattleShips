@@ -15,4 +15,9 @@ public class ReturnToMenuButton : MonoBehaviour
         }
         SceneManager.LoadScene("MainMenu");
     }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene("ShipSelectionScene");
+    }
 }
