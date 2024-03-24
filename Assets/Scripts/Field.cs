@@ -588,6 +588,177 @@ public class Field : MonoBehaviour
         return;
     }
 
+    public void ShowBotShips()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                if (shipsArray[i, j] > 0 && field[i, j].GetComponent<Chunks>().index == 0)
+                {
+                    field[i, j].GetComponent<Chunks>().index = ShipPartIndex(i, j);
+                    field[i, j].GetComponent<Chunks>().BlinkSprites();
+                }
+            }
+        }
+    }
+
+    private int ShipPartIndex(int x, int y)
+    {
+        int size = 0;
+        bool isVert = false;
+        FindSizeDirection(0, x, y, ref size, ref isVert);
+        if (size == 1)
+        {
+            return 1;
+        }
+        else if (isVert)
+        {
+            switch (size)
+            {
+                case 2:
+                    if (y - 1 < 0 || shipsArray[x, y - 1] == 0)
+                    {
+                        return 2;
+                    }
+                    else
+                    {
+                        return 8;
+                    }
+                    break;
+                case 3:
+                    if (y - 1 < 0 || shipsArray[x, y - 1] == 0)
+                    {
+                        return 2;
+                    }
+                    else if (y + 1 > 9 || shipsArray[x, y + 1] == 0)
+                    {
+                        return 8;
+                    }
+                    else
+                    {
+                        return 4;
+                    }
+                    break;
+                default:
+                    if (y - 1 < 0 || shipsArray[x, y - 1] == 0)
+                    {
+                        return 2;
+                    }
+                    else if (y + 1 > 9 || shipsArray[x, y + 1] == 0)
+                    {
+                        return 8;
+                    }
+                    else if (y + 1 <= 9 && shipsArray[x, y + 1] != 0)
+                    {
+                        if (y + 2 > 9 || shipsArray[x, y + 2] == 0)
+                        {
+                            return 6;
+                        }
+                        else
+                        {
+                            return 4;
+                        }
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            switch (size)
+            {
+                case 2:
+                    if (x - 1 < 0 || shipsArray[x - 1, y] == 0)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 7;
+                    }
+                    break;
+                case 3:
+                    if (x - 1 < 0 || shipsArray[x - 1, y] == 0)
+                    {
+                        return 1;
+                    }
+                    else if (x + 1 > 9 || shipsArray[x + 1, y] == 0)
+                    {
+                        return 7;
+                    }
+                    else
+                    {
+                        return 3;
+                    }
+                    break;
+                default:
+                    if (x - 1 < 0 || shipsArray[x - 1, y] == 0)
+                    {
+                        return 1;
+                    }
+                    else if (x + 1 > 9 || shipsArray[x + 1, y] == 0)
+                    {
+                        return 7;
+                    }
+                    else if (x + 1 <= 9 && shipsArray[x + 1, y] != 0)
+                    {
+                        if (x + 2 > 9 || shipsArray[x + 2, y] == 0)
+                        {
+                            return 5;
+                        }
+                        else
+                        {
+                            return 3;
+                        }
+                    }
+                    break;
+            }
+        }
+        return 10;
+    }
+
+    public void FindSizeDirection(int direction, int x, int y, ref int size, ref bool isVert)
+    {
+
+        if (x < 0 || x > 9 || y < 0 || y > 9)
+        {
+            return;
+        }
+        if (shipsArray[x, y] == 0)
+        {
+            return;
+        }
+
+        if (direction == 1 || direction == 3) { isVert = false; }
+        if (direction == 2 || direction == 4) { isVert = true; }
+        size++;
+
+        switch (direction)
+        {
+            case 0:
+                FindSizeDirection(1, x - 1, y, ref size, ref isVert);
+                FindSizeDirection(2, x, y - 1, ref size, ref isVert);
+                FindSizeDirection(3, x + 1, y, ref size, ref isVert);
+                FindSizeDirection(4, x, y + 1, ref size, ref isVert);
+                break;
+            case 1:
+                FindSizeDirection(1, x - 1, y, ref size, ref isVert);
+                break;
+            case 2:
+                FindSizeDirection(2, x, y - 1, ref size, ref isVert);
+                break;
+            case 3:
+                FindSizeDirection(3, x + 1, y, ref size, ref isVert);
+                break;
+            case 4:
+                FindSizeDirection(4, x, y + 1, ref size, ref isVert);
+                break;
+            default:
+                break;
+        }
+        return;
+    }
+
     void Start()
     {
 

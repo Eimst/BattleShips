@@ -55,6 +55,11 @@ public class Bot : MonoBehaviour, IKillable
         return field;
     }
 
+    public void ShowBotShips()
+    {
+        field.ShowBotShips();
+    }
+
     // Update is called once per frame
     void Update()
     {
