@@ -24,10 +24,6 @@ public class GameManager : MonoBehaviour
 
     CursorChanger cursor;
 
-    private bool isFirstTime = true;
-    private float timer = 0f;
-    public int xx = 0;
-
     public enum GameState
     {
         Setup,
@@ -91,18 +87,12 @@ public class GameManager : MonoBehaviour
                 break;
 
              case GameState.GameOver:
+                //Debug.Log(playerFieldInstance.GetRemainingBoats());
                 if (playerFieldInstance.GetRemainingBoats() == 0)
+                //if (true)
                 {
-                    timer = timer + Time.deltaTime;
-                    if (isFirstTime)
-                    {
-                        botFieldInstance.ShowBotShips();
-                    }
-                    if (timer > 5.0)
-                    {
-                        StartCoroutine(LoadSceneWithDelay("DefeatScene"));
-                    }
-                    isFirstTime = false;
+                    botFieldInstance.ShowBotShips();
+                    StartCoroutine(LoadSceneWithDelay("DefeatScene"));
                 }
                 else
                     StartCoroutine(LoadSceneWithDelay("VictoryScene"));
@@ -289,6 +279,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator LoadSceneWithDelay(string sceneName)
     {
+        yield return new WaitForSeconds(6f);
 
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
         while (!asyncLoad.isDone)

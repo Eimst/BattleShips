@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -29,6 +30,9 @@ public class Field : MonoBehaviour
         IllegalMove
     }
 
+    private bool Starts = false;
+    private float timer = 0f;
+    private ArrayList blinkingShipsArray;
 
     public void CreateField()
     {
@@ -590,17 +594,24 @@ public class Field : MonoBehaviour
 
     public void ShowBotShips()
     {
+        if (Starts) { return; }
+        blinkingShipsArray = new ArrayList();
         for (int i = 0; i < 10; i++)
         {
             for (int j = 0; j < 10; j++)
             {
                 if (shipsArray[i, j] > 0 && field[i, j].GetComponent<Chunks>().index == 0)
                 {
-                    field[i, j].GetComponent<Chunks>().index = ShipPartIndex(i, j);
-                    field[i, j].GetComponent<Chunks>().BlinkSprites();
+                    int[] newArr = new int[3];
+                    newArr[0] = i;
+                    newArr[1] = j;
+                    newArr[2] = ShipPartIndex(i, j);
+                    blinkingShipsArray.Add(newArr);
+                    field[i, j].GetComponent<Chunks>().ChangeClour();
                 }
             }
         }
+        Starts = true;
     }
 
     private int ShipPartIndex(int x, int y)
@@ -759,6 +770,24 @@ public class Field : MonoBehaviour
         return;
     }
 
+    private void Blink()
+    {
+        //Debug.Log(blinkingShipsArray.Count);
+        foreach (int[] part in blinkingShipsArray)
+        {
+            //Debug.Log(field[part[0], part[1]].GetComponent<Chunks>().index == 0);
+            if (field[part[0], part[1]].GetComponent<Chunks>().index == 0)
+            {
+                field[part[0], part[1]].GetComponent<Chunks>().index = part[2];
+            }
+            else
+            {
+                field[part[0], part[1]].GetComponent<Chunks>().index = 0;
+                //Debug.Log(field[part[0], part[1]].GetComponent<Chunks>().index);
+            }
+        }
+    }
+
     void Start()
     {
 
@@ -768,6 +797,15 @@ public class Field : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Starts)
+        {
+            timer += Time.deltaTime;
+            if (timer > 0.75f)
+            {
+                //Debug.Log("GG");
+                Blink();
+                timer = 0f;
+            }
+        }
     }
 }
