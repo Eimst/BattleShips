@@ -66,5 +66,10 @@ public class Player : MonoBehaviour, IKillable
         return remainingBoats;
     }
 
+    public Field GetField()
+    {
+        return field;
+    }
+
     
 }
