@@ -73,29 +73,27 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        IsGameOver();
         switch (currentState)
         {
             case GameState.PlayerTurn:
                 MouseTrajectory();
-                IsGameOver();
                 break;
 
             case GameState.BotTurn:
                 if (!isBotTurnHandled)
-                    StartCoroutine(HandleBotTurn());
-                IsGameOver();
+                    StartCoroutine(HandleBotTurn());    
                 break;
 
              case GameState.GameOver:
                 //Debug.Log(playerFieldInstance.GetRemainingBoats());
                 if (playerFieldInstance.GetRemainingBoats() == 0)
-                //if (true)
                 {
-                    botFieldInstance.ShowBotShips();
-                    StartCoroutine(LoadSceneWithDelay("DefeatScene"));
+                    botFieldInstance.GetField().ShowBotShips();
+                    StartCoroutine(LoadSceneWithDelay("DefeatScene", 6f));
                 }
                 else
-                    StartCoroutine(LoadSceneWithDelay("VictoryScene"));
+                    StartCoroutine(LoadSceneWithDelay("VictoryScene", 0));
                 break;
         }
         previousState = currentState;
@@ -197,6 +195,8 @@ public class GameManager : MonoBehaviour
         switch (result)
         {
             case DestroyResult.Success:
+                if (!isPlayer)
+                    botFieldInstance.hit = true;
                 break;
 
             case DestroyResult.Failure:
@@ -277,9 +277,9 @@ public class GameManager : MonoBehaviour
     }
 
 
-    IEnumerator LoadSceneWithDelay(string sceneName)
+    IEnumerator LoadSceneWithDelay(string sceneName, float delay)
     {
-        yield return new WaitForSeconds(6f);
+        yield return new WaitForSeconds(delay);
 
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
         while (!asyncLoad.isDone)
@@ -299,5 +299,12 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
+
+
+    public void UpdateBotVision()
+    {
+        botFieldInstance.UpdateBotVision(playerFieldInstance.GetField().GetBoardVision());
+    }
+
 }
 

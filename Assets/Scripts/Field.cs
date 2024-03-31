@@ -142,6 +142,21 @@ public class Field : MonoBehaviour
         }
     }
 
+    public int[,] GetBoardVision()
+    {
+        int[,] boardArray = new int[10, 10];
+        for (int i = 0; i < fieldLength; i++)
+        {
+            for (int j = 0; j < fieldLength; j++)
+            {
+                if(field[i, j].GetComponent<Chunks>().index == 9)
+                {
+                    boardArray[i, j] = 1;
+                }
+            }
+        }
+        return boardArray;
+    }
    
 
     public bool IsWrongPlace(int x1, int y1, int x2, int y2)
@@ -636,7 +651,7 @@ public class Field : MonoBehaviour
                     {
                         return 8;
                     }
-                    break;
+
                 case 3:
                     if (y - 1 < 0 || shipsArray[x, y - 1] == 0)
                     {
@@ -650,7 +665,7 @@ public class Field : MonoBehaviour
                     {
                         return 4;
                     }
-                    break;
+
                 default:
                     if (y - 1 < 0 || shipsArray[x, y - 1] == 0)
                     {
@@ -687,7 +702,7 @@ public class Field : MonoBehaviour
                     {
                         return 7;
                     }
-                    break;
+   
                 case 3:
                     if (x - 1 < 0 || shipsArray[x - 1, y] == 0)
                     {
@@ -701,7 +716,7 @@ public class Field : MonoBehaviour
                     {
                         return 3;
                     }
-                    break;
+
                 default:
                     if (x - 1 < 0 || shipsArray[x - 1, y] == 0)
                     {
