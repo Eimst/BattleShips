@@ -60,6 +60,10 @@ public class Bot : MonoBehaviour, IKillable
 
     private int tryEdgesCount;
 
+    private int shotCount;
+
+  
+
     void Start()
     {
 
@@ -82,6 +86,7 @@ public class Bot : MonoBehaviour, IKillable
         shipsRemaining.Add(2, 3);
         shipsRemaining.Add(3, 2);
         shipsRemaining.Add(4, 1);
+        shotCount = 5;
     }
 
     void RecalculateHeatMap()
@@ -99,11 +104,25 @@ public class Bot : MonoBehaviour, IKillable
                     countHitCells++;
             }
         }
-        if(!tryEdges && countHitCells > 25)
+
+        if (shipsPossiblePlacementCount == 1)
         {
-            if(shipsPossiblePlacementCount == 1)
-                gameState = GameState.OnlyOneTileLeft;
-            else gameState = GameState.Mid_Late;
+            shotCount = 2;
+            gameManager.countMissedShot = 2;
+        }
+            
+
+        if(!tryEdges)
+        {
+            if (countHitCells > 25)
+            {
+                if (shipsPossiblePlacementCount == 1)
+                    gameState = GameState.OnlyOneTileLeft;
+                else gameState = GameState.Mid_Late;
+
+            }
+            else gameState = GameState.Early;
+            
         }
     }
 
@@ -198,7 +217,7 @@ public class Bot : MonoBehaviour, IKillable
         }
             
         if (coordinates.Count == 0)
-            return FindCoordinateWithPotentialTarget(target - 0.05);
+            return FindCoordinateWithPotentialTarget(target - 0.05, attempt + 1);
         return GetRandomCoordinate(coordinates);
     }
 
@@ -272,7 +291,7 @@ public class Bot : MonoBehaviour, IKillable
             if(y + i < 0 || y + i > 9) continue;
             for (int j = -1; j <= 1; j++)
             {
-                if ((x + j < 0 || x + j > 9) || i == 0 && j == 0) 
+                if (x + j < 0 || x + j > 9 || (i == 0 && j == 0)) 
                     continue;
                 //Debug.Log(i + " " + j + " " + botVision[x+j, y + i]);
                 if (botVision[x + j, y + i] != 0)
@@ -497,7 +516,6 @@ public class Bot : MonoBehaviour, IKillable
     public string ApplyShot()
     {
         gameManager.UpdateBotVision();
-        RecalculateHeatMap();
         if (hit)
         {
             lastSuccessfulHit = lastHit;
@@ -507,12 +525,12 @@ public class Bot : MonoBehaviour, IKillable
         }
         else if (tryEdges)
         {
-            gameState = GameState.TryEdges;
             tryEdgesCount--;
-            if (tryEdgesCount == 0)
+            if (tryEdgesCount <= 0)
                 tryEdges = false;
+            else gameState = GameState.TryEdges;
         }
-        
+        RecalculateHeatMap();
         string coordinates = "";
         switch (state)
         {
@@ -768,7 +786,7 @@ public class Bot : MonoBehaviour, IKillable
 
     public void ResetEdgesCount()
     {
-        tryEdgesCount = 5;
+        tryEdgesCount = shotCount;
     }
 
     // Update is called once per frame
