@@ -8,7 +8,7 @@ using TMPro;
 using System;
 using static Field;
 
-public class GameManager : MonoBehaviour 
+public class GameManager : MonoBehaviour
 {
     public Player playerFieldPrefab;
     public Bot botFieldPrefab;
@@ -53,6 +53,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public int countMissedShot {get; set;}
+
     void Start()
     {
         // Attempt to find an existing player instance.
@@ -70,6 +72,7 @@ public class GameManager : MonoBehaviour
 
         cursor = FindObjectOfType<CursorChanger>();
         missedCount = 0;
+        countMissedShot = 4;
     }
 
 
@@ -200,7 +203,7 @@ public class GameManager : MonoBehaviour
                 if (!isPlayer)
                 {
                     botFieldInstance.hit = true;
-                    botFieldInstance.tryEdges = false;
+                    //botFieldInstance.tryEdges = false;
                     missedCount = 0;
                 }
                     
@@ -215,11 +218,11 @@ public class GameManager : MonoBehaviour
                     currentState = GameState.PlayerTurn;
                     if(!botFieldInstance.tryEdges)
                         missedCount++;
-                    if (missedCount > 5)
+                    if (missedCount > countMissedShot)
                     {
                         botFieldInstance.tryEdges = true;
                         botFieldInstance.ResetEdgesCount();
-                        missedCount= 0;
+                        missedCount = 0;
                     }
                         
                 }
