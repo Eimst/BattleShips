@@ -49,11 +49,16 @@ public class Bot : MonoBehaviour, IKillable
         Early,
         Mid_Late,
         OnlyOneTileLeft,
+        TryEdges,
     }
 
     private GameState gameState;
 
     private int shipsPossiblePlacementCount = 19;
+
+    public bool tryEdges {get; set;}
+
+    private int tryEdgesCount;
 
     void Start()
     {
@@ -72,7 +77,7 @@ public class Bot : MonoBehaviour, IKillable
         lastHit = "";
         lastSuccessfulHit = "";
         gameManager = GetComponentInParent<GameManager>();
-
+        tryEdges = false;
         shipsRemaining.Add(1, 4);
         shipsRemaining.Add(2, 3);
         shipsRemaining.Add(3, 2);
@@ -94,7 +99,7 @@ public class Bot : MonoBehaviour, IKillable
                     countHitCells++;
             }
         }
-        if(countHitCells > 25)
+        if(!tryEdges && countHitCells > 25)
         {
             if(shipsPossiblePlacementCount == 1)
                 gameState = GameState.OnlyOneTileLeft;
@@ -168,25 +173,43 @@ public class Bot : MonoBehaviour, IKillable
     }
 
 
-    string FindCoordinateWithPotentialTarget(double target = 0.90)
+    string FindCoordinateWithPotentialTarget(double target = 0.90, int attempt = 0)
     {
         List<string> coordinates = new List<string>();
         for (int i = 0; i < heatMap.GetLength(0); i++)
         {
             for (int j = 0; j < heatMap.GetLength(1); j++)
             {
-                if (heatMap[i, j] >= (gameState == GameState.Early ? 0.50 : target))
+                if(gameState == GameState.TryEdges && EdgesCoordinates(i, j, target - 0.3))
+                {
+                    coordinates.Add(i + " " + j);
+                }
+                else if (gameState != GameState.TryEdges && heatMap[i, j] >= (gameState == GameState.Early ? 0.80 : target))
                 {
                     coordinates.Add(i + " " + j);
                 }
             }
         }
         // lastHit = coordinates;
+        if(attempt == 5)
+        {
+            gameState = GameState.Mid_Late;
+            tryEdges = false;
+        }
+            
         if (coordinates.Count == 0)
             return FindCoordinateWithPotentialTarget(target - 0.05);
         return GetRandomCoordinate(coordinates);
     }
 
+
+    bool EdgesCoordinates(int i, int j, double target)
+    {
+        if((i >= 0 && (j == 0 || j == 9)) || (j >= 0 && (i == 0 || i == 9)))
+            if (heatMap[i, j] >= target)
+                return true;
+        return false;
+    }
 
     string GetRandomCoordinate(List<string> coordinates)
     {
@@ -211,6 +234,11 @@ public class Bot : MonoBehaviour, IKillable
             start = 1;
             end = 10;
         }
+        else if(gameState == GameState.TryEdges)
+        {
+            start = 1;
+            end = 10;
+        }
 
         int count = 0;
         while (count < 50)
@@ -220,10 +248,40 @@ public class Bot : MonoBehaviour, IKillable
                 Math.Abs(int.Parse(coordinates[randomCoordinate].Split(' ')[1]) - int.Parse(lastHit.Split(' ')[1])) >= start &&
                 Math.Abs(int.Parse(coordinates[randomCoordinate].Split(' ')[0]) - int.Parse(lastHit.Split(' ')[0])) +
                 Math.Abs(int.Parse(coordinates[randomCoordinate].Split(' ')[1]) - int.Parse(lastHit.Split(' ')[1])) <= end)
-                return coordinates[randomCoordinate];
+            {
+                if((gameState == GameState.TryEdges || gameState == GameState.Early) && IsClearNearby(int.Parse(coordinates[randomCoordinate].Split(' ')[0]),
+                    int.Parse(coordinates[randomCoordinate].Split(' ')[1])))
+                {
+                    return coordinates[randomCoordinate];
+                }
+                else if(gameState != GameState.Early) 
+                    return coordinates[randomCoordinate];
+            }
+
+                
             count++;
         }
         return coordinates[Random.Range(0, coordinates.Count)];
+    }
+
+
+    bool IsClearNearby(int x, int y)
+    {
+        for (int i = -1; i <= 1; i++)
+        {
+            if(y + i < 0 || y + i > 9) continue;
+            for (int j = -1; j <= 1; j++)
+            {
+                if ((x + j < 0 || x + j > 9) || i == 0 && j == 0) 
+                    continue;
+                //Debug.Log(i + " " + j + " " + botVision[x+j, y + i]);
+                if (botVision[x + j, y + i] != 0)
+                    return false;
+                
+            }
+        }
+        
+        return true;
     }
 
 
@@ -258,14 +316,19 @@ public class Bot : MonoBehaviour, IKillable
     }
 
 
-    string CaseHelperPlus(int xOrig, int yOrig, bool isHorizontal)
+   string CaseHelperPlus(int xOrig, int yOrig, bool isHorizontal)
     {
+        string coordinates = "";
+
         for (int i = 1; i <= 3; i++)
         {
             if (!isHorizontal && yOrig + i < 10)
             {
                 if (botVision[xOrig, yOrig + i] == 0)
-                    return xOrig + " " + (yOrig + i);
+                {
+                    coordinates = xOrig + " " + (yOrig + i) + ";" + heatMap[xOrig, yOrig + i];
+                    return coordinates;
+                }
                 else if (botVision[xOrig, yOrig + i] == 1)
                     break;
             }
@@ -273,48 +336,68 @@ public class Bot : MonoBehaviour, IKillable
             else if (isHorizontal && xOrig + i < 10)
             {
                 if (botVision[xOrig + i, yOrig] == 0)
-                    return (xOrig + i) + " " + yOrig;
+                {
+                    coordinates = xOrig + i + " " + yOrig + ";" + heatMap[xOrig + i, yOrig];
+                    return coordinates;
+                }
                 else if (botVision[xOrig + i, yOrig] == 1)
                     break;
             }
         }
-        return "";
+        return coordinates;
     }
 
     string CaseHelperMinus(int xOrig, int yOrig, bool isHorizontal)
     {
+        string coordinates = "";
         for (int i = 1; i <= 3; i++)
         {
             if (!isHorizontal && yOrig - i >= 0)
             {
                 if (botVision[xOrig, yOrig - i] == 0)
-                    return xOrig + " " + (yOrig - i);
+                {
+                    coordinates = xOrig + " " + (yOrig - i) + ";" + heatMap[xOrig, yOrig - i];
+                    return coordinates; 
+                }
                 else if (botVision[xOrig, yOrig - i] == 1)
                     break;
             }
             else if (isHorizontal && xOrig - i >= 0)
             {
                 if (botVision[xOrig - i, yOrig] == 0)
-                    return xOrig - i + " " + yOrig;
+                {
+                    coordinates = xOrig - i + " " + yOrig + ";" + heatMap[xOrig - i, yOrig];
+                    return coordinates;
+                }
                 else if (botVision[xOrig - i, yOrig] == 1)
                     break;
             }
         }
-        return "";
+        return coordinates;
     }
-
 
     string CaseVertical(int xOrig, int yOrig)
     {
+        Dictionary<string, double> heatList = new Dictionary<string, double>();
+        string plusCoor = CaseHelperPlus(xOrig, yOrig, false);
+        string minusCoor = CaseHelperMinus(xOrig, yOrig, false);
+
+        if(plusCoor.Length > 0)
+            heatList.Add(plusCoor.Split(";")[0], double.Parse(plusCoor.Split(";")[1]));
+
+        if(minusCoor.Length > 0)
+            heatList.Add(minusCoor.Split(";")[0], double.Parse(minusCoor.Split(";")[1]));
+
+        double maxHeat = 0;
         string coordinates = "";
-        if (Random.Range(0, 2) == 1)
-            coordinates = CaseHelperPlus(xOrig, yOrig, false);
-
-        if(coordinates.Length < 1) 
-            coordinates = CaseHelperMinus(xOrig, yOrig, false);
-
-        if(coordinates.Length < 1)
-            coordinates = CaseHelperPlus(xOrig, yOrig, false);
+        foreach(KeyValuePair<string, double> heat in heatList)
+        {
+            if(heat.Value > maxHeat)
+            {
+                maxHeat = heat.Value;
+                coordinates = heat.Key;
+            }
+        }
 
         return coordinates;
     }
@@ -322,47 +405,61 @@ public class Bot : MonoBehaviour, IKillable
 
     string CaseHorizontal(int xOrig, int yOrig)
     {
+        Dictionary<string, double> heatList = new Dictionary<string, double>();
+        string plusCoor = CaseHelperPlus(xOrig, yOrig, true);
+        string minusCoor = CaseHelperMinus(xOrig, yOrig, true);
+
+        if (plusCoor.Length > 0)
+            heatList.Add(plusCoor.Split(";")[0], double.Parse(plusCoor.Split(";")[1]));
+
+        if (minusCoor.Length > 0)
+            heatList.Add(minusCoor.Split(";")[0], double.Parse(minusCoor.Split(";")[1]));
+
+        double maxHeat = 0;
         string coordinates = "";
-        if (Random.Range(0, 2) == 1)
-            coordinates = CaseHelperPlus(xOrig, yOrig, true);
+        foreach (KeyValuePair<string, double> heat in heatList)
+        {
+            if (heat.Value > maxHeat)
+            {
+                maxHeat = heat.Value;
+                coordinates = heat.Key;
+            }
+        }
 
-        if (coordinates.Length < 1)
-            coordinates = CaseHelperMinus(xOrig, yOrig, true);
-
-        if(coordinates.Length < 1)
-            coordinates = CaseHelperPlus(xOrig, yOrig, true);
         return coordinates;
     }
 
 
-    string CaseUnknown(int xOrig, int yOrig, int attempt = 0)
+    string CaseUnknown(int xOrig, int yOrig)
     {
-        
-        bool isHorizontal = Random.Range(0, 2) == 0 ? true : false;
-        string coordinates = "";
 
-        if (isHorizontal)
+        Dictionary<string, double> heatList = new Dictionary<string, double>();
+
+        if(xOrig + 1 < 10 && botVision[xOrig + 1, yOrig] == 0)
+            heatList.Add(xOrig + 1 + " " + yOrig, heatMap[xOrig + 1, yOrig]);
+
+        if(xOrig - 1 >= 0 && botVision[xOrig - 1, yOrig] == 0)
+            heatList.Add(xOrig - 1 + " " + yOrig, heatMap[xOrig - 1, yOrig]);
+
+        if (yOrig + 1 < 10 && botVision[xOrig, yOrig + 1] == 0)
+            heatList.Add(xOrig + " " + (yOrig + 1), heatMap[xOrig, yOrig + 1]);
+
+        if (yOrig - 1 >= 0 && botVision[xOrig, yOrig - 1] == 0)
+            heatList.Add(xOrig + " " + (yOrig - 1), heatMap[xOrig, yOrig - 1]);
+
+        double maxHeat = 0;
+        string coordinates = "";
+        foreach(KeyValuePair<string, double> heat in heatList)
         {
-            if(Random.Range(0, 2) == 0 && xOrig + 1 < 10 && botVision[xOrig + 1, yOrig] == 0)
+            if(heat.Value > maxHeat)
             {
-                coordinates = xOrig + 1 + " " + yOrig;
-            }
-            if(coordinates.Length < 1 && xOrig - 1 >= 0 && botVision[xOrig - 1, yOrig] == 0)
-            {
-                coordinates = xOrig - 1 + " " + yOrig;
+                maxHeat = heat.Value;
+                coordinates = heat.Key;
             }
         }
-        else
-        {
-            if(Random.Range(0, 2) == 0 && yOrig + 1 < 10 && botVision[xOrig, yOrig + 1] == 0)
-                coordinates = xOrig + " " + (yOrig + 1);
-            if(coordinates.Length < 1 && yOrig - 1 >= 0 && botVision[xOrig, yOrig - 1] == 0)
-                coordinates = xOrig + " " + (yOrig - 1);
-        }
-        if(coordinates.Length < 1 && attempt < 25)
-            coordinates = CaseUnknown(xOrig, yOrig, attempt + 1);
         return coordinates;
     }
+
 
     string Attack()
     {
@@ -407,6 +504,13 @@ public class Bot : MonoBehaviour, IKillable
             botVision[int.Parse(lastSuccessfulHit.Split(' ')[0]), int.Parse(lastSuccessfulHit.Split(' ')[1])] = -1;
             state = BotState.Atacking;
             hit = false;
+        }
+        else if (tryEdges)
+        {
+            gameState = GameState.TryEdges;
+            tryEdgesCount--;
+            if (tryEdgesCount == 0)
+                tryEdges = false;
         }
         
         string coordinates = "";
@@ -659,6 +763,12 @@ public class Bot : MonoBehaviour, IKillable
                     botVision[i, j] = 1;
             }
         }
+    }
+
+
+    public void ResetEdgesCount()
+    {
+        tryEdgesCount = 5;
     }
 
     // Update is called once per frame

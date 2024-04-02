@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
 
     bool isBotTurnHandled = false;
 
+    int missedCount;
 
     void Awake()
     {
@@ -68,6 +69,7 @@ public class GameManager : MonoBehaviour
         botFieldInstance.gameObject.SetActive(false);
 
         cursor = FindObjectOfType<CursorChanger>();
+        missedCount = 0;
     }
 
 
@@ -196,7 +198,12 @@ public class GameManager : MonoBehaviour
         {
             case DestroyResult.Success:
                 if (!isPlayer)
+                {
                     botFieldInstance.hit = true;
+                    botFieldInstance.tryEdges = false;
+                    missedCount = 0;
+                }
+                    
                 break;
 
             case DestroyResult.Failure:
@@ -204,7 +211,19 @@ public class GameManager : MonoBehaviour
                 if (isPlayer)
                     currentState = GameState.BotTurn;
                 else
+                {
                     currentState = GameState.PlayerTurn;
+                    if(!botFieldInstance.tryEdges)
+                        missedCount++;
+                    if (missedCount > 5)
+                    {
+                        botFieldInstance.tryEdges = true;
+                        botFieldInstance.ResetEdgesCount();
+                        missedCount= 0;
+                    }
+                        
+                }
+                    
                 SpawnText();
                 break;
 
