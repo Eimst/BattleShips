@@ -29,6 +29,7 @@ public class ResolutionController : MonoBehaviour
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.RefreshShownValue();
         LoadSettings(currResIndex);
+        Screen.fullScreen = true;
     }
 
     public void SetFullScreen(bool isFullScreen)
