@@ -77,6 +77,7 @@
     <Compile Include="Assets\Scripts\BackgroundMovement.cs" />
     <Compile Include="Assets\Scripts\Bot.cs" />
     <Compile Include="Assets\Scripts\AudioController.cs" />
+    <Compile Include="Assets\Scripts\ResolutionController.cs" />
     <Compile Include="Assets\Scripts\BackgroundScrolling.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger2.cs" />
     <Compile Include="Assets\Scripts\AudioManager.cs" />
