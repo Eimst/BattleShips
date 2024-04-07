@@ -544,7 +544,7 @@ public class Bot : MonoBehaviour, IKillable
         }
         if(coordinates.Length < 1)
         {
-            Debug.LogError(lastHit + "   Last Successful hit "+ lastSuccessfulHit);
+            //Debug.LogError(lastHit + "   Last Successful hit "+ lastSuccessfulHit);
             coordinates = ApplyShot();
         }
                 
