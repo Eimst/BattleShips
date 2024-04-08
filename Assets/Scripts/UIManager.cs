@@ -56,7 +56,8 @@ public class UIManager : MonoBehaviour
     private IEnumerator FadeInTextCoroutine(TextMeshProUGUI text, float duration)
     {
         isFadingIn = true;
-        isFadingOut = false; 
+        isFadingOut = false;
+        yield return new WaitUntil(() => FindObjectOfType<GameManager>().isAnimationDone);
         text.gameObject.SetActive(true);
         float elapsed = 0f;
         while (elapsed < duration)
@@ -73,7 +74,8 @@ public class UIManager : MonoBehaviour
     private IEnumerator FadeOutTextCoroutine(TextMeshProUGUI text, float duration)
     {
         isFadingOut = true;
-        isFadingIn = false; 
+        isFadingIn = false;
+        yield return new WaitUntil(() => FindObjectOfType<GameManager>().isAnimationDone);
         float elapsed = 0f;
         while (elapsed < duration)
         {
