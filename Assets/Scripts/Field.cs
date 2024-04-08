@@ -370,6 +370,7 @@ public class Field : MonoBehaviour
     }
     public IEnumerator MoveBulletWithDelay(Vector3 startPos, int x1, int y1)
     {
+        FindObjectOfType<GameManager>().isAnimationDone = false;
         GameObject bulletInstance = Instantiate(bullet, new Vector3(startPos.x + 1 + x1, startPos.y, 0), Quaternion.identity);
         bulletInstance.transform.Rotate(0, 0, -90);
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
@@ -378,6 +379,7 @@ public class Field : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
         Destroy(bulletInstance);
+        FindObjectOfType<GameManager>().isAnimationDone = true;
     }
     public DestroyResult Destroy(int x1, int y1)
      {
