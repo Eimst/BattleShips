@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 
 public class Field : MonoBehaviour
 {
-
+    public AudioClip bulletSound;
     public AudioClip waterSound;
     public AudioClip fireSound;
     public AudioClip explosionSound;
@@ -371,12 +371,12 @@ public class Field : MonoBehaviour
     public IEnumerator MoveBulletWithDelay(Vector3 startPos, int x1, int y1)
     {
         FindObjectOfType<GameManager>().isAnimationDone = false;
-        GameObject bulletInstance = Instantiate(bullet, new Vector3(startPos.x + 1 + x1, startPos.y, 0), Quaternion.identity);
+        GameObject bulletInstance = Instantiate(bullet, new Vector3(startPos.x + 1 + x1, startPos.y + 2, 0), Quaternion.identity);
         bulletInstance.transform.Rotate(0, 0, -90);
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
         {
             bulletInstance.transform.Translate(Vector3.right);
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.15f);
         }
         Destroy(bulletInstance);
         if (shipsArray[x1, y1] == 0)
@@ -420,6 +420,7 @@ public class Field : MonoBehaviour
             bulletRenderer.sortingOrder = 40;
             bullet.transform.localScale = new Vector3(1f, 1f, 1f);
             bullet.transform.Rotate(0f, 0f, 90f);
+            AudioSource.PlayClipAtPoint(bulletSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
             StartCoroutine(MoveBulletWithDelay(startPos, x1, y1));
             if (shipsArray[x1, y1] == 0)
             {

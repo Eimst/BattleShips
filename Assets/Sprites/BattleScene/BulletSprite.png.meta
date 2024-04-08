@@ -110,34 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BulletSprite_0
-      rect:
-        serializedVersion: 2
-        x: 48
-        y: 193
-        width: 9
-        height: 7
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 18facac4847ddf044980e0e00667ad77
-      internalID: 331279473
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: BulletSprite_1
       rect:
         serializedVersion: 2
-        x: 49
-        y: 88
-        width: 131
-        height: 196
+        x: 13
+        y: 107
+        width: 199
+        height: 148
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -155,10 +134,10 @@ TextureImporter:
       name: BulletSprite_2
       rect:
         serializedVersion: 2
-        x: 209
-        y: 87
+        x: 235
+        y: 111
         width: 154
-        height: 196
+        height: 138
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -176,10 +155,10 @@ TextureImporter:
       name: BulletSprite_4
       rect:
         serializedVersion: 2
-        x: 395
-        y: 87
-        width: 201
-        height: 195
+        x: 420
+        y: 85
+        width: 180
+        height: 168
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -197,10 +176,10 @@ TextureImporter:
       name: BulletSprite_5
       rect:
         serializedVersion: 2
-        x: 615
+        x: 628
         y: 87
-        width: 133
-        height: 193
+        width: 227
+        height: 170
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -218,10 +197,10 @@ TextureImporter:
       name: BulletSprite_6
       rect:
         serializedVersion: 2
-        x: 767
+        x: 893
         y: 88
-        width: 155
-        height: 193
+        width: 191
+        height: 165
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -239,10 +218,10 @@ TextureImporter:
       name: BulletSprite_7
       rect:
         serializedVersion: 2
-        x: 948
-        y: 86
-        width: 200
-        height: 195
+        x: 1138
+        y: 90
+        width: 179
+        height: 167
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -269,6 +248,7 @@ TextureImporter:
     nameFileIdTable:
       BulletSprite_0: 331279473
       BulletSprite_1: 2063783640
+      BulletSprite_10: -100633130
       BulletSprite_2: -2054170137
       BulletSprite_3: 1625967777
       BulletSprite_4: -988305628

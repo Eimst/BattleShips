@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daffa498655adb7489ac399b4bd653f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bulletSound: {fileID: 8300000, guid: 5ef0ed5ae55d72948aac0c16711fd4b9, type: 3}
   waterSound: {fileID: 8300000, guid: b885f59dd020fe243bdc6a84b2fbf269, type: 3}
   fireSound: {fileID: 8300000, guid: 86f59de4136aeaf4091300f44e1e83c2, type: 3}
   explosionSound: {fileID: 8300000, guid: d754161d67d955248b8c4cad39d32679, type: 3}
