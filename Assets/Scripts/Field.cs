@@ -379,6 +379,32 @@ public class Field : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
         Destroy(bulletInstance);
+        if (shipsArray[x1, y1] == 0)
+        {
+            Renderer waterRenderer = water.GetComponent<Renderer>();
+            waterRenderer.sortingOrder = 30;
+            water.transform.localScale = new Vector3(1f, 1f, 1f);
+            AudioSource.PlayClipAtPoint(waterSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            GameObject waterInstance = Instantiate(water, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), Quaternion.identity);
+            Destroy(waterInstance, 1.35f);
+            field[x1, y1].GetComponent<Chunks>().index = 9;
+        }
+        else
+        {
+            Renderer fireRenderer = fire.GetComponent<Renderer>();
+            fireRenderer.sortingOrder = 30;
+            //field[x1, y1].GetComponent<Chunks>().index = 10;
+            fire.transform.localScale = new Vector3(0.5f, 0.35f, 1f);
+            if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
+                AudioSource.PlayClipAtPoint(explosionSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            else AudioSource.PlayClipAtPoint(fireSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            squaresOnFire.Add(Instantiate(fire, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), Quaternion.identity));
+            if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
+                DestroyAllShip(x1, y1, shipsArray[x1, y1]);
+            shipsArray[x1, y1] *= -1;
+        }
+       
+
         FindObjectOfType<GameManager>().isAnimationDone = true;
     }
     public DestroyResult Destroy(int x1, int y1)
@@ -397,26 +423,8 @@ public class Field : MonoBehaviour
             StartCoroutine(MoveBulletWithDelay(startPos, x1, y1));
             if (shipsArray[x1, y1] == 0)
             {
-                Renderer waterRenderer = water.GetComponent<Renderer>();
-                waterRenderer.sortingOrder = 30;
-                water.transform.localScale = new Vector3(1f, 1f, 1f);
-                AudioSource.PlayClipAtPoint(waterSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
-                GameObject waterInstance = Instantiate(water, new Vector3(startPos.x+1+x1, startPos.y-1-y1, 0), Quaternion.identity);
-                Destroy(waterInstance, 1.35f);
-                field[x1, y1].GetComponent<Chunks>().index = 9;
                 return DestroyResult.Failure;
             }
-            Renderer fireRenderer = fire.GetComponent<Renderer>();
-            fireRenderer.sortingOrder = 30;
-            //field[x1, y1].GetComponent<Chunks>().index = 10;
-            fire.transform.localScale = new Vector3(0.5f, 0.35f, 1f);
-            if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
-                AudioSource.PlayClipAtPoint(explosionSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
-            else AudioSource.PlayClipAtPoint(fireSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
-            squaresOnFire.Add(Instantiate(fire, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), Quaternion.identity));
-            if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
-                DestroyAllShip(x1, y1, shipsArray[x1, y1]);
-            shipsArray[x1, y1] *= -1;
             return DestroyResult.Success;
         }
             
