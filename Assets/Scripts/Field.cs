@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using TMPro;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Field : MonoBehaviour
 {
+
     public AudioClip waterSound;
     public AudioClip fireSound;
     public AudioClip explosionSound;
@@ -366,9 +368,18 @@ public class Field : MonoBehaviour
         }
         
     }
-
-
-     public DestroyResult Destroy(int x1, int y1)
+    public IEnumerator MoveBulletWithDelay(Vector3 startPos, int x1, int y1)
+    {
+        GameObject bulletInstance = Instantiate(bullet, new Vector3(startPos.x + 1 + x1, startPos.y, 0), Quaternion.identity);
+        bulletInstance.transform.Rotate(0, 0, -90);
+        while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
+        {
+            bulletInstance.transform.Translate(Vector3.right);
+            yield return new WaitForSeconds(0.3f);
+        }
+        Destroy(bulletInstance);
+    }
+    public DestroyResult Destroy(int x1, int y1)
      {
         Vector3 startPos = transform.position;
         int[] illegalIndexes = new int[] { 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 };
@@ -377,6 +388,11 @@ public class Field : MonoBehaviour
             
         else 
         {
+            Renderer bulletRenderer = bullet.GetComponent<Renderer>();
+            bulletRenderer.sortingOrder = 40;
+            bullet.transform.localScale = new Vector3(1f, 1f, 1f);
+            bullet.transform.Rotate(0f, 0f, 90f);
+            StartCoroutine(MoveBulletWithDelay(startPos, x1, y1));
             if (shipsArray[x1, y1] == 0)
             {
                 Renderer waterRenderer = water.GetComponent<Renderer>();
