@@ -3,11 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Field : MonoBehaviour
 {
+    public GameObject bullet;
+    public GameObject water;
+    public GameObject fire;
+    public GameObject explosion;
+
+    public List<GameObject> squaresOnFire;
+    public int currOnFire = 0;
+
     public GameObject letter, number, square;
 
     public GameObject[] letters;
@@ -66,6 +75,7 @@ public class Field : MonoBehaviour
         letters = new GameObject[fieldLength];
         numbers = new GameObject[fieldLength];
         field = new GameObject[fieldLength, fieldLength];
+        squaresOnFire = new List<GameObject>();
         // Reset the fieldArray to a new, empty state
         fieldArray = new int[fieldLength, fieldLength];
         shipsArray = new int[fieldLength, fieldLength];
@@ -356,6 +366,7 @@ public class Field : MonoBehaviour
 
      public DestroyResult Destroy(int x1, int y1)
      {
+        Vector3 startPos = transform.position;
         int[] illegalIndexes = new int[] { 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 };
         if (illegalIndexes.Contains(field[x1, y1].GetComponent<Chunks>().index))
             return DestroyResult.IllegalMove;
@@ -364,10 +375,19 @@ public class Field : MonoBehaviour
         {
             if (shipsArray[x1, y1] == 0)
             {
+                Renderer waterRenderer = water.GetComponent<Renderer>();
+                waterRenderer.sortingOrder = 30;
+                water.transform.localScale = new Vector3(1f, 1f, 1f);
+                GameObject waterInstance = Instantiate(water, new Vector3(startPos.x+1+x1, startPos.y-1-y1, 0), Quaternion.identity);
+                Destroy(waterInstance, 1.35f);
                 field[x1, y1].GetComponent<Chunks>().index = 9;
                 return DestroyResult.Failure;
             }
-            field[x1, y1].GetComponent<Chunks>().index = 10;
+            Renderer fireRenderer = fire.GetComponent<Renderer>();
+            fireRenderer.sortingOrder = 30;
+            //field[x1, y1].GetComponent<Chunks>().index = 10;
+            fire.transform.localScale = new Vector3(0.5f, 0.35f, 1f);
+            squaresOnFire.Add(Instantiate(fire, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), Quaternion.identity));
             if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
                 DestroyAllShip(x1, y1, shipsArray[x1, y1]);
             shipsArray[x1, y1] *= -1;
@@ -390,6 +410,7 @@ public class Field : MonoBehaviour
 
     public void DestroyAllShip(int x, int y, int shipNum)
     {
+        Vector3 startPos = transform.position;
         int[][] dir = {
             new int[] { -1, 0 },
             new int[] { -1, 1 },
@@ -430,6 +451,16 @@ public class Field : MonoBehaviour
         }
         if (size == 0)
         {
+            for (int ii = 0; ii < squaresOnFire.Count; ii++)
+                if (squaresOnFire[ii].transform.position.x == startPos.x + 1 + startX && squaresOnFire[ii].transform.position.y == startPos.y - 1 - startY)
+                    squaresOnFire[ii].GetComponent<Renderer>().enabled = false;
+
+            Renderer explosionRenderer = explosion.GetComponent<Renderer>();
+            explosionRenderer.sortingOrder = 30;
+            explosion.transform.localScale = new Vector3(1f, 1f, 1f);
+            GameObject explosionInstance = Instantiate(explosion, new Vector3(startPos.x + 1 + startX, startPos.y - 1 - startY, 0), Quaternion.identity);
+            Destroy(explosionInstance, 1f);
+
             field[x, y].GetComponent<Chunks>().index = 12;
             for (int i = 0; i < 8; i++)
             {
@@ -445,6 +476,16 @@ public class Field : MonoBehaviour
             {
                 if (type == "h")
                 {
+                    for (int ii = 0; ii < squaresOnFire.Count; ii++)
+                        if (squaresOnFire[ii].transform.position.x == startPos.x + 1 + startX + i && squaresOnFire[ii].transform.position.y == startPos.y - 1 - startY)
+                            squaresOnFire[ii].GetComponent<Renderer>().enabled = false;
+
+                    Renderer explosionRenderer = explosion.GetComponent<Renderer>();
+                    explosionRenderer.sortingOrder = 30;
+                    explosion.transform.localScale = new Vector3(1f, 1f, 1f);
+                    GameObject explosionInstance = Instantiate(explosion, new Vector3(startPos.x + 1 + startX + i, startPos.y - 1 - startY, 0), Quaternion.identity);
+                    Destroy(explosionInstance, 1f);
+
                     if (i == 0)
                     {
                         field[startX + i, startY].GetComponent<Chunks>().index = 12;
@@ -472,6 +513,16 @@ public class Field : MonoBehaviour
                 }
                 if (type == "v")
                 {
+                    for (int ii = 0; ii < squaresOnFire.Count; ii++)
+                        if (squaresOnFire[ii].transform.position.x == startPos.x + 1 + startX && squaresOnFire[ii].transform.position.y == startPos.y - 1 - (startY + i))
+                            squaresOnFire[ii].GetComponent<Renderer>().enabled = false;
+
+                    Renderer explosionRenderer = explosion.GetComponent<Renderer>();
+                    explosionRenderer.sortingOrder = 30;
+                    explosion.transform.localScale = new Vector3(1f, 1f, 1f);
+                    GameObject explosionInstance = Instantiate(explosion, new Vector3(startPos.x + 1 + startX, startPos.y - 1 - (startY + i), 0), Quaternion.identity);
+                    Destroy(explosionInstance, 1f);
+
                     if (i == 0)
                     {
                         field[startX, startY + i].GetComponent<Chunks>().index = 13;
