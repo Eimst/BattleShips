@@ -4,6 +4,10 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
+  - bullet: {fileID: 6318822750974615840, guid: 7af48e448cfceea4c803e08f03bb87e1, type: 3}
+  - water: {fileID: 6221026007227336456, guid: 62727615eeee40f40abe1a461c1e065a, type: 3}
+  - fire: {fileID: 5846687100453320315, guid: dfa1c91c94538f142949bb0672dd0953, type: 3}
+  - explosion: {fileID: 7001663112218421554, guid: 0a967002637520e47be39b4a3143624c, type: 3}
   - letter: {fileID: 6264264112802515456, guid: 0782e1a4948330d4abe09d1d0efaadf4, type: 3}
   - number: {fileID: 5263190147229853245, guid: 36d847d50e9b4204ca61f1a40a61802f, type: 3}
   - square: {fileID: 4026429434205382015, guid: dd181ed99289fa94baf26632f2a60a2c, type: 3}

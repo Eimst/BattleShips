@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour
 
     int missedCount;
 
+    public bool isAnimationDone { get; set; }
+
     void Awake()
     {
         if (instance == null)
@@ -73,11 +75,15 @@ public class GameManager : MonoBehaviour
         cursor = FindObjectOfType<CursorChanger>();
         missedCount = 0;
         countMissedShot = 4;
+        isAnimationDone = true;
     }
 
 
     void Update()
     {
+        if (!isAnimationDone)
+            return;
+
         IsGameOver();
         switch (currentState)
         {
