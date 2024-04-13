@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,9 @@ public class Mouse : MonoBehaviour
 {
     // Main  camera
     public Camera Camera;
+    private int savedX = -1;
+    private int savedY = -1;
+    private bool savedPos = false;
 
     private void Update()
     {
@@ -21,6 +25,9 @@ public class Mouse : MonoBehaviour
             {
                 if (CheckToPutShip(x, y, script.currentSpriteIndex, script.isRotated))
                 {
+                    savedX = -1;
+                    savedY = -1;
+                    savedPos = false;
                     script.currentSpriteIndex = 0;
                     script.ChangeSprite(0);
                 }
@@ -33,6 +40,29 @@ public class Mouse : MonoBehaviour
                 PickUpShip(x, y);
             }
         }
+
+        if (Validate(ref x, ref y, script.currentSpriteIndex))
+        {
+            if (x != savedX || y != savedY || (script.currentSpriteIndex % 2 == 0) != savedPos)
+            {
+                savedX = x;
+                savedY = y;
+                savedPos = script.currentSpriteIndex % 2 == 0;
+                Indicate(x, y, script.currentSpriteIndex);
+            }
+        }
+        else
+        {
+            // BUGAS!!! LOL kiek cheburek. you suck!!!
+            if (-1 != savedX || -1 != savedY)
+            {
+                savedX = -1;
+                savedY = -1;
+                savedPos = false;
+                Field field = FindObjectOfType<Field>();
+                field.StopIndication();
+            }
+        }
     }
 
     private bool CheckToPutShip(int x, int y, int spriteIndex, bool isRotated)
@@ -42,10 +72,12 @@ public class Mouse : MonoBehaviour
         bool done = false;
         if (isRotated)
         {
+            field.StopIndication();
             field.EnterShip((int)x, (int)y, (int)x, (int)y + size, ref done);
         }
         else
         {
+            field.StopIndication();
             field.EnterShip((int)x, (int)y, (int)x + size, (int)y, ref done);
         }
         return done;
@@ -53,6 +85,7 @@ public class Mouse : MonoBehaviour
 
     private bool Validate(ref int x, ref int y, int spriteIndex)
     {
+        if (spriteIndex == 0) { return false; }
         Vector3 worldPosition = ScreenCordsToWorldCords();
         float xTem = worldPosition.x;
         float yTem = worldPosition.y;
@@ -90,6 +123,16 @@ public class Mouse : MonoBehaviour
             script.ChangeSprite(script.currentSpriteIndex);
         }
         //Debug.Log(size);
+    }
+
+    private void Indicate(int x, int y, int spriteIndex)
+    {
+        Field field = FindObjectOfType<Field>();
+        field.StopIndication();
+        if (field.CheckForShips(x, y, (spriteIndex + 1) / 2, spriteIndex % 2 == 0))
+        {
+            field.Indicate(x, y, (spriteIndex + 1) / 2, spriteIndex % 2 == 0);
+        }
     }
 
     public void onClick()

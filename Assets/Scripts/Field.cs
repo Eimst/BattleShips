@@ -48,6 +48,7 @@ public class Field : MonoBehaviour
     private bool Starts = false;
     private float timer = 0f;
     private ArrayList blinkingShipsArray;
+    private ArrayList IndicatedTiles;
 
     public void CreateField()
     {
@@ -889,9 +890,69 @@ public class Field : MonoBehaviour
         }
     }
 
+    public bool CheckForShips(int x, int y, int size, bool isVertical)
+    {
+        if (isVertical)
+        {
+            for (int j = y; j < y + size; j++)
+            {
+                if (fieldArray[x, j] > 0)
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            for (int j = x; j < x + size; j++)
+            {
+                if (fieldArray[j, y] > 0)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void Indicate(int x, int y, int size, bool isVertical)
+    {
+        if (isVertical)
+        {
+            for (int j = y; j < y + size; j++)
+            {
+                int[] newArr = new int[2];
+                newArr[0] = x;
+                newArr[1] = j;
+                field[x, j].GetComponent<Chunks>().index = 21;
+                IndicatedTiles.Add(newArr);
+            }
+        }
+        else
+        {
+            for (int j = x; j < x + size; j++)
+            {
+                int[] newArr = new int[2];
+                newArr[0] = j;
+                newArr[1] = y;
+                field[j, y].GetComponent<Chunks>().index = 21;
+                IndicatedTiles.Add(newArr);
+            }
+        }
+    }
+
+    public void StopIndication()
+    {
+        foreach (int[] part in IndicatedTiles)
+        {
+            field[part[0], part[1]].GetComponent<Chunks>().index = 0;
+        }
+        IndicatedTiles.Clear();
+    }
+
     void Start()
     {
-
+        IndicatedTiles = new ArrayList();
     }
 
 
