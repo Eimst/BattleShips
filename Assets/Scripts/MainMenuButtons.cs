@@ -6,8 +6,13 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuButtons : MonoBehaviour
 {
+
+    public bool modeSpecial { get; set; } 
+
     public void PlayGame()
     {
+        PlayerPrefs.SetInt("Mode", modeSpecial ? 1 : 0);
+
         StartCoroutine(EnableStartButtonAfterDelay(1.5f));
     }
 

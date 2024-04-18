@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     private bool lastState = true;
     private bool isFadingIn = false;
     private bool isFadingOut = false;
+    public GameObject powersPanel;
 
 
     private void Update()
@@ -88,4 +89,11 @@ public class UIManager : MonoBehaviour
         text.gameObject.SetActive(false);
         isFadingOut = false;
     }
+
+
+    public void AddSpecialPower()
+    {
+        powersPanel.SetActive(true);
+    }
+
 }
