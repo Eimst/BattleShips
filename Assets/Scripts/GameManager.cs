@@ -18,11 +18,30 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
-    private UIManager textUIM;
+    private UIManager UIM;
 
     private GameObject lastHoveredTile = null;
 
     CursorChanger cursor;
+    /*
+    public enum GameMode
+    {
+        Standard,
+        Special
+    }
+    
+    public GameMode mode = new GameMode();
+    */
+    public enum ChosenAbility
+    {
+        None,
+        x3,
+        VerHoz,
+        Sonar
+    }
+
+    public ChosenAbility chosenAbility = ChosenAbility.None;
+
 
     public enum GameState
     {
@@ -141,11 +160,21 @@ public class GameManager : MonoBehaviour
                 {
                     if (lastHoveredTile != null)
                     {
-                        botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+                        if(chosenAbility == ChosenAbility.None)
+                            botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+                        else botFieldInstance.GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
                     }
 
                     if (botFieldInstance.GetField().ChangeSprite(currentTile))
+                    {
+                        if (chosenAbility != ChosenAbility.None)
+                        {
+                            botFieldInstance.GetField().ChangeSprite(currentTile);
+                            botFieldInstance.GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
+                        }
+                           
                         cursor.ChangeCursor(true);
+                    }
                     else
                         cursor.ChangeCursor(false);
 
@@ -156,7 +185,14 @@ public class GameManager : MonoBehaviour
                 if (Input.GetMouseButtonDown(0))
                 {
                     cursor.ChangeCursor(false);
-                    botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+                    if (chosenAbility != ChosenAbility.None)
+                    {
+                        botFieldInstance.GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
+                        chosenAbility = ChosenAbility.None;
+                    }
+                        
+                    else 
+                        botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
                     StateHandler(Destroy(currentTile.name, botFieldInstance), true);
                 }
 
@@ -164,7 +200,12 @@ public class GameManager : MonoBehaviour
         }
         else if (lastHoveredTile != null)
         {
-            botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+            if (chosenAbility == ChosenAbility.None)
+                botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
+            else
+            {
+                botFieldInstance.GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
+            }
             lastHoveredTile = null;
             cursor.ChangeCursor(false);
         }
@@ -252,11 +293,11 @@ public class GameManager : MonoBehaviour
     {
         if (currentState == GameState.PlayerTurn && previousState == GameState.BotTurn)
         {
-            textUIM.FadeInTextPlayerTurn(0.6f);
+            UIM.FadeInTextPlayerTurn(0.6f);
         }
         else if (currentState == GameState.BotTurn && previousState == GameState.PlayerTurn)
         {
-            textUIM.FadeOutTextPlayerTurn(0.6f);
+            UIM.FadeOutTextPlayerTurn(0.6f);
         }
     }
 
@@ -296,10 +337,14 @@ public class GameManager : MonoBehaviour
                 // Set player's position to a different vector in the third scene
                 playerFieldInstance.transform.position = new Vector3(-11, 6, 0);
             }
+           // this.mode = PlayerPrefs.GetInt("Mode") == 0 ? GameMode.Standard : GameMode.Special;
 
             currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
             previousState = currentState == GameState.PlayerTurn ? GameState.BotTurn : GameState.PlayerTurn;
-            textUIM = FindObjectOfType<UIManager>();
+            UIM = FindObjectOfType<UIManager>();
+
+            if (PlayerPrefs.GetInt("Mode") == 0)
+                UIM.AddSpecialPower();
             SpawnText();
         }
     }
@@ -320,6 +365,15 @@ public class GameManager : MonoBehaviour
     }
 
 
+
+    public void SetAbility(int abilityIndex)
+    {
+        Debug.Log("Called " + abilityIndex);
+        chosenAbility = (ChosenAbility)abilityIndex;
+        Debug.Log(chosenAbility);
+    }
+
+
     public void GoToBattle()
     {
         if (playerFieldInstance.AreAllSpawned())
@@ -327,6 +381,7 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }
+
 
 
     public void UpdateBotVision()
