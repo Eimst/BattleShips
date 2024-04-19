@@ -132,6 +132,7 @@ public class ShootingManager : MonoBehaviour
                     if(!skip) 
                     {
                         gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
+                        skip = false;
                     }
                     
                     chosenAbility = chosenAbility == ChosenAbility.Vertical ? ChosenAbility.Horizontal : ChosenAbility.Vertical;
@@ -158,6 +159,7 @@ public class ShootingManager : MonoBehaviour
                         if (gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility))
                         {
                             chosenAbility = ChosenAbility.None;
+                            cursor.ChangeToAttack(false);
                             // shooting with ability below
                             StateHandler(Destroy(currentTile.name, gameManager.GetBotInstance()), true);
                         }
