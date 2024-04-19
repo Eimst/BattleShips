@@ -8,6 +8,9 @@ public class UIManager : MonoBehaviour
 
     public TextMeshProUGUI textPlayerTurn;
 
+    public TMP_Text shipsRemainingPlayer;
+    public TMP_Text shipsRemainingBot;
+
     public Toggle check;
 
     private bool lastState = true;
@@ -96,4 +99,10 @@ public class UIManager : MonoBehaviour
         powersPanel.SetActive(true);
     }
 
+    public void ShowRemainingShips(bool bot, string text)
+    {
+        if (bot)
+            shipsRemainingBot.text = text;
+        else shipsRemainingPlayer.text = text;
+    }
 }
