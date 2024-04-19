@@ -60,6 +60,10 @@ public class Player : MonoBehaviour, IKillable
         return result;
     }
 
+    public int[] GetShipsCount()
+    {
+        return field.ShipsCount();
+    }
 
     public int GetRemainingBoats()
     {

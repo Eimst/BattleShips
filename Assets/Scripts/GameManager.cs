@@ -100,6 +100,15 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (UIM is not null)
+        {
+            int[] playerShips = playerFieldInstance.GetShipsCount();
+            string playerText = playerShips[3].ToString() + "        " + playerShips[2].ToString() + "      " + playerShips[1].ToString() + "   " + playerShips[0].ToString();
+            UIM.ShowRemainingShips(false, playerText);
+            int[] botShips = botFieldInstance.GetShipsCount();
+            string botText = botShips[3].ToString() + "        " + botShips[2].ToString() + "      " + botShips[1].ToString() + "   " + botShips[0].ToString();
+            UIM.ShowRemainingShips(true, botText);
+        }
         if (!isAnimationDone)
             return;
 
@@ -302,7 +311,6 @@ public class GameManager : MonoBehaviour
     }
 
 
-
     Field.DestroyResult Destroy(string coordinates, IKillable instance)
     {
         int x = int.Parse(coordinates.Split(' ')[0]);
@@ -337,14 +345,14 @@ public class GameManager : MonoBehaviour
                 // Set player's position to a different vector in the third scene
                 playerFieldInstance.transform.position = new Vector3(-11, 6, 0);
             }
-           // this.mode = PlayerPrefs.GetInt("Mode") == 0 ? GameMode.Standard : GameMode.Special;
-
+            // this.mode = PlayerPrefs.GetInt("Mode") == 0 ? GameMode.Standard : GameMode.Special;
             currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
             previousState = currentState == GameState.PlayerTurn ? GameState.BotTurn : GameState.PlayerTurn;
             UIM = FindObjectOfType<UIManager>();
-
             if (PlayerPrefs.GetInt("Mode") == 0)
+            {
                 UIM.AddSpecialPower();
+            }
             SpawnText();
         }
     }
@@ -379,6 +387,7 @@ public class GameManager : MonoBehaviour
         if (playerFieldInstance.AreAllSpawned())
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            playerFieldInstance.GetField().shipsCount = new int[] { 4, 3, 2, 1 };
         }
     }
 
@@ -388,6 +397,5 @@ public class GameManager : MonoBehaviour
     {
         botFieldInstance.UpdateBotVision(playerFieldInstance.GetField().GetBoardVision());
     }
-
 }
 
