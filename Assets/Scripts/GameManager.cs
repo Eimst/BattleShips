@@ -20,28 +20,6 @@ public class GameManager : MonoBehaviour
 
     private UIManager UIM;
 
-    private GameObject lastHoveredTile = null;
-
-    CursorChanger cursor;
-    /*
-    public enum GameMode
-    {
-        Standard,
-        Special
-    }
-    
-    public GameMode mode = new GameMode();
-    */
-    public enum ChosenAbility
-    {
-        None,
-        x3,
-        VerHoz,
-        Sonar
-    }
-
-    public ChosenAbility chosenAbility = ChosenAbility.None;
-
 
     public enum GameState
     {
@@ -51,15 +29,15 @@ public class GameManager : MonoBehaviour
         GameOver
     }
 
+    private ShootingManager shootingManager;
+
     public GameState currentState = GameState.Setup;
 
     private GameState previousState;
 
-    bool isBotTurnHandled = false;
-
-    int missedCount;
-
     public bool isAnimationDone { get; set; }
+
+
 
     void Awake()
     {
@@ -74,7 +52,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public int countMissedShot {get; set;}
 
     void Start()
     {
@@ -90,29 +67,39 @@ public class GameManager : MonoBehaviour
         botFieldInstance = Instantiate(botFieldPrefab, new Vector3(2, 5, 0), Quaternion.identity);
         botFieldInstance.transform.SetParent(transform);
         botFieldInstance.gameObject.SetActive(false);
-
-        cursor = FindObjectOfType<CursorChanger>();
-        missedCount = 0;
-        countMissedShot = 4;
         isAnimationDone = true;
     }
 
 
     void Update()
     {
+
+        if (UIM is not null)
+        {
+            int[] playerShips = playerFieldInstance.GetShipsCount();
+
+            string playerText = playerShips[3].ToString() + "        "
+                + playerShips[2].ToString() + "      " + playerShips[1].ToString() + "   " + playerShips[0].ToString();
+            UIM.ShowRemainingShips(false, playerText);
+            int[] botShips = botFieldInstance.GetShipsCount();
+
+            string botText = botShips[3].ToString() + "        " + 
+                botShips[2].ToString() + "      " + botShips[1].ToString() + "   " + botShips[0].ToString();
+            UIM.ShowRemainingShips(true, botText);
+        }
         if (!isAnimationDone)
             return;
 
         IsGameOver();
+
         switch (currentState)
         {
             case GameState.PlayerTurn:
-                MouseTrajectory();
+                shootingManager.PlayerShoot();
                 break;
 
             case GameState.BotTurn:
-                if (!isBotTurnHandled)
-                    StartCoroutine(HandleBotTurn());    
+                shootingManager.BotShoot();   
                 break;
 
              case GameState.GameOver:
@@ -131,84 +118,10 @@ public class GameManager : MonoBehaviour
 
 
 
-    void IsGameOver()
+    private void IsGameOver()
     {
         if (playerFieldInstance.GetRemainingBoats() == 0 || botFieldInstance.GetRemainingBoats() == 0)
             currentState = GameState.GameOver;
-    }
-
-
-    void MouseTrajectory() //  Y pozicija visada tokia pati
-    {
-        int boardStartX;
-        int boardEndX;
-
-        boardStartX = 2;
-        boardEndX = 12;
-
-        Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero);
-        if (hit.collider != null)
-        {
-
-            if (hit.collider.transform.position.x >= boardStartX && hit.collider.transform.position.x <= boardEndX &&
-                hit.collider.transform.position.y <= 5 && hit.collider.transform.position.y >= -5)
-            {
-                GameObject currentTile = hit.collider.gameObject;
-
-                if (currentTile != lastHoveredTile)
-                {
-                    if (lastHoveredTile != null)
-                    {
-                        if(chosenAbility == ChosenAbility.None)
-                            botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
-                        else botFieldInstance.GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
-                    }
-
-                    if (botFieldInstance.GetField().ChangeSprite(currentTile))
-                    {
-                        if (chosenAbility != ChosenAbility.None)
-                        {
-                            botFieldInstance.GetField().ChangeSprite(currentTile);
-                            botFieldInstance.GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
-                        }
-                           
-                        cursor.ChangeCursor(true);
-                    }
-                    else
-                        cursor.ChangeCursor(false);
-
-                    lastHoveredTile = currentTile;
-                }
-
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    cursor.ChangeCursor(false);
-                    if (chosenAbility != ChosenAbility.None)
-                    {
-                        botFieldInstance.GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
-                        chosenAbility = ChosenAbility.None;
-                    }
-                        
-                    else 
-                        botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
-                    StateHandler(Destroy(currentTile.name, botFieldInstance), true);
-                }
-
-            }
-        }
-        else if (lastHoveredTile != null)
-        {
-            if (chosenAbility == ChosenAbility.None)
-                botFieldInstance.GetField().ChangeSprite(lastHoveredTile);
-            else
-            {
-                botFieldInstance.GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
-            }
-            lastHoveredTile = null;
-            cursor.ChangeCursor(false);
-        }
     }
 
 
@@ -224,72 +137,21 @@ public class GameManager : MonoBehaviour
     }
 
 
-    IEnumerator HandleBotTurn()
+    private void HandleTurnChange(bool isPlayerTurn)
     {
-        isBotTurnHandled = true;
-        yield return new WaitForSeconds(1.2f);
-        Field.DestroyResult result;
-        do
+        if (isPlayerTurn)
         {
-            result = Destroy(botFieldInstance.ApplyShot(), playerFieldInstance);
-
-        } while (result == Field.DestroyResult.IllegalMove);
-
-        StateHandler(result, false);
-
-        isBotTurnHandled = false;
-
-    }
-
-
-    void StateHandler(Field.DestroyResult result, bool isPlayer)
-    {
-        switch (result)
+            currentState = GameState.PlayerTurn;
+        }
+        else
         {
-            case DestroyResult.Success:
-                if (!isPlayer)
-                {
-                    botFieldInstance.hit = true;
-                    //botFieldInstance.tryEdges = false;
-                    missedCount = 0;
-                }
-                    
-                break;
-
-            case DestroyResult.Failure:
-                // Handle failure (move hit water)
-                if (isPlayer)
-                    currentState = GameState.BotTurn;
-                else
-                {
-                    currentState = GameState.PlayerTurn;
-                    if(!botFieldInstance.tryEdges)
-                        missedCount++;
-                    if (missedCount > countMissedShot)
-                    {
-                        botFieldInstance.tryEdges = true;
-                        botFieldInstance.ResetEdgesCount();
-                        missedCount = 0;
-                    }
-                        
-                }
-                    
-                SpawnText();
-                break;
-
-            case DestroyResult.IllegalMove:
-                // Handle illegal move
-                Debug.Log("Illegal move attempted.");
-                if (isPlayer)
-                    currentState = GameState.PlayerTurn;
-                else
-                    currentState = GameState.BotTurn;
-                break;
+            currentState = GameState.BotTurn;
         }
     }
 
 
-    void SpawnText()
+
+    private void SpawnText()
     {
         if (currentState == GameState.PlayerTurn && previousState == GameState.BotTurn)
         {
@@ -299,15 +161,6 @@ public class GameManager : MonoBehaviour
         {
             UIM.FadeOutTextPlayerTurn(0.6f);
         }
-    }
-
-
-
-    Field.DestroyResult Destroy(string coordinates, IKillable instance)
-    {
-        int x = int.Parse(coordinates.Split(' ')[0]);
-        int y = int.Parse(coordinates.Split(' ')[1]);
-        return instance.Destroy(x, y);
     }
 
 
@@ -323,7 +176,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name.Equals("BattleScene"))
         {
@@ -341,9 +194,27 @@ public class GameManager : MonoBehaviour
 
             currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
             previousState = currentState == GameState.PlayerTurn ? GameState.BotTurn : GameState.PlayerTurn;
+
+
+            if (ShootingManager.Instance == null)
+            {
+                GameObject shootingManagerObject = new GameObject("ShootingManager");
+                shootingManagerObject.AddComponent<ShootingManager>();
+            }
+
+            shootingManager = ShootingManager.Instance;
+
+            // Subscribe to the ShootingManager's event
+            if (shootingManager != null)
+            {
+                shootingManager.OnTurnChange += HandleTurnChange;
+            }
+
             UIM = FindObjectOfType<UIManager>();
 
             if (PlayerPrefs.GetInt("Mode") == 0)
+            if (PlayerPrefs.GetInt("Mode") == 1)
+            {
                 UIM.AddSpecialPower();
             SpawnText();
         }
@@ -365,15 +236,6 @@ public class GameManager : MonoBehaviour
     }
 
 
-
-    public void SetAbility(int abilityIndex)
-    {
-        Debug.Log("Called " + abilityIndex);
-        chosenAbility = (ChosenAbility)abilityIndex;
-        Debug.Log(chosenAbility);
-    }
-
-
     public void GoToBattle()
     {
         if (playerFieldInstance.AreAllSpawned())
@@ -383,11 +245,32 @@ public class GameManager : MonoBehaviour
     }
 
 
+    public Player GetPlayerInstance()
+    {
+        return playerFieldInstance;
+    }
+
+
+    public Bot GetBotInstance()
+    {
+        return botFieldInstance;
+    }
+
 
     public void UpdateBotVision()
     {
         botFieldInstance.UpdateBotVision(playerFieldInstance.GetField().GetBoardVision());
     }
 
+
+
+    private void OnDestroy()
+    {
+        // Always make sure to unsubscribe from the event when the GameObject is destroyed
+        if (shootingManager != null)
+        {
+            shootingManager.OnTurnChange -= HandleTurnChange;
+        }
+    }
 }
 
