@@ -10,11 +10,11 @@ public class AbilityButton : MonoBehaviour
 
     private void Start()
     {
-        myButton.onClick.AddListener(CallGameManagerSetAbility);
+        myButton.onClick.AddListener(CallShootingManagerSetAbility);
     }
 
-    private void CallGameManagerSetAbility()
+    private void CallShootingManagerSetAbility()
     {
-        GameObject.FindObjectOfType<GameManager>().SetAbility(abilityNumber);
+        GameObject.FindObjectOfType<ShootingManager>().SetAbility(abilityNumber);
     }
 }

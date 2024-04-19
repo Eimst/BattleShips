@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger1.cs" />
     <Compile Include="Assets\Scripts\SpriteScripts\Scroller.cs" />
+    <Compile Include="Assets\Scripts\ShootingManager.cs" />
     <Compile Include="Assets\Scripts\ChangeLayerPriority.cs" />
     <Compile Include="Assets\Scripts\VolumeInit.cs" />
     <Compile Include="Assets\Scripts\MainMenuButtons.cs" />
