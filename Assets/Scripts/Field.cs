@@ -10,11 +10,6 @@ using Random = UnityEngine.Random;
 
 public class Field : MonoBehaviour
 {
-    public AudioClip bulletSound;
-    public AudioClip waterSound;
-    public AudioClip fireSound;
-    public AudioClip explosionSound;
-
     public GameObject bullet;
     public GameObject water;
     public GameObject fire;
@@ -470,7 +465,9 @@ public class Field : MonoBehaviour
             Renderer waterRenderer = water.GetComponent<Renderer>();
             waterRenderer.sortingOrder = 30;
             water.transform.localScale = new Vector3(1f, 1f, 1f);
-            AudioSource.PlayClipAtPoint(waterSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            //AudioSource.PlayClipAtPoint(waterSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            GameObject waterSound = GameObject.Find("WaterSound");
+            waterSound.GetComponent<AudioSource>().Play();
             GameObject waterInstance = Instantiate(water, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), Quaternion.identity);
             Destroy(waterInstance, 1.35f);
             field[x1, y1].GetComponent<Chunks>().index = 9;
@@ -482,8 +479,17 @@ public class Field : MonoBehaviour
             //field[x1, y1].GetComponent<Chunks>().index = 10;
             fire.transform.localScale = new Vector3(0.5f, 0.35f, 1f);
             if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
-                AudioSource.PlayClipAtPoint(explosionSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
-            else AudioSource.PlayClipAtPoint(fireSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            {
+                //AudioSource.PlayClipAtPoint(explosionSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+                GameObject explosionSound = GameObject.Find("ExplosionSound");
+                explosionSound.GetComponent<AudioSource>().Play();
+            }
+            else
+            {
+                //AudioSource.PlayClipAtPoint(fireSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+                GameObject fireSound = GameObject.Find("FireSound");
+                fireSound.GetComponent<AudioSource>().Play();
+            } 
             squaresOnFire.Add(Instantiate(fire, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), Quaternion.identity));
             if (IsAllShipDestroyed(shipsArray[x1, y1], x1, y1))
                 DestroyAllShip(x1, y1, shipsArray[x1, y1]);
@@ -506,7 +512,9 @@ public class Field : MonoBehaviour
             bulletRenderer.sortingOrder = 40;
             bullet.transform.localScale = new Vector3(1f, 1f, 1f);
             bullet.transform.Rotate(0f, 0f, 90f);
-            AudioSource.PlayClipAtPoint(bulletSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            GameObject bulletSound = GameObject.Find("BulletSound");
+            bulletSound.GetComponent<AudioSource>().Play();
+            //AudioSource.PlayClipAtPoint(bulletSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
             StartCoroutine(MoveBulletWithDelay(startPos, x1, y1));
             if (shipsArray[x1, y1] == 0)
             {
