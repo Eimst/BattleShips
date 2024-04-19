@@ -182,6 +182,8 @@ public class GameManager : MonoBehaviour
     {
         if (scene.name.Equals("BattleScene"))
         {
+            playerFieldInstance.GetField().shipsCount = new int[] { 4, 3, 2, 1 };
+
             if (botFieldInstance != null)
             {
                 botFieldInstance.transform.position = new Vector3(1, 6, 0);
@@ -243,7 +245,6 @@ public class GameManager : MonoBehaviour
         if (playerFieldInstance.AreAllSpawned())
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            playerFieldInstance.GetField().shipsCount = new int[] { 4, 3, 2, 1 };
         }
     }
 
