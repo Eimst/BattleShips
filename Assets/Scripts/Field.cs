@@ -461,8 +461,8 @@ public class Field : MonoBehaviour
         bulletInstance.transform.Rotate(0, 0, -90);
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
         {
-            bulletInstance.transform.Translate(Vector3.right);
-            yield return new WaitForSeconds(0.15f);
+            bulletInstance.transform.Translate(Vector3.right * 0.1f);
+            yield return new WaitForSeconds(0.001f);
         }
         Destroy(bulletInstance);
         if (shipsArray[x1, y1] == 0)
