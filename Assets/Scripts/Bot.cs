@@ -87,6 +87,7 @@ public class Bot : MonoBehaviour, IKillable
         shipsRemaining.Add(3, 2);
         shipsRemaining.Add(4, 1);
         shotCount = 5;
+        field.shipsCount = new int[] { 4, 3, 2, 1 };
     }
 
     void RecalculateHeatMap()
@@ -754,7 +755,11 @@ public class Bot : MonoBehaviour, IKillable
         return result;
     }
 
-   
+    public int[] GetShipsCount()
+    {
+        return field.ShipsCount();
+    }
+
     public int GetRemainingBoats()
     {
         return remainingBoats;
@@ -782,7 +787,6 @@ public class Bot : MonoBehaviour, IKillable
             }
         }
     }
-
 
     public void ResetEdgesCount()
     {

@@ -85,6 +85,7 @@ public class GameManager : MonoBehaviour
 
             string botText = botShips[3].ToString() + "        " + 
                 botShips[2].ToString() + "      " + botShips[1].ToString() + "   " + botShips[0].ToString();
+
             UIM.ShowRemainingShips(true, botText);
         }
         if (!isAnimationDone)
@@ -164,6 +165,7 @@ public class GameManager : MonoBehaviour
     }
 
 
+
     void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -190,8 +192,7 @@ public class GameManager : MonoBehaviour
                 // Set player's position to a different vector in the third scene
                 playerFieldInstance.transform.position = new Vector3(-11, 6, 0);
             }
-           // this.mode = PlayerPrefs.GetInt("Mode") == 0 ? GameMode.Standard : GameMode.Special;
-
+            // this.mode = PlayerPrefs.GetInt("Mode") == 0 ? GameMode.Standard : GameMode.Special;
             currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
             previousState = currentState == GameState.PlayerTurn ? GameState.BotTurn : GameState.PlayerTurn;
 
@@ -212,10 +213,11 @@ public class GameManager : MonoBehaviour
 
             UIM = FindObjectOfType<UIManager>();
 
-            if (PlayerPrefs.GetInt("Mode") == 0)
             if (PlayerPrefs.GetInt("Mode") == 1)
+
             {
                 UIM.AddSpecialPower();
+            }
             SpawnText();
         }
     }
@@ -241,6 +243,7 @@ public class GameManager : MonoBehaviour
         if (playerFieldInstance.AreAllSpawned())
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            playerFieldInstance.GetField().shipsCount = new int[] { 4, 3, 2, 1 };
         }
     }
 
@@ -272,5 +275,6 @@ public class GameManager : MonoBehaviour
             shootingManager.OnTurnChange -= HandleTurnChange;
         }
     }
+
 }
 

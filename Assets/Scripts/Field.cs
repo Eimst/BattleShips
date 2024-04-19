@@ -456,7 +456,6 @@ public class Field : MonoBehaviour
                 }
             }
         }
-        
     }
     public IEnumerator MoveBulletWithDelay(Vector3 startPos, int x1, int y1)
     {
@@ -587,6 +586,7 @@ public class Field : MonoBehaviour
             Destroy(explosionInstance, 1f);
 
             field[x, y].GetComponent<Chunks>().index = 12;
+            shipsCount[0]--;
             for (int i = 0; i < 8; i++)
             {
                 if (x + dir[i][0] >= 0 && x + dir[i][0] <= 9 && y + dir[i][1] >= 0 && y + dir[i][1] <= 9)
@@ -618,18 +618,25 @@ public class Field : MonoBehaviour
                     else if (i == 1)
                     {
                         if (i == size)
+                        {
                             field[startX + i, startY].GetComponent<Chunks>().index = 18;
+                            shipsCount[1]--;
+                        }
                         else field[startX + i, startY].GetComponent<Chunks>().index = 14;
                     }
                     else if (i == 2)
                     {
                         if (i == size)
+                        {
                             field[startX + i, startY].GetComponent<Chunks>().index = 18;
+                            shipsCount[2]--;
+                        }
                         else field[startX + i, startY].GetComponent<Chunks>().index = 16;
                     }
                     else if (i == 3)
                     {
                         field[startX + i, startY].GetComponent<Chunks>().index = 18;
+                        shipsCount[3]--;
                     }
                     for (int j = 0; j < 8; j++)
                         if (startX + i + dir[j][0] >= 0 && startX + i + dir[j][0] <= 9 && startY + dir[j][1] >= 0 && startY + dir[j][1] <= 9)
@@ -655,18 +662,25 @@ public class Field : MonoBehaviour
                     else if (i == 1)
                     {
                         if (i == size)
+                        {
                             field[startX, startY + i].GetComponent<Chunks>().index = 19;
+                            shipsCount[1]--;
+                        }
                         else field[startX, startY + i].GetComponent<Chunks>().index = 15;
                     }
                     else if (i == 2)
                     {
                         if (i == size)
+                        {
                             field[startX, startY + i].GetComponent<Chunks>().index = 19;
+                            shipsCount[2]--;
+                        }
                         else field[startX, startY + i].GetComponent<Chunks>().index = 17;
                     }
                     else if (i == 3)
                     {
                         field[startX, startY + i].GetComponent<Chunks>().index = 19;
+                        shipsCount[3]--;
                     }
                     for (int j = 0; j < 8; j++)
                         if (startX + dir[j][0] >= 0 && startX + dir[j][0] <= 9 && startY + i + dir[j][1] >= 0 && startY + i + dir[j][1] <= 9)
@@ -1037,6 +1051,11 @@ public class Field : MonoBehaviour
             field[part[0], part[1]].GetComponent<Chunks>().index = 0;
         }
         IndicatedTiles.Clear();
+    }
+
+    public int[] ShipsCount()
+    {
+        return shipsCount;
     }
 
     void Start()
