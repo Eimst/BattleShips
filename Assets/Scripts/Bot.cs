@@ -109,7 +109,7 @@ public class Bot : MonoBehaviour, IKillable
         if (shipsPossiblePlacementCount == 1)
         {
             shotCount = 2;
-            gameManager.countMissedShot = 2;
+            FindAnyObjectByType<ShootingManager>().SendMessage("SetCountMissedShot", 2);
         }
             
 

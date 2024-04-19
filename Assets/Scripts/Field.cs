@@ -130,28 +130,33 @@ public class Field : MonoBehaviour
         }
     }
 
-    public bool ChangeSprite(GameObject coordinates)
+
+    public bool CheckIfShotPossible(GameObject coordinates)
     {
         int x = int.Parse(coordinates.name.Split(' ')[0]);
         int y = int.Parse(coordinates.name.Split(' ')[1]);
-        if (shipsArray[x, y] < 0)
-            return false;
+        return field[x, y].GetComponent<Chunks>().index == 0;
+    }
+
+
+    public void ChangeSprite(GameObject coordinates)
+    {
+        int x = int.Parse(coordinates.name.Split(' ')[0]);
+        int y = int.Parse(coordinates.name.Split(' ')[1]);
 
         if (field[x, y].GetComponent<Chunks>().index == 20)
         {
             field[x, y].GetComponent<Chunks>().index = 0;
         }
            
-        else if (field[x, y].GetComponent<Chunks>().index == 0)
+        else if (field[x, y].GetComponent<Chunks>().index == 0 && shipsArray[x, y] >= 0)
         {
             field[x, y].GetComponent<Chunks>().index = 20;
-            return true;
-        }
-        return false;    
+        }   
     }
 
 
-    public void ChangeSpriteSpecialAb(GameObject coordinates, GameManager.ChosenAbility ability)
+    public bool ChangeSpriteSpecialAb(GameObject coordinates, ShootingManager.ChosenAbility ability)
     {
         int x = int.Parse(coordinates.name.Split(' ')[0]);
         int y = int.Parse(coordinates.name.Split(' ')[1]);
@@ -159,57 +164,51 @@ public class Field : MonoBehaviour
         if(field[x, y].GetComponent<Chunks>().index != 0 && field[x, y].GetComponent<Chunks>().index != 20
             || shipsArray[x, y] < 0)
         {
-            return;
+            return false;
         }
 
-        if (ability == GameManager.ChosenAbility.x3)
+        int count = 0;
+        if (ability == ShootingManager.ChosenAbility.x3)
         {
-            X3TileChanger(x, y);
+            count = X3TileChanger(x, y, count);
         }
-        else if(ability == GameManager.ChosenAbility.VerHoz)
+        else if(ability == ShootingManager.ChosenAbility.Vertical)
         {
-            VerHozTileChanger(x, y);
-        }  
-       
+            count = VerHozTileChanger(x, y, false, count);
+        }
+        else if (ability == ShootingManager.ChosenAbility.Horizontal)
+        {
+            count = VerHozTileChanger(x, y, true, count);
+        }
+        return count > 1;
     }
 
 
-    private void VerHozTileChanger(int x, int y)
+    private int VerHozTileChanger(int x, int y, bool isHoz, int count)
     {
-        int yTemp = 0;
-        int xTemp = 0;
-
+        int xOrig = x;
+        int yOrig = y;
         for (int i = 0; i <= 9; i++)
         {
-            if (field[xTemp, y].GetComponent<Chunks>().index == 20)
+            x = isHoz ? i : x;
+            y = isHoz ? y : i;
+            
+            if (field[x, y].GetComponent<Chunks>().index == 20)
             {
-                field[xTemp, y].GetComponent<Chunks>().index = 0;
+                field[x, y].GetComponent<Chunks>().index = 0;
+                count++;
             }
-
-            else if (shipsArray[xTemp, y] >= 0 && field[xTemp, y].GetComponent<Chunks>().index == 0)
+            else if (shipsArray[x, y] >= 0 && field[x, y].GetComponent<Chunks>().index == 0)
             {
-                field[xTemp, y].GetComponent<Chunks>().index = 20;
+                field[x, y].GetComponent<Chunks>().index = 20;
+                count++;
             }
-            if(y != yTemp)
-            {
-                if (field[x, yTemp].GetComponent<Chunks>().index == 20)
-                {
-                    field[x, yTemp].GetComponent<Chunks>().index = 0;
-                }
-
-                else if (shipsArray[x, yTemp] >= 0 && field[x, yTemp].GetComponent<Chunks>().index == 0)
-                {
-                    field[x, yTemp].GetComponent<Chunks>().index = 20;
-                }
-            }
-           
-            xTemp++;
-            yTemp++;
         }
+        return count;
     }
 
 
-    private void X3TileChanger(int x, int y)
+    private int X3TileChanger(int x, int y, int count)
     {
         int xStart = x - 1 < 0 ? 0 : x - 1;
         int xEnd = x + 1 > 9 ? 9 : x + 1;
@@ -220,17 +219,21 @@ public class Field : MonoBehaviour
         {
             for (int j = yStart; j <= yEnd; j++)
             {
+                
                 if (field[i, j].GetComponent<Chunks>().index == 20)
                 {
                     field[i, j].GetComponent<Chunks>().index = 0;
+                    count++;
                 }
 
                 else if (shipsArray[i, j] >= 0 && field[i, j].GetComponent<Chunks>().index == 0)
                 {
                     field[i, j].GetComponent<Chunks>().index = 20;
+                    count++;
                 }
             }
         }
+        return count;
     }
 
 

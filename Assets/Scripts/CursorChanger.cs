@@ -31,7 +31,7 @@ public class CursorChanger : MonoBehaviour
     }
 
 
-    public void ChangeCursor(bool attack)
+    public void ChangeToAttack(bool attack)
     {
         Cursor.SetCursor(attack ? cursorAtack : cursorArrow, Vector2.zero, CursorMode.ForceSoftware);
     }
