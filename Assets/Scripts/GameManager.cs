@@ -115,7 +115,7 @@ public class GameManager : MonoBehaviour
                     StartCoroutine(LoadSceneWithDelay("DefeatScene", 6f));
                 }
                 else
-                    StartCoroutine(LoadSceneWithDelay("VictoryScene", 0));
+                    StartCoroutine(LoadSceneWithDelay("VictoryScene", 1f));
                 break;
         }
         previousState = currentState;
