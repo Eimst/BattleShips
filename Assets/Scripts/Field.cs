@@ -155,13 +155,13 @@ public class Field : MonoBehaviour
     {
         int x = int.Parse(coordinates.name.Split(' ')[0]);
         int y = int.Parse(coordinates.name.Split(' ')[1]);
-
+        /*
         if(field[x, y].GetComponent<Chunks>().index != 0 && field[x, y].GetComponent<Chunks>().index != 20
             || shipsArray[x, y] < 0)
         {
             return false;
         }
-
+        */
         int count = 0;
         if (ability == ShootingManager.ChosenAbility.x3)
         {
@@ -181,21 +181,37 @@ public class Field : MonoBehaviour
 
     private int VerHozTileChanger(int x, int y, bool isHoz, int count)
     {
+        
         int xOrig = x;
         int yOrig = y;
+
+        int xPrev = 0;
+        int yPrev = 0;
         for (int i = 0; i <= 9; i++)
         {
             x = isHoz ? i : x;
             y = isHoz ? y : i;
             
-            if (field[x, y].GetComponent<Chunks>().index == 20)
+            if (field[x, y].GetComponent<Chunks>().index == 20 || field[x, y].GetComponent<Chunks>().index == 22)
             {
                 field[x, y].GetComponent<Chunks>().index = 0;
                 count++;
             }
             else if (shipsArray[x, y] >= 0 && field[x, y].GetComponent<Chunks>().index == 0)
             {
-                field[x, y].GetComponent<Chunks>().index = 20;
+                if(count == 0)
+                {
+                    field[x, y].GetComponent<Chunks>().index = 22;
+                    xPrev = x;
+                    yPrev = y;
+                }
+                else if(count == 1)
+                {
+                    field[x, y].GetComponent<Chunks>().index = 20;
+                    field[xPrev, yPrev].GetComponent<Chunks>().index = 20;
+                }
+                else
+                    field[x, y].GetComponent<Chunks>().index = 20;
                 count++;
             }
         }
@@ -210,12 +226,14 @@ public class Field : MonoBehaviour
         int yStart = y - 1 < 0 ? 0 : y - 1;
         int yEnd = y + 1 > 9 ? 9 : y + 1;
 
+        int xPrev = 0;
+        int yPrev = 0;
         for (int i = xStart; i <= xEnd; i++)
         {
             for (int j = yStart; j <= yEnd; j++)
             {
                 
-                if (field[i, j].GetComponent<Chunks>().index == 20)
+                if (field[i, j].GetComponent<Chunks>().index == 20 || field[i, j].GetComponent<Chunks>().index == 22)
                 {
                     field[i, j].GetComponent<Chunks>().index = 0;
                     count++;
@@ -223,7 +241,19 @@ public class Field : MonoBehaviour
 
                 else if (shipsArray[i, j] >= 0 && field[i, j].GetComponent<Chunks>().index == 0)
                 {
-                    field[i, j].GetComponent<Chunks>().index = 20;
+                    if (count == 0)
+                    {
+                        xPrev = i;
+                        yPrev = j;
+                        field[i, j].GetComponent<Chunks>().index = 22;
+                    }
+                    else if(count == 1)
+                    {
+                        field[i, j].GetComponent<Chunks>().index = 20;
+                        field[xPrev, yPrev].GetComponent<Chunks>().index = 20;
+                    }
+                    else
+                        field[i, j].GetComponent<Chunks>().index = 20;
                     count++;
                 }
             }

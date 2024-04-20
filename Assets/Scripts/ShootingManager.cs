@@ -95,15 +95,13 @@ public class ShootingManager : MonoBehaviour
 
                 if (currentTile != lastHoveredTile)
                 {
-                    if (lastHoveredTile != null && !skip)
+                    if (lastHoveredTile != null)
                     {
                         if (chosenAbility == ChosenAbility.None)
                             gameManager.GetBotInstance().GetField().ChangeSprite(lastHoveredTile);
                         else 
                             gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
                     }
-                    else
-                        skip = false;
 
                     if (chosenAbility == ChosenAbility.None && gameManager.GetBotInstance().GetField().CheckIfShotPossible(currentTile))
                     {
@@ -119,37 +117,17 @@ public class ShootingManager : MonoBehaviour
                     {
                         cursor.ChangeToAttack(true);
                     }
-                    else if(chosenAbility != ChosenAbility.None)
-                    {
-                        gameManager.GetBotInstance().GetField().ChangeSprite(currentTile);
-                        skip = true;
-                    }
-
+                    
                     lastHoveredTile = currentTile;
                 }
 
                 if (Input.GetMouseButtonDown(1) && (chosenAbility == ChosenAbility.Horizontal || chosenAbility == ChosenAbility.Vertical))
                 {
-                    if(!skip) 
-                    {
-                        gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
-                        skip = false;
-                    }
+                     gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
+                     lastHoveredTile = null;
                     
                     chosenAbility = chosenAbility == ChosenAbility.Vertical ? ChosenAbility.Horizontal : ChosenAbility.Vertical;
 
-                    if (gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility))
-                    {
-                        cursor.ChangeToAttack(true);
-                        skip = false;
-                    }
-                    else
-                    {
-                        cursor.ChangeToAttack(false);
-                        gameManager.GetBotInstance().GetField().ChangeSprite(currentTile);
-                        skip = true;
-                    }
-                        
                 }
 
                 if (Input.GetMouseButtonDown(0))
@@ -165,7 +143,7 @@ public class ShootingManager : MonoBehaviour
                         }
                         else
                         {
-                            gameManager.GetBotInstance().GetField().ChangeSprite(currentTile);
+                            gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
                             Debug.Log("You cant shoot here");
                         }
                     }
