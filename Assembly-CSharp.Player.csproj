@@ -62,18 +62,22 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger1.cs" />
     <Compile Include="Assets\Scripts\SpriteScripts\Scroller.cs" />
+    <Compile Include="Assets\Scripts\ShootingManager.cs" />
     <Compile Include="Assets\Scripts\ChangeLayerPriority.cs" />
     <Compile Include="Assets\Scripts\VolumeInit.cs" />
     <Compile Include="Assets\Scripts\MainMenuButtons.cs" />
     <Compile Include="Assets\Scripts\Field.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger4.cs" />
     <Compile Include="Assets\Scripts\SpriteScripts\BulletScript.cs" />
+    <Compile Include="Assets\Scripts\PersistentOperations.cs" />
     <Compile Include="Assets\Scripts\Chunks.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger3.cs" />
     <Compile Include="Assets\Scripts\Mouse.cs" />
     <Compile Include="Assets\Scripts\ReturnToMenuButton.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\AbilityButton.cs" />
+    <Compile Include="Assets\Scripts\CloseOrOpenPanel.cs" />
     <Compile Include="Assets\Scripts\BackgroundMovement.cs" />
     <Compile Include="Assets\Scripts\Bot.cs" />
     <Compile Include="Assets\Scripts\AudioController.cs" />

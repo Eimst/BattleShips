@@ -508,17 +508,19 @@ public class Field : MonoBehaviour
         int[] illegalIndexes = new int[] { 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 };
         if (illegalIndexes.Contains(field[x1, y1].GetComponent<Chunks>().index))
             return DestroyResult.IllegalMove;
-            
+        if (shipsArray[x1, y1] < 0)
+            return DestroyResult.IllegalMove;
+
         else 
         {
-            Renderer bulletRenderer = bullet.GetComponent<Renderer>();
-            bulletRenderer.sortingOrder = 40;
-            bullet.transform.localScale = new Vector3(1f, 1f, 1f);
-            bullet.transform.Rotate(0f, 0f, 90f);
-            GameObject bulletSound = GameObject.Find("BulletSound");
-            bulletSound.GetComponent<AudioSource>().Play();
-            //AudioSource.PlayClipAtPoint(bulletSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
-            StartCoroutine(MoveBulletWithDelay(startPos, x1, y1));
+            //Renderer bulletRenderer = bullet.GetComponent<Renderer>();
+            //bulletRenderer.sortingOrder = 40;
+            //bullet.transform.localScale = new Vector3(1f, 1f, 1f);
+            //bullet.transform.Rotate(0f, 0f, 90f);
+            //GameObject bulletSound = GameObject.Find("BulletSound");
+            //bulletSound.GetComponent<AudioSource>().Play();
+            ////AudioSource.PlayClipAtPoint(bulletSound, new Vector3(startPos.x + 1 + x1, startPos.y - 1 - y1, 0), 1f);
+            //StartCoroutine(MoveBulletWithDelay(startPos, x1, y1));
             if (shipsArray[x1, y1] == 0)
             {
                 return DestroyResult.Failure;

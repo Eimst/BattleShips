@@ -168,7 +168,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
+    public bool isThereNoShipLeft()
+    {
+        return botFieldInstance.GetRemainingBoats() == 0;
+    }
 
     void OnEnable()
     {
