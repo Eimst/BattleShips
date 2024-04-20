@@ -5,19 +5,23 @@ using UnityEngine.SceneManagement;
 
 public class ReturnToMenuButton : MonoBehaviour
 {
+    private void Start()
+    {
+        if (PersistentOperations.instance == null)
+        {
+            GameObject operations = new GameObject("PersistentOperations");
+            operations.AddComponent<PersistentOperations>();
+        }
+    }
+
     public void ReturnToMenu()
     {
-        if (GameManager.instance != null)
-        {
-            // Destroy the instance of GameManager
-            Destroy(GameManager.instance.gameObject); 
-            GameManager.instance = null; 
-        }
-        SceneManager.LoadScene("MainMenu");
+        FindObjectOfType<PersistentOperations>().ReturnToMenu();
     }
 
     public void Restart()
     {
-        SceneManager.LoadScene("ShipSelectionScene");
+        FindObjectOfType<PersistentOperations>().Restart();
     }
+
 }

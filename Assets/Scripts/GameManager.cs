@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     private UIManager UIM;
 
+    public CloseOrOpenPanel panelController;
 
     public enum GameState
     {
@@ -89,6 +90,9 @@ public class GameManager : MonoBehaviour
             UIM.ShowRemainingShips(true, botText);
         }
         if (!isAnimationDone)
+            return;
+
+        if (panelController != null && panelController.isOpen)
             return;
 
         IsGameOver();
@@ -182,6 +186,8 @@ public class GameManager : MonoBehaviour
     {
         if (scene.name.Equals("BattleScene"))
         {
+            playerFieldInstance.GetField().shipsCount = new int[] { 4, 3, 2, 1 };
+
             if (botFieldInstance != null)
             {
                 botFieldInstance.transform.position = new Vector3(1, 6, 0);
@@ -212,7 +218,7 @@ public class GameManager : MonoBehaviour
             }
 
             UIM = FindObjectOfType<UIManager>();
-
+            panelController = FindObjectOfType<CloseOrOpenPanel>();
             if (PlayerPrefs.GetInt("Mode") == 1)
 
             {
@@ -243,7 +249,6 @@ public class GameManager : MonoBehaviour
         if (playerFieldInstance.AreAllSpawned())
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            playerFieldInstance.GetField().shipsCount = new int[] { 4, 3, 2, 1 };
         }
     }
 
