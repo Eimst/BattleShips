@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     private UIManager UIM;
 
+    public CloseOrOpenPanel panelController;
 
     public enum GameState
     {
@@ -89,6 +90,9 @@ public class GameManager : MonoBehaviour
             UIM.ShowRemainingShips(true, botText);
         }
         if (!isAnimationDone)
+            return;
+
+        if (panelController != null && panelController.isOpen)
             return;
 
         IsGameOver();
@@ -214,7 +218,7 @@ public class GameManager : MonoBehaviour
             }
 
             UIM = FindObjectOfType<UIManager>();
-
+            panelController = FindObjectOfType<CloseOrOpenPanel>();
             if (PlayerPrefs.GetInt("Mode") == 1)
 
             {

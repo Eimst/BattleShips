@@ -77,6 +77,7 @@
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\AbilityButton.cs" />
+    <Compile Include="Assets\Scripts\CloseOrOpenPanel.cs" />
     <Compile Include="Assets\Scripts\BackgroundMovement.cs" />
     <Compile Include="Assets\Scripts\Bot.cs" />
     <Compile Include="Assets\Scripts\AudioController.cs" />
