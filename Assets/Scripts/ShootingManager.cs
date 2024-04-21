@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using static Field;
 using static GameManager;
@@ -94,15 +95,13 @@ public class ShootingManager : MonoBehaviour
 
                 if (currentTile != lastHoveredTile)
                 {
-                    if (lastHoveredTile != null && !skip)
+                    if (lastHoveredTile != null)
                     {
                         if (chosenAbility == ChosenAbility.None)
                             gameManager.GetBotInstance().GetField().ChangeSprite(lastHoveredTile);
                         else 
                             gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
                     }
-                    else
-                        skip = false;
 
                     if (chosenAbility == ChosenAbility.None && gameManager.GetBotInstance().GetField().CheckIfShotPossible(currentTile))
                     {
@@ -118,69 +117,43 @@ public class ShootingManager : MonoBehaviour
                     {
                         cursor.ChangeToAttack(true);
                     }
-                    else if(chosenAbility != ChosenAbility.None)
-                    {
-                        gameManager.GetBotInstance().GetField().ChangeSprite(currentTile);
-                        skip = true;
-                    }
-
+                    
                     lastHoveredTile = currentTile;
                 }
 
                 if (Input.GetMouseButtonDown(1) && (chosenAbility == ChosenAbility.Horizontal || chosenAbility == ChosenAbility.Vertical))
                 {
-                    if(!skip) 
-                    {
-                        gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
-                        skip = false;
-                    }
+                     gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
+                     lastHoveredTile = null;
                     
                     chosenAbility = chosenAbility == ChosenAbility.Vertical ? ChosenAbility.Horizontal : ChosenAbility.Vertical;
 
-                    if (gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility))
-                    {
-                        cursor.ChangeToAttack(true);
-                        skip = false;
-                    }
-                    else
-                    {
-                        cursor.ChangeToAttack(false);
-                        gameManager.GetBotInstance().GetField().ChangeSprite(currentTile);
-                        skip = true;
-                    }
-                        
                 }
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    
                     if (chosenAbility != ChosenAbility.None)
                     {
                         if (gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility))
                         {
-                            chosenAbility = ChosenAbility.None;
                             cursor.ChangeToAttack(false);
                             // shooting with ability below
-                            StateHandler(Destroy(currentTile.name, gameManager.GetBotInstance()), true);
+                            SpecialAbilityUsed(chosenAbility, currentTile.name, true);
+                            chosenAbility = ChosenAbility.None;
                         }
                         else
                         {
-                            gameManager.GetBotInstance().GetField().ChangeSprite(currentTile);
+                            gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
                             Debug.Log("You cant shoot here");
                         }
-                        
                     }
-
                     else if (chosenAbility == ChosenAbility.None)
                     {
                         cursor.ChangeToAttack(false);
                         gameManager.GetBotInstance().GetField().ChangeSprite(lastHoveredTile);
                         StateHandler(Destroy(currentTile.name, gameManager.GetBotInstance()), true);
-                    }
-                    
-                        
+                    } 
                 }
-
             }
         }
         else if (lastHoveredTile != null)
@@ -280,5 +253,42 @@ public class ShootingManager : MonoBehaviour
         countMissedShot = value;
     }
 
-
+    private void SpecialAbilityUsed(ChosenAbility chosenAbility, string coordinates, bool isPlayer)
+    {
+        int x = int.Parse(coordinates.Split(' ')[0]);
+        int y = int.Parse(coordinates.Split(' ')[1]);
+        switch (chosenAbility)
+        {
+            case ChosenAbility.Horizontal:
+                for (int i = 0; i < 10; i++)
+                {
+                    if (gameManager.isThereNoShipLeft()) { break; }
+                    Destroy(i+" "+y, gameManager.GetBotInstance());
+                }
+                OnTurnChange?.Invoke(!isPlayer);
+                break;
+            case ChosenAbility.Vertical:
+                for (int i = 0; i < 10; i++)
+                {
+                    if (gameManager.isThereNoShipLeft()) { break; }
+                    Debug.Log(Destroy(x + " " + i, gameManager.GetBotInstance()));
+                }
+                OnTurnChange?.Invoke(!isPlayer);
+                break;
+            case ChosenAbility.x3:
+                for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+                {
+                    for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+                    {
+                        if (gameManager.isThereNoShipLeft()) { break; }
+                        Debug.Log(Destroy(i + " " + j, gameManager.GetBotInstance()));
+                    }
+                }
+                OnTurnChange?.Invoke(!isPlayer);
+                break;
+            case ChosenAbility.Sonar:
+                // Impliment Sonar Ability
+                break;
+        }
+    }
 }
