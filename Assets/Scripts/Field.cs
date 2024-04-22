@@ -1015,19 +1015,19 @@ public class Field : MonoBehaviour
         return;
     }
 
-    private void Blink()
+    private void Blink(int index)
     {
         //Debug.Log(blinkingShipsArray.Count);
         foreach (int[] part in blinkingShipsArray)
         {
             //Debug.Log(field[part[0], part[1]].GetComponent<Chunks>().index == 0);
-            if (field[part[0], part[1]].GetComponent<Chunks>().index == 0)
+            if (field[part[0], part[1]].GetComponent<Chunks>().index == index)
             {
                 field[part[0], part[1]].GetComponent<Chunks>().index = part[2];
             }
             else
             {
-                field[part[0], part[1]].GetComponent<Chunks>().index = 0;
+                field[part[0], part[1]].GetComponent<Chunks>().index = index;
                 //Debug.Log(field[part[0], part[1]].GetComponent<Chunks>().index);
             }
         }
@@ -1058,16 +1058,17 @@ public class Field : MonoBehaviour
         return true;
     }
 
-    public void Indicate(int x, int y, int size, bool isVertical)
+    public void Indicate(int x, int y, int size, bool isVertical, bool isWrongPlace)
     {
         if (isVertical)
         {
             for (int j = y; j < y + size; j++)
             {
-                int[] newArr = new int[2];
+                int[] newArr = new int[3];
                 newArr[0] = x;
                 newArr[1] = j;
-                field[x, j].GetComponent<Chunks>().index = 21;
+                newArr[2] = field[x, j].GetComponent<Chunks>().index;
+                field[x, j].GetComponent<Chunks>().index = isWrongPlace ? 22 : 21;
                 IndicatedTiles.Add(newArr);
             }
         }
@@ -1075,10 +1076,11 @@ public class Field : MonoBehaviour
         {
             for (int j = x; j < x + size; j++)
             {
-                int[] newArr = new int[2];
+                int[] newArr = new int[3];
                 newArr[0] = j;
                 newArr[1] = y;
-                field[j, y].GetComponent<Chunks>().index = 21;
+                newArr[2] = field[j, y].GetComponent<Chunks>().index;
+                field[j, y].GetComponent<Chunks>().index = isWrongPlace ? 22 : 21;
                 IndicatedTiles.Add(newArr);
             }
         }
@@ -1088,7 +1090,7 @@ public class Field : MonoBehaviour
     {
         foreach (int[] part in IndicatedTiles)
         {
-            field[part[0], part[1]].GetComponent<Chunks>().index = 0;
+            field[part[0], part[1]].GetComponent<Chunks>().index = part[2];
         }
         IndicatedTiles.Clear();
     }
@@ -1113,7 +1115,7 @@ public class Field : MonoBehaviour
             if (timer > 0.75f)
             {
                 //Debug.Log("GG");
-                Blink();
+                Blink(0);
                 timer = 0f;
             }
         }
