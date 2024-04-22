@@ -89,6 +89,7 @@
     <Compile Include="Assets\Scripts\CursorChanger.cs" />
     <Compile Include="Assets\Scripts\SpriteChanger.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
+    <Compile Include="Assets\Scripts\DisableRenderer.cs" />
     <Compile Include="Assets\Scripts\IKillable.cs" />
   </ItemGroup>
   <ItemGroup>
