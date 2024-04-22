@@ -8,6 +8,12 @@ public class CloseOrOpenPanel : MonoBehaviour
 
     public GameObject panel;
 
+    public Button button;
+
+    public Sprite imageExit;
+
+    public Sprite imageOpen;
+
     public bool isOpen { get; set; }
 
 
@@ -23,11 +29,13 @@ public class CloseOrOpenPanel : MonoBehaviour
         {
             panel.SetActive(false);
             isOpen= false;
+            button.image.sprite = imageOpen;
         }
         else
         {
             panel.SetActive(true);
             isOpen= true;
+            button.image.sprite = imageExit;
         }
         
     }
@@ -37,11 +45,9 @@ public class CloseOrOpenPanel : MonoBehaviour
     {
         if (isOpen && Input.GetMouseButtonDown(0))
         {
-            Vector2 mousePosition = Input.mousePosition;
-            Debug.Log(mousePosition.x + " " + mousePosition.y);
-            if (mousePosition.x >= 0 && mousePosition.x <= 1420 && mousePosition.y >= 0 && mousePosition.y <= 1100 || mousePosition.y < 620)
+            if (!RectTransformUtility.RectangleContainsScreenPoint(panel.GetComponent<RectTransform>(), Input.mousePosition, null))
             {
-                ManagePanel();    
+                ManagePanel();
             }
         }
     }

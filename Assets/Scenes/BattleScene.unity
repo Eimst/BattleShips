@@ -288,8 +288,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 706, y: 306}
-  m_SizeDelta: {x: -1425, y: -625}
+  m_AnchoredPosition: {x: 686.75, y: 306}
+  m_SizeDelta: {x: -1386.5, y: -625}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &20116616
 MonoBehaviour:
@@ -1032,7 +1032,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 35
+    m_FontSize: 34
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 3
@@ -1043,7 +1043,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Show when is your turn
+  m_Text: Show when it is your turn
 --- !u!222 &181373470
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3212,7 +3212,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 920, y: 500}
-  m_SizeDelta: {x: 80, y: 80}
+  m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1111867619
 MonoBehaviour:
@@ -3227,6 +3227,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panel: {fileID: 20116614}
+  button: {fileID: 1111867620}
+  imageExit: {fileID: 21300000, guid: ba31878c115544d46b4482408e93caeb, type: 3}
+  imageOpen: {fileID: 21300000, guid: b86bfb445cb9e7c448909596ff464036, type: 3}
 --- !u!114 &1111867620
 MonoBehaviour:
   m_ObjectHideFlags: 0
