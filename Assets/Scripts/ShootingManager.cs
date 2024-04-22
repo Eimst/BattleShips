@@ -1,18 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
+using UnityEngine.UI;
 using static Field;
 using static GameManager;
 
 public class ShootingManager : MonoBehaviour
 {
-
     private GameManager gameManager;
 
     bool isBotTurnHandled = false;
 
     int missedCount;
+
+    private Renderer _renderer;
 
     public enum ChosenAbility
     {
@@ -245,7 +246,34 @@ public class ShootingManager : MonoBehaviour
     {
         Debug.Log("Called " + abilityIndex);
         chosenAbility = (ChosenAbility)abilityIndex;
+        if (chosenAbility == ChosenAbility.Vertical)
+        {
+            _renderer = GameObject.Find("GreenPower").GetComponent<Renderer>();
+            GameObject.Find("GreenPowerSound").GetComponent<AudioSource>().Play();
+            _renderer.enabled = true;
+            Invoke("DisableRenderer", 0.8f);
+        }
+        else if (chosenAbility == ChosenAbility.x3)
+        {
+            _renderer = GameObject.Find("RedPower").GetComponent<Renderer>();
+            GameObject.Find("RedPowerSound").GetComponent<AudioSource>().Play();
+            _renderer.enabled = true;
+            Invoke("DisableRenderer", 0.8f);
+        }
+        else if (chosenAbility == ChosenAbility.Horizontal)
+        {
+            _renderer = GameObject.Find("BluePower").GetComponent<Renderer>();
+            GameObject.Find("BluePowerSound").GetComponent<AudioSource>().Play();
+            _renderer.enabled = true;
+            Invoke("DisableRenderer", 0.8f);
+        }
         Debug.Log(chosenAbility);
+    }
+
+    private void DisableRenderer()
+    {
+        _renderer.enabled = false;
+
     }
 
     public void SetCountMissedShot(int value)
