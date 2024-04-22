@@ -69,8 +69,8 @@
     <Compile Include="Assets\Scripts\Field.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger4.cs" />
     <Compile Include="Assets\Scripts\SpriteScripts\BulletScript.cs" />
-    <Compile Include="Assets\Scripts\PersistentOperations.cs" />
     <Compile Include="Assets\Scripts\Fade.cs" />
+    <Compile Include="Assets\Scripts\PersistentOperations.cs" />
     <Compile Include="Assets\Scripts\Chunks.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger3.cs" />
     <Compile Include="Assets\Scripts\Mouse.cs" />

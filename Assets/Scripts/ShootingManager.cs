@@ -325,5 +325,7 @@ public class ShootingManager : MonoBehaviour
                 // Impliment Sonar Ability
                 break;
         }
+        if(isPlayer)
+            gameManager.SendMessage("SpawnText");
     }
 }
