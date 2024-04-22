@@ -267,6 +267,8 @@ public class ShootingManager : MonoBehaviour
             _renderer.enabled = true;
             Invoke("DisableRenderer", 0.8f);
         }
+        GameObject.Find("FadePanel").GetComponent<Animator>().Play("FadeIn");
+        Invoke("FadeOut", 0.4f);
         Debug.Log(chosenAbility);
     }
 
@@ -274,6 +276,11 @@ public class ShootingManager : MonoBehaviour
     {
         _renderer.enabled = false;
 
+    }
+
+    private void FadeOut()
+    {
+        GameObject.Find("FadePanel").GetComponent<Animator>().Play("FadeOut");
     }
 
     public void SetCountMissedShot(int value)
