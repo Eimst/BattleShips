@@ -232,6 +232,27 @@ public class GameManager : MonoBehaviour
     }
 
 
+
+    public bool PermissionToUsePowers()
+    {
+        if(currentState == GameState.PlayerTurn && isAnimationDone)
+        {
+            StartCoroutine(StopGameUntilPowerAnimationFadesOut());
+            return true;
+        }
+        return false;
+    }
+
+
+    IEnumerator StopGameUntilPowerAnimationFadesOut()
+    {
+        isAnimationDone = false;
+
+        yield return new WaitForSeconds(0.8f);
+        isAnimationDone = true;
+    }
+
+
     IEnumerator LoadSceneWithDelay(string sceneName, float delay)
     {
         yield return new WaitForSeconds(delay);

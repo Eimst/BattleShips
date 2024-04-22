@@ -33,8 +33,6 @@ public class ShootingManager : MonoBehaviour
 
     private int countMissedShot;
 
-    bool skip = false;
-
     public delegate void TurnChangeHandler(bool isPlayerTurn);
     public event TurnChangeHandler OnTurnChange;
 
@@ -244,6 +242,9 @@ public class ShootingManager : MonoBehaviour
 
     public void SetAbility(int abilityIndex)
     {
+        if(!gameManager.PermissionToUsePowers())
+            return;
+
         Debug.Log("Called " + abilityIndex);
         chosenAbility = (ChosenAbility)abilityIndex;
         if (chosenAbility == ChosenAbility.Vertical)
