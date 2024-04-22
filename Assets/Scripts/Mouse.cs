@@ -31,6 +31,12 @@ public class Mouse : MonoBehaviour
                     script.currentSpriteIndex = 0;
                     script.ChangeSprite(0);
                 }
+                else
+                {
+                    savedX = -1;
+                    savedY = -1;
+                    savedPos = false;
+                }
             }
         }
         else if (Input.GetMouseButtonDown(0))
@@ -131,7 +137,11 @@ public class Mouse : MonoBehaviour
         field.StopIndication();
         if (field.CheckForShips(x, y, (spriteIndex + 1) / 2, spriteIndex % 2 == 0))
         {
-            field.Indicate(x, y, (spriteIndex + 1) / 2, spriteIndex % 2 == 0);
+            field.Indicate(x, y, (spriteIndex + 1) / 2, spriteIndex % 2 == 0, false);
+        }
+        else
+        {
+            field.Indicate(x, y, (spriteIndex + 1) / 2, spriteIndex % 2 == 0, true);
         }
     }
 
