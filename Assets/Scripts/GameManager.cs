@@ -38,7 +38,26 @@ public class GameManager : MonoBehaviour
 
     public bool isAnimationDone { get; set; }
 
+    private int _playerTurnCount;
+    
+    private int _botTurnCount;
 
+    public enum GameMode
+    {
+        Standard,
+        Special
+    }
+
+    public GameMode gameMode;
+
+
+    private int _x3PowerRep = 5;
+
+    private int _hozVerPowerRep = 10;
+
+    private int _sonarPowerRep = 8;
+
+    private bool _disappear;
 
     void Awake()
     {
@@ -69,6 +88,8 @@ public class GameManager : MonoBehaviour
         botFieldInstance.transform.SetParent(transform);
         botFieldInstance.gameObject.SetActive(false);
         isAnimationDone = true;
+        _playerTurnCount = 1;
+        _botTurnCount = 1;
     }
 
 
@@ -116,7 +137,7 @@ public class GameManager : MonoBehaviour
                 }
                 else
                     StartCoroutine(LoadSceneWithDelay("VictoryScene", 1f));
-                break;
+                break; 
         }
         previousState = currentState;
     }
@@ -147,14 +168,21 @@ public class GameManager : MonoBehaviour
         if (isPlayerTurn)
         {
             currentState = GameState.PlayerTurn;
+            
+            if (gameMode == GameMode.Standard) return;
+            _botTurnCount++; 
         }
         else
         {
             currentState = GameState.BotTurn;
+            
+            if (gameMode == GameMode.Standard) return;
+            _playerTurnCount++; 
         }
+        CheckIfPowersAvailable();
     }
 
-
+    
 
     private void SpawnText()
     {
@@ -205,7 +233,6 @@ public class GameManager : MonoBehaviour
             currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
             previousState = currentState == GameState.PlayerTurn ? GameState.BotTurn : GameState.PlayerTurn;
 
-
             if (ShootingManager.Instance == null)
             {
                 GameObject shootingManagerObject = new GameObject("ShootingManager");
@@ -220,13 +247,15 @@ public class GameManager : MonoBehaviour
                 shootingManager.OnTurnChange += HandleTurnChange;
             }
 
+            botFieldInstance.SetShootingManager(shootingManager);
             UIM = FindObjectOfType<UIManager>();
             panelController = FindObjectOfType<CloseOrOpenPanel>();
             if (PlayerPrefs.GetInt("Mode") == 1)
-
             {
                 UIM.AddSpecialPower();
+                gameMode = GameMode.Special;
             }
+            else gameMode = GameMode.Standard;
             SpawnText();
         }
     }
@@ -294,6 +323,34 @@ public class GameManager : MonoBehaviour
         botFieldInstance.UpdateBotVision(playerFieldInstance.GetField().GetBoardVision());
     }
 
+
+    private void CheckIfPowersAvailable()
+    {
+        if (_playerTurnCount % _x3PowerRep == 0)
+            UIM.FadeInPowerButton(1);
+
+        if (_playerTurnCount % _hozVerPowerRep == 0)
+            UIM.FadeInPowerButton(2);
+
+        if (_playerTurnCount % _sonarPowerRep == 0)
+            UIM.FadeInPowerButton(4);
+        
+        if (_botTurnCount % _x3PowerRep == 0)
+            shootingManager.SetAbilityForBot(1);
+
+        if (_botTurnCount % _hozVerPowerRep == 0)
+            shootingManager.SetAbilityForBot(2);
+
+        //if (_botTurnCount % _sonarPowerRep == 0)
+          //  shootingManager.SetAbilityForBot(4);
+    }
+
+    public void SetPowersRep(int x3, int hozVez, int sonar)
+    {
+        _x3PowerRep = x3;
+        _hozVerPowerRep = hozVez;
+        _sonarPowerRep = sonar;
+    }
 
 
     private void OnDestroy()

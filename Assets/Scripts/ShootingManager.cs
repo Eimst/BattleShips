@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static Field;
 using static GameManager;
@@ -12,6 +13,8 @@ public class ShootingManager : MonoBehaviour
     bool isBotTurnHandled = false;
 
     int missedCount;
+
+    private UIManager UIM;
 
     private Renderer _renderer;
 
@@ -25,8 +28,13 @@ public class ShootingManager : MonoBehaviour
     }
 
 
-    public ChosenAbility chosenAbility = ChosenAbility.None;
+    [FormerlySerializedAs("chosenAbility")] 
+    public ChosenAbility playerChosenAbility = ChosenAbility.None;
 
+    private List<ChosenAbility> availableAbilitiesBot;
+    
+    public ChosenAbility botChosenAbility = ChosenAbility.None;
+    
     private GameObject lastHoveredTile = null;
 
     CursorChanger cursor;
@@ -58,6 +66,8 @@ public class ShootingManager : MonoBehaviour
         cursor = FindObjectOfType<CursorChanger>();
         missedCount = 0;
         countMissedShot = 4;
+        availableAbilitiesBot = new List<ChosenAbility>();
+        UIM = FindObjectOfType<UIManager>();
     }
 
 
@@ -70,7 +80,10 @@ public class ShootingManager : MonoBehaviour
     public void BotShoot()
     {
         if (!isBotTurnHandled)
+        {
             StartCoroutine(HandleBotTurn());
+        }
+            
     }
 
 
@@ -96,13 +109,13 @@ public class ShootingManager : MonoBehaviour
                 {
                     if (lastHoveredTile != null)
                     {
-                        if (chosenAbility == ChosenAbility.None)
+                        if (playerChosenAbility == ChosenAbility.None)
                             gameManager.GetBotInstance().GetField().ChangeSprite(lastHoveredTile);
                         else 
-                            gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
+                            gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(lastHoveredTile, playerChosenAbility);
                     }
 
-                    if (chosenAbility == ChosenAbility.None && gameManager.GetBotInstance().GetField().CheckIfShotPossible(currentTile))
+                    if (playerChosenAbility == ChosenAbility.None && gameManager.GetBotInstance().GetField().CheckIfShotPossible(currentTile))
                     {
                         gameManager.GetBotInstance().GetField().ChangeSprite(currentTile);
                         cursor.ChangeToAttack(true);
@@ -112,7 +125,7 @@ public class ShootingManager : MonoBehaviour
                         cursor.ChangeToAttack(false);
                     }
                     
-                    if (chosenAbility != ChosenAbility.None && gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility))
+                    if (playerChosenAbility != ChosenAbility.None && gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, playerChosenAbility))
                     {
                         cursor.ChangeToAttack(true);
                     }
@@ -120,33 +133,33 @@ public class ShootingManager : MonoBehaviour
                     lastHoveredTile = currentTile;
                 }
 
-                if (Input.GetMouseButtonDown(1) && (chosenAbility == ChosenAbility.Horizontal || chosenAbility == ChosenAbility.Vertical))
+                if (Input.GetMouseButtonDown(1) && (playerChosenAbility == ChosenAbility.Horizontal || playerChosenAbility == ChosenAbility.Vertical))
                 {
-                     gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
+                     gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, playerChosenAbility);
                      lastHoveredTile = null;
                     
-                    chosenAbility = chosenAbility == ChosenAbility.Vertical ? ChosenAbility.Horizontal : ChosenAbility.Vertical;
+                    playerChosenAbility = playerChosenAbility == ChosenAbility.Vertical ? ChosenAbility.Horizontal : ChosenAbility.Vertical;
 
                 }
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if (chosenAbility != ChosenAbility.None)
+                    if (playerChosenAbility != ChosenAbility.None)
                     {
-                        if (gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility))
+                        if (gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, playerChosenAbility))
                         {
                             cursor.ChangeToAttack(false);
                             // shooting with ability below
-                            SpecialAbilityUsed(chosenAbility, currentTile.name, true);
-                            chosenAbility = ChosenAbility.None;
+                            SpecialAbilityUsed(playerChosenAbility, currentTile.name, true);
+                            playerChosenAbility = ChosenAbility.None;
                         }
                         else
                         {
-                            gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, chosenAbility);
+                            gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(currentTile, playerChosenAbility);
                             Debug.Log("You cant shoot here");
                         }
                     }
-                    else if (chosenAbility == ChosenAbility.None)
+                    else if (playerChosenAbility == ChosenAbility.None)
                     {
                         cursor.ChangeToAttack(false);
                         gameManager.GetBotInstance().GetField().ChangeSprite(lastHoveredTile);
@@ -157,11 +170,11 @@ public class ShootingManager : MonoBehaviour
         }
         else if (lastHoveredTile != null)
         {
-            if (chosenAbility == ChosenAbility.None)
+            if (playerChosenAbility == ChosenAbility.None)
                 gameManager.GetBotInstance().GetField().ChangeSprite(lastHoveredTile);
             else
             {
-                gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(lastHoveredTile, chosenAbility);
+                gameManager.GetBotInstance().GetField().ChangeSpriteSpecialAb(lastHoveredTile, playerChosenAbility);
             }
             lastHoveredTile = null;
             cursor.ChangeToAttack(false);
@@ -172,15 +185,30 @@ public class ShootingManager : MonoBehaviour
     IEnumerator HandleBotTurn()
     {
         isBotTurnHandled = true;
-        yield return new WaitForSeconds(1.2f);
-        Field.DestroyResult result;
-        do
+        
+        if(availableAbilitiesBot.Count == 0)
         {
-            result = Destroy(gameManager.GetBotInstance().ApplyShot(), gameManager.GetPlayerInstance());
+            yield return new WaitForSeconds(1.2f);
+            Field.DestroyResult result;
+            do
+            {
+                result = Destroy(gameManager.GetBotInstance().ApplyShot(), gameManager.GetPlayerInstance());
 
-        } while (result == Field.DestroyResult.IllegalMove);
+            } while (result == Field.DestroyResult.IllegalMove);
 
-        StateHandler(result, false);
+            StateHandler(result, false);
+        }
+        else
+        {
+            Debug.Log("BotHasAbility");
+            string coordinates = gameManager.GetBotInstance().ApplyShotWithSpecialAbility(availableAbilitiesBot);
+            UIM.FadeInTextBotAb(0.3f, "Bot activated special ability - " + botChosenAbility);
+            yield return new WaitForSeconds(2f);
+            SpecialAbilityUsed(botChosenAbility, coordinates, false);
+            botChosenAbility = ChosenAbility.None;
+            availableAbilitiesBot.Clear();
+            UIM.FadeOutTextBotAb(0.3f);
+        }
 
         isBotTurnHandled = false;
 
@@ -202,17 +230,24 @@ public class ShootingManager : MonoBehaviour
 
             case DestroyResult.Failure:
                 if (isPlayer)
+                {
+                    UIM.FadeOutPowerButton();
                     OnTurnChange?.Invoke(false);
+                }
                 else
                 {
                     OnTurnChange?.Invoke(true);
-                    if (!gameManager.GetBotInstance().tryEdges)
-                        missedCount++;
-                    if (missedCount > countMissedShot)
+                    
+                    if (gameManager.gameMode == GameMode.Standard)
                     {
-                        gameManager.GetBotInstance().tryEdges = true;
-                        gameManager.GetBotInstance().ResetEdgesCount();
-                        missedCount = 0;
+                        if (!gameManager.GetBotInstance().tryEdges)
+                            missedCount++;
+                        if (missedCount > countMissedShot)
+                        {
+                            gameManager.GetBotInstance().tryEdges = true;
+                            gameManager.GetBotInstance().ResetEdgesCount();
+                            missedCount = 0;
+                        }
                     }
 
                 }
@@ -223,10 +258,7 @@ public class ShootingManager : MonoBehaviour
             case DestroyResult.IllegalMove:
                 // Handle illegal move
                 Debug.Log("Illegal move attempted.");
-                if (isPlayer)
-                    OnTurnChange?.Invoke(true);
-                else
-                    OnTurnChange?.Invoke(false);
+                
                 break;
         }
     }
@@ -244,24 +276,23 @@ public class ShootingManager : MonoBehaviour
     {
         if(!gameManager.PermissionToUsePowers())
             return;
-
         Debug.Log("Called " + abilityIndex);
-        chosenAbility = (ChosenAbility)abilityIndex;
-        if (chosenAbility == ChosenAbility.Vertical)
+        playerChosenAbility = (ChosenAbility)abilityIndex;
+        if (playerChosenAbility == ChosenAbility.Vertical)
         {
             _renderer = GameObject.Find("GreenPower").GetComponent<Renderer>();
             GameObject.Find("GreenPowerSound").GetComponent<AudioSource>().Play();
             _renderer.enabled = true;
             Invoke("DisableRenderer", 0.8f);
         }
-        else if (chosenAbility == ChosenAbility.x3)
+        else if (playerChosenAbility == ChosenAbility.x3)
         {
             _renderer = GameObject.Find("RedPower").GetComponent<Renderer>();
             GameObject.Find("RedPowerSound").GetComponent<AudioSource>().Play();
             _renderer.enabled = true;
             Invoke("DisableRenderer", 0.8f);
         }
-        else if (chosenAbility == ChosenAbility.Horizontal)
+        else if (playerChosenAbility == ChosenAbility.Horizontal)
         {
             _renderer = GameObject.Find("BluePower").GetComponent<Renderer>();
             GameObject.Find("BluePowerSound").GetComponent<AudioSource>().Play();
@@ -270,9 +301,16 @@ public class ShootingManager : MonoBehaviour
         }
         GameObject.Find("FadePanel").GetComponent<Animator>().Play("FadeIn");
         Invoke("FadeOut", 0.4f);
-        Debug.Log(chosenAbility);
+        Debug.Log(playerChosenAbility);
     }
 
+
+    public void SetAbilityForBot(int abilityIndex)
+    {
+        availableAbilitiesBot.Add((ChosenAbility)abilityIndex);
+    }
+
+    
     private void DisableRenderer()
     {
         _renderer.enabled = false;
@@ -293,13 +331,20 @@ public class ShootingManager : MonoBehaviour
     {
         int x = int.Parse(coordinates.Split(' ')[0]);
         int y = int.Parse(coordinates.Split(' ')[1]);
+        
         switch (chosenAbility)
         {
             case ChosenAbility.Horizontal:
                 for (int i = 0; i < 10; i++)
                 {
                     if (gameManager.isThereNoShipLeft()) { break; }
-                    Destroy(i+" "+y, gameManager.GetBotInstance());
+                    if(isPlayer)
+                        Destroy(i+" "+y, gameManager.GetBotInstance());
+                    else
+                    {
+                        Destroy(i + " " + y, gameManager.GetPlayerInstance());
+                        isBotTurnHandled = false;
+                    }
                 }
                 OnTurnChange?.Invoke(!isPlayer);
                 break;
@@ -307,7 +352,12 @@ public class ShootingManager : MonoBehaviour
                 for (int i = 0; i < 10; i++)
                 {
                     if (gameManager.isThereNoShipLeft()) { break; }
-                    Debug.Log(Destroy(x + " " + i, gameManager.GetBotInstance()));
+                    if(isPlayer)
+                        Debug.Log(Destroy(x + " " + i, gameManager.GetBotInstance()));
+                    else
+                    {
+                        Destroy(x + " " + i, gameManager.GetPlayerInstance());
+                    }
                 }
                 OnTurnChange?.Invoke(!isPlayer);
                 break;
@@ -317,7 +367,14 @@ public class ShootingManager : MonoBehaviour
                     for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
                     {
                         if (gameManager.isThereNoShipLeft()) { break; }
-                        Debug.Log(Destroy(i + " " + j, gameManager.GetBotInstance()));
+
+                        if (isPlayer)
+                            Debug.Log(Destroy(i + " " + j, gameManager.GetBotInstance()));
+                        else
+                        {
+                            Destroy(i + " " + j, gameManager.GetPlayerInstance());
+                        }
+                            
                     }
                 }
                 OnTurnChange?.Invoke(!isPlayer);
@@ -326,7 +383,6 @@ public class ShootingManager : MonoBehaviour
                 // Impliment Sonar Ability
                 break;
         }
-        if(isPlayer)
-            gameManager.SendMessage("SpawnText");
+        gameManager.SendMessage("SpawnText");
     }
 }

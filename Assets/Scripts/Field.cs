@@ -490,7 +490,7 @@ public class Field : MonoBehaviour
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
         {
             bulletInstance.transform.Translate(Vector3.right * 0.1f);
-            yield return new WaitForSeconds(0.001f);
+            yield return new WaitForSeconds(0.004f);
         }
         Destroy(bulletInstance);
         if (shipsArray[x1, y1] == 0)
