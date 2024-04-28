@@ -312,7 +312,7 @@ public class Field : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2.5f);
 
         if (count < 1)
             StartCoroutine(SonarTileChanger(x, y, count + 1));

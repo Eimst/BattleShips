@@ -45,11 +45,11 @@ public class UIManager : MonoBehaviour
             lastState = currentState;
             if (currentState && FindObjectOfType<GameManager>().currentState == GameManager.GameState.PlayerTurn)
             {
-                StartCoroutine(FadeInTextCoroutine(textPlayerTurn, 1f));
+                StartCoroutine(FadeInTextCoroutine(textPlayerTurn, 0.5f));
             }
             else
             {
-                StartCoroutine(FadeOutTextCoroutine(textPlayerTurn, 1f));
+                StartCoroutine(FadeOutTextCoroutine(textPlayerTurn, 0.5f));
             }
             
         }
@@ -75,9 +75,20 @@ public class UIManager : MonoBehaviour
     }
 
     
-    public void FadeInTextBotAb(float duration, string text)
+    public void FadeInTextBotAb(float duration, ShootingManager.ChosenAbility botChosenAbility)
     {
-        botAbText.SetText(text);
+        switch (botChosenAbility)
+        {
+            case ShootingManager.ChosenAbility.x3:
+                botAbText.SetText( "Bot activated special ability \n3x3");
+                break;
+            case ShootingManager.ChosenAbility.Horizontal:
+                botAbText.SetText("Bot activated special ability \nHorizontal/Vertical");
+                break;
+            case ShootingManager.ChosenAbility.Sonar:
+                botAbText.SetText("Bot activated special ability \nSonar");
+                break;
+        }
         StartCoroutine(FadeInTextCoroutine(botAbText, duration));
     }
     

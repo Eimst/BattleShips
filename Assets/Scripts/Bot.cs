@@ -50,7 +50,7 @@ public class Bot : MonoBehaviour, IKillable
     private enum GameState
     {
         Early,
-        Mid_Late,
+        MidLate,
         OnlyOneTileLeft,
         TryEdges,
     }
@@ -88,10 +88,7 @@ public class Bot : MonoBehaviour, IKillable
         lastSuccessfulHit = "";
         gameManager = GetComponentInParent<GameManager>();
         tryEdges = false;
-        shipsRemaining.Add(1, 4);
-        shipsRemaining.Add(2, 3);
-        shipsRemaining.Add(3, 2);
-        shipsRemaining.Add(4, 1);
+
         shotCount = 5;
         field.shipsCount = new int[] { 4, 3, 2, 1 };
         _unfinishedShips = new Stack<string>();
@@ -134,7 +131,7 @@ public class Bot : MonoBehaviour, IKillable
             {
                 if (shipsPossiblePlacementCount == 1)
                     gameState = GameState.OnlyOneTileLeft;
-                else gameState = GameState.Mid_Late;
+                else gameState = GameState.MidLate;
 
             }
             else gameState = GameState.Early;
@@ -151,7 +148,6 @@ public class Bot : MonoBehaviour, IKillable
         foreach (KeyValuePair<int, int> ship in shipsRemaining)
         {
             count += CalculateOneShipPlacementPos(ship.Key -1, x, y);
-           // Debug.Log("---------------------------------------------------" + count);
         }
         return count / shipsPossiblePlacementCount;
     }
@@ -162,8 +158,6 @@ public class Bot : MonoBehaviour, IKillable
         int endX = Math.Min(9, x + size);
         int startY = Math.Max(0, y - size);
         int endY = Math.Min(9, y + size);
-    //    Debug.Log("x: " + x + "   y: " + y + "  ship size: " + (size + 1) + " " +
-    //        " startX: " + startX + "  endX: " + endX + "  startY: " + startY + "  endY: " + endY);
         if (size != 0)
             return  CalculateOneShipHorizontal(startX, endX, y, size) + CalculateOneShipVertical(startY, endY, x, size);
         return CalculateOneShipHorizontal(startX, endX, y, size);
@@ -198,7 +192,6 @@ public class Bot : MonoBehaviour, IKillable
     {
         for (int i = start; i <= end; i++)
         {
-            // Debug.Log("isHorizontal: " + horizontal + " i: " + i + " botVision: " + (horizontal ? botVision[i, axis] : botVision[axis, i]));
             if (horizontal && botVision[i, axis] != 0)
                 return false;
             else if (!horizontal && botVision[axis, i] != 0)
@@ -228,7 +221,7 @@ public class Bot : MonoBehaviour, IKillable
         // lastHit = coordinates;
         if(attempt == 5)
         {
-            gameState = GameState.Mid_Late;
+            gameState = GameState.MidLate;
             tryEdges = false;
         }
             
@@ -259,7 +252,7 @@ public class Bot : MonoBehaviour, IKillable
             start = 5;
             end = 10;
         }
-        else if (gameState == GameState.Mid_Late)
+        else if (gameState == GameState.MidLate)
         {
             start = 2;
             end = 6;
@@ -309,7 +302,6 @@ public class Bot : MonoBehaviour, IKillable
             {
                 if (x + j < 0 || x + j > 9 || (i == 0 && j == 0)) 
                     continue;
-                //Debug.Log(i + " " + j + " " + botVision[x+j, y + i]);
                 if (botVision[x + j, y + i] != 0)
                     return false;
                 
@@ -520,7 +512,6 @@ public class Bot : MonoBehaviour, IKillable
         }
         if(coordinates.Length < 1)
         {
-            CheckWhichShipIsDestroyed(xOrig, yOrig);
             lastSuccessfulHit = "";
             shipState = HitShipState.Unknown;
             state = BotState.Searching;
@@ -552,7 +543,7 @@ public class Bot : MonoBehaviour, IKillable
 
     public string ApplyShot()
     {
-        if (state != BotState.Atacking && _detectedShips.Count > 0)
+        if ((state != BotState.Atacking && _detectedShips.Count > 0) || (_detectedShips.Count > 0 && IsTheSameShip(new Stack<string>(_detectedShips))))
         {
             lastHit = _detectedShips.Pop();
             lastSuccessfulHit = lastHit;
@@ -565,7 +556,6 @@ public class Bot : MonoBehaviour, IKillable
         if (hit)
         {
             lastSuccessfulHit = lastHit;
-           // botVision[int.Parse(lastSuccessfulHit.Split(' ')[0]), int.Parse(lastSuccessfulHit.Split(' ')[1])] = -1;
             state = BotState.Atacking;
             hit = false;
         }
@@ -602,197 +592,6 @@ public class Bot : MonoBehaviour, IKillable
                 
         lastHit = coordinates;
         return coordinates;
-        
-        
-       // int x = Random.Range(0, 10);
-       // int y = Random.Range(0, 10);
-       // return x + " " + y;
-    }
-
-
-    void CheckWhichShipIsDestroyed(int x, int y)
-    {
-        switch (shipState)
-        {
-            case HitShipState.Unknown:
-                CheckIfUnknownD(x, y);
-                break;
-            case HitShipState.Horizontal: 
-                CheckIfHorizontalD(x, y);
-                break;
-            case HitShipState.Vertical:
-                CheckIfVerticalD(x, y);
-                break;
-        }
-    }
-
-
-    void CheckIfVerticalD(int x, int y)
-    {
-        int yTop = y;
-        int yButtom = y;
-        bool checkButtom = true;
-        bool checkTop = true;
-
-        int size = 1;
-        while (checkButtom || checkTop)
-        {
-            if (checkButtom)
-            {
-                if (yButtom + 1 > 9 || yButtom + 1 < 10 && botVision[x, yButtom + 1] == 1)
-                    checkButtom = false;
-
-                else
-                {
-                    size++;
-                    yButtom += 1;
-                }
-                
-            }
-            if(checkTop)
-            {
-                if (yTop -1 < 0 || yTop - 1 >= 0 && botVision[x, yTop - 1] == 1)
-                    checkTop = false;
-                else
-                {
-                    size++;
-                    yTop -= 1;
-                }
-               
-            }
-        }
-        if (size == 4 && shipsRemaining.ContainsKey(4))
-        {
-            shipsRemaining[4] = shipsRemaining[4] - 1;
-            if (shipsRemaining[4] == 0)
-            {
-                shipsRemaining.Remove(4);
-                shipsPossiblePlacementCount -= 8;
-            }
-        }
-        else if (size == 3 && shipsRemaining.ContainsKey(3))
-        {
-            shipsRemaining[3] = shipsRemaining[3] - 1;
-            if (shipsRemaining[3] == 0)
-            {
-                shipsRemaining.Remove(3);
-                shipsPossiblePlacementCount -= 6;
-            }
-        }
-        else if(shipsRemaining.ContainsKey(2))
-        {
-            shipsRemaining[2] = shipsRemaining[2] - 1;
-            if (shipsRemaining[2] == 0)
-            {
-                shipsRemaining.Remove(2);
-                shipsPossiblePlacementCount -= 4;
-            }
-        }
-    }
-
-
-    void CheckIfHorizontalD(int x, int y)
-    {
-        int xRight = x;
-        int xLeft = x;
-        bool checkRight = true;
-        bool checkLeft = true;
-        int size = 1;
-        while (checkRight || checkLeft)
-        {
-            if(checkRight)
-            {
-                if (xRight + 1 > 9 || xRight + 1 < 10 && botVision[xRight + 1, y] == 1)
-                    checkRight = false;
-                else
-                {
-                    size++;
-                    xRight += 1;
-                }
-                
-            }
-            else
-            {
-                if (xLeft - 1 < 0 || xLeft - 1 >= 0 && botVision[xLeft - 1, y] == 1)
-                    checkLeft = false;
-                else
-                {
-                    size++;
-                    xLeft -= 1;
-                }
-                
-            }
-        }
-        if(size == 4 && shipsRemaining.ContainsKey(4))
-        {
-            shipsRemaining[4] = shipsRemaining[4] - 1;
-            if (shipsRemaining[4] == 0)
-            {
-                shipsRemaining.Remove(4);
-                shipsPossiblePlacementCount -= 8;
-            }
-        }
-        else if (size == 3 && shipsRemaining.ContainsKey(3))
-        {
-            shipsRemaining[3] = shipsRemaining[3] - 1;
-            if (shipsRemaining[3] == 0)
-            {
-                shipsRemaining.Remove(3);
-                shipsPossiblePlacementCount -= 6;
-            }
-        }
-        else if(shipsRemaining.ContainsKey(2))
-        {
-            shipsRemaining[2] = shipsRemaining[2] - 1;
-            if (shipsRemaining[2] == 0)
-            {
-                shipsRemaining.Remove(2);
-                shipsPossiblePlacementCount -= 4;
-            }
-        }
-    }
-
-
-    void CheckIfUnknownD(int x, int y)
-    {
-        var top = false;
-        var bottom = false;
-        var right = false;
-        var left = false;
-
-        if(x + 1 > 9) right= true;
-        if(x - 1 < 0) left= true;
-        if(y + 1 > 9) bottom = true;
-        if(y - 1 < 0) top = true;
-
-        if(!right && botVision[x + 1, y] == 1) 
-        {
-            right = true;
-        }
-        if (!left && botVision[x - 1, y] == 1)
-        {
-            left = true;
-        }
-        if (!top && botVision[x, y - 1] == 1)
-        {
-            top = true;
-        }
-        if (!bottom && botVision[x, y + 1] == 1)
-        {
-            bottom = true;
-        }
-
-        if(right && left && top && bottom && shipsRemaining.ContainsKey(1))
-        {
-            shipsRemaining[1] = shipsRemaining[1] - 1;
-            if (shipsRemaining[1] == 0)
-            {
-                shipsRemaining.Remove(1);
-                shipsPossiblePlacementCount--;
-            }
-                
-        }
-
     }
 
     
@@ -853,9 +652,43 @@ public class Bot : MonoBehaviour, IKillable
             _unfinishedShips.Push(x + " " + y);
         }
     }
-    
-    
-    
+
+
+    public void UpdatePlayerShipsCount(int[] ships)
+    {
+        if (ships[3] > 0)
+            shipsRemaining[4] = ships[3];
+        else if(shipsRemaining.ContainsKey(4))
+        {
+            shipsRemaining.Remove(4);
+            shipsPossiblePlacementCount -= 8;
+        }
+        
+        if (ships[2] > 0)
+            shipsRemaining[3] = ships[2];
+        else if(shipsRemaining.ContainsKey(3))
+        {
+            shipsRemaining.Remove(3);
+            shipsPossiblePlacementCount -= 6;
+        }
+        
+        if (ships[1] > 0)
+            shipsRemaining[2] = ships[1];
+        else if(shipsRemaining.ContainsKey(2))
+        {
+            shipsRemaining.Remove(2);
+            shipsPossiblePlacementCount -= 4;
+        }
+        
+        if (ships[0] > 0)
+            shipsRemaining[1] = ships[0];
+        else if(shipsRemaining.ContainsKey(1))
+        {
+            shipsRemaining.Remove(1);
+            shipsPossiblePlacementCount--;
+        }
+        
+    }
     
     
     
