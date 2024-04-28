@@ -56,6 +56,7 @@ public class ShootingManager : MonoBehaviour
         {
             Instance = this;
         }
+        availableAbilitiesBot = new List<ChosenAbility>();
     }
 
 
@@ -66,7 +67,7 @@ public class ShootingManager : MonoBehaviour
         cursor = FindObjectOfType<CursorChanger>();
         missedCount = 0;
         countMissedShot = 4;
-        availableAbilitiesBot = new List<ChosenAbility>();
+        
         UIM = FindObjectOfType<UIManager>();
     }
 

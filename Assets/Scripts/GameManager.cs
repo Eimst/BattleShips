@@ -6,6 +6,7 @@ using System.Threading;
 using Random = UnityEngine.Random;
 using TMPro;
 using System;
+using UnityEngine.UI;
 using static Field;
 
 public class GameManager : MonoBehaviour
@@ -58,6 +59,7 @@ public class GameManager : MonoBehaviour
     private int _sonarPowerRep = 8;
 
     private bool _disappear;
+    
 
     void Awake()
     {
@@ -137,13 +139,22 @@ public class GameManager : MonoBehaviour
                 }
                 else
                     StartCoroutine(LoadSceneWithDelay("VictoryScene", 1f));
-                break; 
+                break;
+                 
         }
         previousState = currentState;
     }
+    
+    
+    
+    public void SetPowersRep(int x3, int hozVer, int sonar)
+    {
+        _x3PowerRep = x3;
+        _hozVerPowerRep = hozVer;
+        _sonarPowerRep = sonar;
+    }
 
-
-
+    
     private void IsGameOver()
     {
         if (playerFieldInstance.GetRemainingBoats() == 0 || botFieldInstance.GetRemainingBoats() == 0)
@@ -254,9 +265,11 @@ public class GameManager : MonoBehaviour
             {
                 UIM.AddSpecialPower();
                 gameMode = GameMode.Special;
+                CheckIfPowersAvailable();
             }
             else gameMode = GameMode.Standard;
             SpawnText();
+            
         }
     }
 
@@ -326,31 +339,31 @@ public class GameManager : MonoBehaviour
 
     private void CheckIfPowersAvailable()
     {
-        if (_playerTurnCount % _x3PowerRep == 0)
+        if(_x3PowerRep == 0 && _hozVerPowerRep == 0 && _sonarPowerRep == 0)
+        {
+            gameMode = GameMode.Standard;
+            return;
+        }
+        
+        if (_x3PowerRep > 0 && _playerTurnCount % _x3PowerRep == 0)
             UIM.FadeInPowerButton(1);
 
-        if (_playerTurnCount % _hozVerPowerRep == 0)
+        if (_hozVerPowerRep > 0 && _playerTurnCount % _hozVerPowerRep == 0)
             UIM.FadeInPowerButton(2);
 
-        if (_playerTurnCount % _sonarPowerRep == 0)
+        if (_sonarPowerRep > 0 && _playerTurnCount % _sonarPowerRep == 0)
             UIM.FadeInPowerButton(4);
         
-        if (_botTurnCount % _x3PowerRep == 0)
+        if (_x3PowerRep > 0 && _botTurnCount % _x3PowerRep == 0)
             shootingManager.SetAbilityForBot(1);
 
-        if (_botTurnCount % _hozVerPowerRep == 0)
+        if (_hozVerPowerRep > 0 && _botTurnCount % _hozVerPowerRep == 0)
             shootingManager.SetAbilityForBot(2);
 
-        //if (_botTurnCount % _sonarPowerRep == 0)
+        //if (_sonarPowerRep > 0 && _botTurnCount % _sonarPowerRep == 0)
           //  shootingManager.SetAbilityForBot(4);
     }
-
-    public void SetPowersRep(int x3, int hozVez, int sonar)
-    {
-        _x3PowerRep = x3;
-        _hozVerPowerRep = hozVez;
-        _sonarPowerRep = sonar;
-    }
+    
 
 
     private void OnDestroy()

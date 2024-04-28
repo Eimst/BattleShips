@@ -31,7 +31,7 @@ public class UIManager : MonoBehaviour
     private GameManager _gameManager;
 
 
-    private void Start()
+    private void Awake()
     {
         _gameManager = FindObjectOfType<GameManager>();
     }
@@ -160,6 +160,7 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator FadeInPowerCoroutine(float duration, Button button)
     {
+     
         button.gameObject.SetActive(true); // Set the button active but transparent
         Image backgroundImage = button.GetComponent<Image>();
         backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, 0f); 
@@ -208,4 +209,6 @@ public class UIManager : MonoBehaviour
         button.gameObject.SetActive(false);
     }
     
+   
+
 }
