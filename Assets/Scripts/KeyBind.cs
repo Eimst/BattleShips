@@ -135,9 +135,9 @@ public class KeyBind : MonoBehaviour
     }
     public void ResetBinds()
     {
-        buttonLabel1.text = "No  key";
-        buttonLabel2.text = "No  key";
-        buttonLabel3.text = "No  key";
+        buttonLabel1.text = "No key";
+        buttonLabel2.text = "No key";
+        buttonLabel3.text = "No key";
         PlayerPrefs.SetString("AbilityKey1", "");
         PlayerPrefs.SetString("AbilityKey2", "");
         PlayerPrefs.SetString("AbilityKey3", "");
