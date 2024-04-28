@@ -360,11 +360,22 @@ public class GameManager : MonoBehaviour
         if (_hozVerPowerRep > 0 && _botTurnCount % _hozVerPowerRep == 0)
             shootingManager.SetAbilityForBot(2);
 
-        //if (_sonarPowerRep > 0 && _botTurnCount % _sonarPowerRep == 0)
-          //  shootingManager.SetAbilityForBot(4);
+        if (_sonarPowerRep > 0 && _botTurnCount % _sonarPowerRep == 0)
+            shootingManager.SetAbilityForBot(4);
+    }
+
+
+    public Stack<String> ReturnSonarResultFromPlayerBoard(string coord, ref int[,] vision)
+    {
+        return playerFieldInstance.GetField().ReturnSonarResults(coord, ref vision);
+    }
+
+
+    public void ShowToPlayerWhichTilesBotDetectedWithSonar(int x, int y)
+    {
+        StartCoroutine(playerFieldInstance.GetField().SonarTileChanger(x, y));
     }
     
-
 
     private void OnDestroy()
     {

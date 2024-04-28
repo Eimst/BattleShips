@@ -68,6 +68,8 @@ public class Bot : MonoBehaviour, IKillable
 
     private Stack<string> _unfinishedShips;
 
+    private Stack<string> _detectedShips;
+
     void Start()
     {
 
@@ -93,6 +95,7 @@ public class Bot : MonoBehaviour, IKillable
         shotCount = 5;
         field.shipsCount = new int[] { 4, 3, 2, 1 };
         _unfinishedShips = new Stack<string>();
+        _detectedShips = new Stack<string>();
     }
 
 
@@ -163,7 +166,7 @@ public class Bot : MonoBehaviour, IKillable
     //        " startX: " + startX + "  endX: " + endX + "  startY: " + startY + "  endY: " + endY);
         if (size != 0)
             return  CalculateOneShipHorizontal(startX, endX, y, size) + CalculateOneShipVertical(startY, endY, x, size);
-        else return CalculateOneShipHorizontal(startX, endX, y, size);
+        return CalculateOneShipHorizontal(startX, endX, y, size);
     }
 
 
@@ -195,7 +198,7 @@ public class Bot : MonoBehaviour, IKillable
     {
         for (int i = start; i <= end; i++)
         {
-       //     Debug.Log("isHorizontal: " + horizontal + " i: " + i + " botVision: " + (horizontal ? botVision[i, axis] : botVision[axis, i]));
+            // Debug.Log("isHorizontal: " + horizontal + " i: " + i + " botVision: " + (horizontal ? botVision[i, axis] : botVision[axis, i]));
             if (horizontal && botVision[i, axis] != 0)
                 return false;
             else if (!horizontal && botVision[axis, i] != 0)
@@ -526,8 +529,38 @@ public class Bot : MonoBehaviour, IKillable
     }
 
 
+    private bool IsTheSameShip(Stack<string> ships)
+    {
+        int xLast = int.Parse(lastSuccessfulHit.Split(' ')[0]);
+        int yLast = int.Parse(lastSuccessfulHit.Split(' ')[1]);
+
+        while (ships.Count > 0)
+        {
+            string coord = ships.Pop();
+            int xNext = int.Parse(coord.Split(' ')[0]);
+            int yNext = int.Parse(coord.Split(' ')[1]);
+
+            if ((xLast == xNext && (yLast + 1 == yNext || yLast - 1 == yNext)) ||
+                (yLast == yNext && (xLast + 1 == xNext || xLast - 1 == xNext)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public string ApplyShot()
     {
+        if (state != BotState.Atacking && _detectedShips.Count > 0)
+        {
+            lastHit = _detectedShips.Pop();
+            lastSuccessfulHit = lastHit;
+            if(_detectedShips.Count == 0 || !IsTheSameShip(new Stack<string>(_detectedShips)))
+                state = BotState.Atacking;
+            return lastHit;
+        }
+        
         gameManager.UpdateBotVision();
         if (hit)
         {
@@ -543,7 +576,7 @@ public class Bot : MonoBehaviour, IKillable
                 tryEdges = false;
             else gameState = GameState.TryEdges;
         }
-
+        
         if (state == BotState.Searching && _unfinishedShips.Count > 0)
         {
             state = BotState.Atacking;
@@ -749,7 +782,7 @@ public class Bot : MonoBehaviour, IKillable
             bottom = true;
         }
 
-        if(right && left && top && bottom)
+        if(right && left && top && bottom && shipsRemaining.ContainsKey(1))
         {
             shipsRemaining[1] = shipsRemaining[1] - 1;
             if (shipsRemaining[1] == 0)
@@ -843,9 +876,14 @@ public class Bot : MonoBehaviour, IKillable
 
         if (coord.Length > 0)
             return coord;
+
+        string coordSonar = PlaceSliderX3()[0];
+
+        _detectedShips = gameManager.ReturnSonarResultFromPlayerBoard(coordSonar, ref botVision);
         
-        // sonaras
-        return "";
+
+        _shootingManager.botChosenAbility = ShootingManager.ChosenAbility.Sonar;
+        return coordSonar;
     }
 
 

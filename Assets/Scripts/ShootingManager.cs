@@ -382,6 +382,11 @@ public class ShootingManager : MonoBehaviour
                 break;
             case ChosenAbility.Sonar:
                 // Impliment Sonar Ability
+                if(!isPlayer)
+                {
+                    gameManager.ShowToPlayerWhichTilesBotDetectedWithSonar(x, y);
+                    OnTurnChange?.Invoke(!isPlayer);
+                }
                 break;
         }
         gameManager.SendMessage("SpawnText");

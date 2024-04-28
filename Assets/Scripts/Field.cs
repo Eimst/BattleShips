@@ -262,6 +262,55 @@ public class Field : MonoBehaviour
     }
 
 
+    public Stack<string> ReturnSonarResults(string coord, ref int[,] vision)
+    {
+        int x = int.Parse(coord.Split(' ')[0]);
+        int y = int.Parse(coord.Split(' ')[1]);
+
+        Stack<string> ships = new Stack<string>();
+        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+        {
+            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+            {
+                if (shipsArray[i, j] > 0)
+                {
+                    ships.Push(i + " " + j);
+                }
+                else vision[i, j] = 1;
+            }
+        }
+
+        return ships;
+    }
+
+
+    public IEnumerator SonarTileChanger(int x, int y, int count = 0)
+    {
+        
+        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+        {
+            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+            {
+                if (field[i, j].GetComponent<Chunks>().index == 0)
+                {
+                    field[i, j].GetComponent<Chunks>().index = 20;
+                }
+                
+                else if (field[i, j].GetComponent<Chunks>().index == 20)
+                {
+                    field[i, j].GetComponent<Chunks>().index = 0;
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(3);
+
+        if (count < 1)
+            StartCoroutine(SonarTileChanger(x, y, count + 1));
+
+    }
+    
+    
     public void MaskField()
     {
         for (int i = 0; i < fieldLength; i++)
