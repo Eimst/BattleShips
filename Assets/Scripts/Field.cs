@@ -276,7 +276,8 @@ public class Field : MonoBehaviour
                 {
                     ships.Push(i + " " + j);
                 }
-                else vision[i, j] = 1;
+                else if(shipsArray[i, j] == 0)
+                    vision[i, j] = 1;
             }
         }
 
@@ -291,14 +292,22 @@ public class Field : MonoBehaviour
         {
             for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
             {
-                if (field[i, j].GetComponent<Chunks>().index == 0)
+                if (count == 0)
                 {
-                    field[i, j].GetComponent<Chunks>().index = 20;
+                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
+                    if (renderer != null)
+                    {
+                        renderer.color = new Color(0.7f, 0.3f, 0.3f, 1); // Darken the sprite
+                    }
                 }
                 
-                else if (field[i, j].GetComponent<Chunks>().index == 20)
+                else 
                 {
-                    field[i, j].GetComponent<Chunks>().index = 0;
+                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
+                    if (renderer != null)
+                    {
+                        renderer.color = new Color(1f, 1f, 1f, 1); // Darken the sprite
+                    }
                 }
             }
         }
