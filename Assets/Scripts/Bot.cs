@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEngine;
 
@@ -43,6 +45,7 @@ public class Bot : MonoBehaviour, IKillable
 
     private HitShipState shipState;
 
+    private ShootingManager _shootingManager;
 
     private enum GameState
     {
@@ -62,7 +65,10 @@ public class Bot : MonoBehaviour, IKillable
 
     private int shotCount;
 
-  
+
+    private Stack<string> _unfinishedShips;
+
+    private Stack<string> _detectedShips;
 
     void Start()
     {
@@ -88,6 +94,15 @@ public class Bot : MonoBehaviour, IKillable
         shipsRemaining.Add(4, 1);
         shotCount = 5;
         field.shipsCount = new int[] { 4, 3, 2, 1 };
+        _unfinishedShips = new Stack<string>();
+        _detectedShips = new Stack<string>();
+    }
+
+
+
+    public void SetShootingManager(ShootingManager shootingManager)
+    {
+        _shootingManager = shootingManager;
     }
 
     void RecalculateHeatMap()
@@ -151,7 +166,7 @@ public class Bot : MonoBehaviour, IKillable
     //        " startX: " + startX + "  endX: " + endX + "  startY: " + startY + "  endY: " + endY);
         if (size != 0)
             return  CalculateOneShipHorizontal(startX, endX, y, size) + CalculateOneShipVertical(startY, endY, x, size);
-        else return CalculateOneShipHorizontal(startX, endX, y, size);
+        return CalculateOneShipHorizontal(startX, endX, y, size);
     }
 
 
@@ -183,7 +198,7 @@ public class Bot : MonoBehaviour, IKillable
     {
         for (int i = start; i <= end; i++)
         {
-       //     Debug.Log("isHorizontal: " + horizontal + " i: " + i + " botVision: " + (horizontal ? botVision[i, axis] : botVision[axis, i]));
+            // Debug.Log("isHorizontal: " + horizontal + " i: " + i + " botVision: " + (horizontal ? botVision[i, axis] : botVision[axis, i]));
             if (horizontal && botVision[i, axis] != 0)
                 return false;
             else if (!horizontal && botVision[axis, i] != 0)
@@ -514,13 +529,43 @@ public class Bot : MonoBehaviour, IKillable
     }
 
 
+    private bool IsTheSameShip(Stack<string> ships)
+    {
+        int xLast = int.Parse(lastSuccessfulHit.Split(' ')[0]);
+        int yLast = int.Parse(lastSuccessfulHit.Split(' ')[1]);
+
+        while (ships.Count > 0)
+        {
+            string coord = ships.Pop();
+            int xNext = int.Parse(coord.Split(' ')[0]);
+            int yNext = int.Parse(coord.Split(' ')[1]);
+
+            if ((xLast == xNext && (yLast + 1 == yNext || yLast - 1 == yNext)) ||
+                (yLast == yNext && (xLast + 1 == xNext || xLast - 1 == xNext)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public string ApplyShot()
     {
+        if (state != BotState.Atacking && _detectedShips.Count > 0)
+        {
+            lastHit = _detectedShips.Pop();
+            lastSuccessfulHit = lastHit;
+            if(_detectedShips.Count == 0 || !IsTheSameShip(new Stack<string>(_detectedShips)))
+                state = BotState.Atacking;
+            return lastHit;
+        }
+        
         gameManager.UpdateBotVision();
         if (hit)
         {
             lastSuccessfulHit = lastHit;
-            botVision[int.Parse(lastSuccessfulHit.Split(' ')[0]), int.Parse(lastSuccessfulHit.Split(' ')[1])] = -1;
+           // botVision[int.Parse(lastSuccessfulHit.Split(' ')[0]), int.Parse(lastSuccessfulHit.Split(' ')[1])] = -1;
             state = BotState.Atacking;
             hit = false;
         }
@@ -530,6 +575,12 @@ public class Bot : MonoBehaviour, IKillable
             if (tryEdgesCount <= 0)
                 tryEdges = false;
             else gameState = GameState.TryEdges;
+        }
+        
+        if (state == BotState.Searching && _unfinishedShips.Count > 0)
+        {
+            state = BotState.Atacking;
+            lastSuccessfulHit = _unfinishedShips.Pop();
         }
         RecalculateHeatMap();
         string coordinates = "";
@@ -610,7 +661,7 @@ public class Bot : MonoBehaviour, IKillable
                
             }
         }
-        if (size == 4)
+        if (size == 4 && shipsRemaining.ContainsKey(4))
         {
             shipsRemaining[4] = shipsRemaining[4] - 1;
             if (shipsRemaining[4] == 0)
@@ -619,7 +670,7 @@ public class Bot : MonoBehaviour, IKillable
                 shipsPossiblePlacementCount -= 8;
             }
         }
-        else if (size == 3)
+        else if (size == 3 && shipsRemaining.ContainsKey(3))
         {
             shipsRemaining[3] = shipsRemaining[3] - 1;
             if (shipsRemaining[3] == 0)
@@ -628,7 +679,7 @@ public class Bot : MonoBehaviour, IKillable
                 shipsPossiblePlacementCount -= 6;
             }
         }
-        else
+        else if(shipsRemaining.ContainsKey(2))
         {
             shipsRemaining[2] = shipsRemaining[2] - 1;
             if (shipsRemaining[2] == 0)
@@ -672,7 +723,7 @@ public class Bot : MonoBehaviour, IKillable
                 
             }
         }
-        if(size == 4)
+        if(size == 4 && shipsRemaining.ContainsKey(4))
         {
             shipsRemaining[4] = shipsRemaining[4] - 1;
             if (shipsRemaining[4] == 0)
@@ -681,7 +732,7 @@ public class Bot : MonoBehaviour, IKillable
                 shipsPossiblePlacementCount -= 8;
             }
         }
-        else if (size == 3)
+        else if (size == 3 && shipsRemaining.ContainsKey(3))
         {
             shipsRemaining[3] = shipsRemaining[3] - 1;
             if (shipsRemaining[3] == 0)
@@ -690,7 +741,7 @@ public class Bot : MonoBehaviour, IKillable
                 shipsPossiblePlacementCount -= 6;
             }
         }
-        else
+        else if(shipsRemaining.ContainsKey(2))
         {
             shipsRemaining[2] = shipsRemaining[2] - 1;
             if (shipsRemaining[2] == 0)
@@ -704,10 +755,10 @@ public class Bot : MonoBehaviour, IKillable
 
     void CheckIfUnknownD(int x, int y)
     {
-        bool top = false;
-        bool bottom = false;
-        bool right = false;
-        bool left = false;
+        var top = false;
+        var bottom = false;
+        var right = false;
+        var left = false;
 
         if(x + 1 > 9) right= true;
         if(x - 1 < 0) left= true;
@@ -731,7 +782,7 @@ public class Bot : MonoBehaviour, IKillable
             bottom = true;
         }
 
-        if(right && left && top && bottom)
+        if(right && left && top && bottom && shipsRemaining.ContainsKey(1))
         {
             shipsRemaining[1] = shipsRemaining[1] - 1;
             if (shipsRemaining[1] == 0)
@@ -791,6 +842,161 @@ public class Bot : MonoBehaviour, IKillable
     public void ResetEdgesCount()
     {
         tryEdgesCount = shotCount;
+    }
+
+
+    public void SetHitShipStatus(int x, int y)
+    {
+        botVision[x, y] = -1;
+        if (_shootingManager.botChosenAbility != ShootingManager.ChosenAbility.None)
+        {
+            _unfinishedShips.Push(x + " " + y);
+        }
+    }
+    
+    
+    
+    
+    
+    
+    // With Ability ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private string CalculateBestPositionForShot(List<ShootingManager.ChosenAbility> abilities)
+    {
+        string[] x3 = new string[2];
+        string[] hozVer = new string[3];
+        
+        if(abilities.Contains(ShootingManager.ChosenAbility.x3))
+            x3 = PlaceSliderX3();
+        
+        if(abilities.Contains(ShootingManager.ChosenAbility.Horizontal))
+            hozVer = SpecialAbiHoz();
+
+        string coord = DetermineWhichAbilityToUse(x3, hozVer);
+
+        if (coord.Length > 0)
+            return coord;
+
+        string coordSonar = PlaceSliderX3()[0];
+
+        _detectedShips = gameManager.ReturnSonarResultFromPlayerBoard(coordSonar, ref botVision);
+        
+
+        _shootingManager.botChosenAbility = ShootingManager.ChosenAbility.Sonar;
+        return coordSonar;
+    }
+
+
+    private string DetermineWhichAbilityToUse(string[] x3, string[] hozVer)
+    {
+        if (hozVer[0] == null && x3[0] == null)
+            return "";
+        
+        if ((x3[0] != null && hozVer[0] == null) || (x3[0] != null && hozVer[0] != null && double.Parse(x3[1]) > double.Parse(hozVer[1])))
+        {
+            _shootingManager.botChosenAbility = ShootingManager.ChosenAbility.x3;
+            return x3[0];
+        }
+        
+        _shootingManager.botChosenAbility = hozVer[2].Equals("1") ? ShootingManager.ChosenAbility.Horizontal : ShootingManager.ChosenAbility.Vertical;
+        
+        return hozVer[0];
+    }
+
+
+    private string[] SpecialAbiHoz()
+    {
+        // Hoz
+        double max = 0;
+        string coordHoz = "";
+        for (int i = 0; i <= 9; i++)
+        {
+            double sum = 0;
+            for (int j = 0; j <= 9; j++)
+            {
+                sum += heatMap[j, i];
+            }
+
+            if (sum > max)
+            {
+                max = sum;
+                coordHoz = 0+ " " + i;
+            }
+        }
+        // Ver
+        string[] vertical = SpecialAbiVer(max);
+
+        if (vertical[0].Length > 0)
+            return vertical;
+
+        return new [] {coordHoz, max.ToString(), "1"};
+    }
+
+    
+    private string[] SpecialAbiVer(double max)
+    {
+        string coord = "";
+        for (int i = 0; i <= 9; i++)
+        {
+            double sum = 0;
+            for (int j = 0; j <= 9; j++)
+            {
+                sum += heatMap[i, j];
+            }
+            if (sum > max)
+            {
+                max = sum;
+                coord = i + " " + 0;
+            }
+        }
+
+        return new [] {coord, max.ToString(), "0"};
+    }
+    
+    
+    private string[] PlaceSliderX3()
+    {
+        double max = 0;
+        string coordinates = "";
+        for (int i = 0; i <= 9; i++)
+        {
+            for (int j = 0; j <= 9; j++)
+            {
+                double current = AbilityX3(i, j);
+                if (current >= max)
+                {
+                    max = current;
+                    coordinates = i + " " + j;
+                }
+            }
+        }
+
+        return new [] {coordinates, max.ToString()};
+
+    }
+
+    private double AbilityX3(int x, int y)
+    {
+        double sum = 0;
+        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+        {
+            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+            {
+                sum += heatMap[i, j];
+            }
+        }
+
+        return sum;
+    }
+    
+    
+    
+    public string ApplyShotWithSpecialAbility(List<ShootingManager.ChosenAbility> abilities)
+    {
+        gameManager.UpdateBotVision();
+        RecalculateHeatMap();
+        return CalculateBestPositionForShot(abilities);
+
     }
 
     // Update is called once per frame

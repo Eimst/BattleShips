@@ -262,6 +262,64 @@ public class Field : MonoBehaviour
     }
 
 
+    public Stack<string> ReturnSonarResults(string coord, ref int[,] vision)
+    {
+        int x = int.Parse(coord.Split(' ')[0]);
+        int y = int.Parse(coord.Split(' ')[1]);
+
+        Stack<string> ships = new Stack<string>();
+        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+        {
+            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+            {
+                if (shipsArray[i, j] > 0)
+                {
+                    ships.Push(i + " " + j);
+                }
+                else if(shipsArray[i, j] == 0)
+                    vision[i, j] = 1;
+            }
+        }
+
+        return ships;
+    }
+
+
+    public IEnumerator SonarTileChanger(int x, int y, int count = 0)
+    {
+        
+        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+        {
+            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+            {
+                if (count == 0)
+                {
+                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
+                    if (renderer != null)
+                    {
+                        renderer.color = new Color(0.7f, 0.3f, 0.3f, 1); // Darken the sprite
+                    }
+                }
+                
+                else 
+                {
+                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
+                    if (renderer != null)
+                    {
+                        renderer.color = new Color(1f, 1f, 1f, 1); // Darken the sprite
+                    }
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(3);
+
+        if (count < 1)
+            StartCoroutine(SonarTileChanger(x, y, count + 1));
+
+    }
+    
+    
     public void MaskField()
     {
         for (int i = 0; i < fieldLength; i++)
@@ -490,7 +548,7 @@ public class Field : MonoBehaviour
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
         {
             bulletInstance.transform.Translate(Vector3.right * 0.1f);
-            yield return new WaitForSeconds(0.001f);
+            yield return new WaitForSeconds(0.004f);
         }
         Destroy(bulletInstance);
         if (shipsArray[x1, y1] == 0)
