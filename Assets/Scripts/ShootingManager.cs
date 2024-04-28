@@ -203,7 +203,8 @@ public class ShootingManager : MonoBehaviour
         {
             Debug.Log("BotHasAbility");
             string coordinates = gameManager.GetBotInstance().ApplyShotWithSpecialAbility(availableAbilitiesBot);
-            UIM.FadeInTextBotAb(0.3f, "Bot activated special ability - " + botChosenAbility);
+            UIM.FadeInTextBotAb(0.3f, botChosenAbility);
+            
             yield return new WaitForSeconds(2f);
             SpecialAbilityUsed(botChosenAbility, coordinates, false);
             botChosenAbility = ChosenAbility.None;
@@ -390,5 +391,17 @@ public class ShootingManager : MonoBehaviour
                 break;
         }
         gameManager.SendMessage("SpawnText");
+    }
+
+
+    public void SetLastHoveredTile()
+    {
+        lastHoveredTile = null;
+    }
+
+
+    public void SetCursorToDefault()
+    {
+        cursor.ChangeToAttack(false);
     }
 }

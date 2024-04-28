@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
         if (UIM is not null)
         {
             int[] playerShips = playerFieldInstance.GetShipsCount();
-
+            botFieldInstance.UpdatePlayerShipsCount(playerShips);
             string playerText = playerShips[3].ToString() + "        "
                 + playerShips[2].ToString() + "      " + playerShips[1].ToString() + "   " + playerShips[0].ToString();
             UIM.ShowRemainingShips(false, playerText);
@@ -199,11 +199,11 @@ public class GameManager : MonoBehaviour
     {
         if (currentState == GameState.PlayerTurn && previousState == GameState.BotTurn)
         {
-            UIM.FadeInTextPlayerTurn(0.6f);
+            UIM.FadeInTextPlayerTurn(0.4f);
         }
         else if (currentState == GameState.BotTurn && previousState == GameState.PlayerTurn)
         {
-            UIM.FadeOutTextPlayerTurn(0.6f);
+            UIM.FadeOutTextPlayerTurn(0.4f);
         }
     }
 
@@ -375,7 +375,21 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(playerFieldInstance.GetField().SonarTileChanger(x, y));
     }
-    
+
+
+    public void PrepareBoardForKeyBindActivation()
+    {
+        Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero);
+        if (hit.collider.transform.position.x >= 2 && hit.collider.transform.position.x <= 12 &&
+            hit.collider.transform.position.y <= 5 && hit.collider.transform.position.y >= -5)
+        {
+            GameObject currentTile = hit.collider.gameObject;
+            botFieldInstance.GetField().ChangeSprite(currentTile);
+            shootingManager.SetCursorToDefault();
+            shootingManager.SetLastHoveredTile();
+        }
+    }
 
     private void OnDestroy()
     {
