@@ -83,7 +83,10 @@ public class UIManager : MonoBehaviour
                 botAbText.SetText( "Bot activated special ability \n3x3");
                 break;
             case ShootingManager.ChosenAbility.Horizontal:
-                botAbText.SetText("Bot activated special ability \nHorizontal/Vertical");
+                botAbText.SetText("Bot activated special ability \nHorizontal");
+                break;
+            case ShootingManager.ChosenAbility.Vertical:
+                botAbText.SetText("Bot activated special ability \nVertical");
                 break;
             case ShootingManager.ChosenAbility.Sonar:
                 botAbText.SetText("Bot activated special ability \nSonar");
