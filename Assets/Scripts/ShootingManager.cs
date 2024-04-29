@@ -187,7 +187,7 @@ public class ShootingManager : MonoBehaviour
     {
         isBotTurnHandled = true;
         
-        if(availableAbilitiesBot.Count == 0)
+        if(availableAbilitiesBot.Count == 0 || !gameManager.GetBotInstance().IsAbilityIsNeeded())
         {
             yield return new WaitForSeconds(1.2f);
             Field.DestroyResult result;

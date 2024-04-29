@@ -419,7 +419,7 @@ public class Bot : MonoBehaviour, IKillable
         string coordinates = "";
         foreach(KeyValuePair<string, double> heat in heatList)
         {
-            if(heat.Value > maxHeat)
+            if(heat.Value >= maxHeat)
             {
                 maxHeat = heat.Value;
                 coordinates = heat.Key;
@@ -446,7 +446,7 @@ public class Bot : MonoBehaviour, IKillable
         string coordinates = "";
         foreach (KeyValuePair<string, double> heat in heatList)
         {
-            if (heat.Value > maxHeat)
+            if (heat.Value >= maxHeat)
             {
                 maxHeat = heat.Value;
                 coordinates = heat.Key;
@@ -512,7 +512,7 @@ public class Bot : MonoBehaviour, IKillable
         }
         if(coordinates.Length < 1)
         {
-            lastSuccessfulHit = "";
+           // lastSuccessfulHit = "";
             shipState = HitShipState.Unknown;
             state = BotState.Searching;
         }
@@ -525,6 +525,7 @@ public class Bot : MonoBehaviour, IKillable
         int xLast = int.Parse(lastSuccessfulHit.Split(' ')[0]);
         int yLast = int.Parse(lastSuccessfulHit.Split(' ')[1]);
 
+        
         while (ships.Count > 0)
         {
             string coord = ships.Pop();
@@ -536,6 +537,10 @@ public class Bot : MonoBehaviour, IKillable
             {
                 return true;
             }
+
+            if (xLast == xNext && yLast == yNext)
+                return true;
+
         }
 
         return false;
@@ -828,13 +833,20 @@ public class Bot : MonoBehaviour, IKillable
     {
         gameManager.UpdateBotVision();
         RecalculateHeatMap();
+        
         return CalculateBestPositionForShot(abilities);
 
     }
 
-    // Update is called once per frame
-    void Update()
+    public bool IsAbilityIsNeeded()
     {
-        
+        Stack<string> last = new Stack<string>();
+        last.Push(lastHit);
+        if (shipsRemaining.Count == 1 && shipsRemaining.Values.First() == 1 && IsTheSameShip(last))
+        {
+            return false;
+        }
+
+        return true;
     }
 }
