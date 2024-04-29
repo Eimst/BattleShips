@@ -42,6 +42,8 @@ public class GameManager : MonoBehaviour
     private int _playerTurnCount;
     
     private int _botTurnCount;
+    
+    public bool isKeyBindPressed { get; set; }
 
     public enum GameMode
     {
@@ -213,7 +215,8 @@ public class GameManager : MonoBehaviour
             UIM.FadeOutTextPlayerTurn(0.4f);
         }
     }
-
+    
+    
     public bool isThereNoShipLeft()
     {
         return botFieldInstance.GetRemainingBoats() == 0;
@@ -230,7 +233,7 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-
+    
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name.Equals("BattleScene"))
@@ -299,6 +302,7 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.8f);
         isAnimationDone = true;
+        isKeyBindPressed = false;
     }
 
 
