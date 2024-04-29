@@ -194,6 +194,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            isKeyBindPressed = false;
             currentState = GameState.BotTurn;
             
             if (gameMode == GameMode.Standard) return;
@@ -302,7 +303,6 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.8f);
         isAnimationDone = true;
-        isKeyBindPressed = false;
     }
 
 
