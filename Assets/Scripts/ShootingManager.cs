@@ -278,16 +278,18 @@ public class ShootingManager : MonoBehaviour
     {
         if(!gameManager.PermissionToUsePowers())
             return;
+        
         Debug.Log("Called " + abilityIndex);
         playerChosenAbility = (ChosenAbility)abilityIndex;
-        if (playerChosenAbility == ChosenAbility.Vertical)
+        
+        if (playerChosenAbility == ChosenAbility.Sonar)
         {
             _renderer = GameObject.Find("GreenPower").GetComponent<Renderer>();
             GameObject.Find("GreenPowerSound").GetComponent<AudioSource>().Play();
             _renderer.enabled = true;
             Invoke("DisableRenderer", 0.8f);
         }
-        else if (playerChosenAbility == ChosenAbility.x3)
+        if (playerChosenAbility == ChosenAbility.x3)
         {
             _renderer = GameObject.Find("RedPower").GetComponent<Renderer>();
             GameObject.Find("RedPowerSound").GetComponent<AudioSource>().Play();
