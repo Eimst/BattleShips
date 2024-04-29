@@ -55,8 +55,8 @@ public class ShowScrollBarValues : MonoBehaviour
 
     public void ShowScrollbarValue()
     {
-        x3T.SetText((Mathf.RoundToInt(x3.value * 10) == 0 ? "OFF" : Mathf.RoundToInt(x3.value * 10).ToString()));
-        hozVerT.SetText(Mathf.RoundToInt(hozVer.value * 10) == 0 ? "OFF" : Mathf.RoundToInt(hozVer.value * 10).ToString());
+        x3T.SetText((Mathf.RoundToInt(x3.value * 9) == 0 ? "OFF" : Mathf.RoundToInt(x3.value * 9 + 1).ToString()));
+        hozVerT.SetText(Mathf.RoundToInt(hozVer.value * 9) == 0 ? "OFF" : Mathf.RoundToInt(hozVer.value * 9 + 1).ToString());
         sonarT.SetText(Mathf.RoundToInt(sonar.value * 7) == 0 ? "OFF" : Mathf.RoundToInt(sonar.value * 7 + 3).ToString());
 
     }
@@ -66,8 +66,8 @@ public class ShowScrollBarValues : MonoBehaviour
     {
         if(check.isOn)
         {
-            FindObjectOfType<GameManager>().SetPowersRep(Mathf.RoundToInt(x3.value * 10),
-                Mathf.RoundToInt(hozVer.value * 10),
+            FindObjectOfType<GameManager>().SetPowersRep(Mathf.RoundToInt(x3.value * 9 + 1),
+                Mathf.RoundToInt(hozVer.value * 9 + 1),
                 Mathf.RoundToInt(sonar.value * 7 + 3));
         }
         else

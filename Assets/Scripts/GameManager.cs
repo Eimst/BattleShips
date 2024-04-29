@@ -149,6 +149,13 @@ public class GameManager : MonoBehaviour
     
     public void SetPowersRep(int x3, int hozVer, int sonar)
     {
+        if(x3 == 1 && hozVer == 1 && sonar == 3)
+        {
+            PlayerPrefs.SetInt("Mode", 0);
+            gameMode = GameMode.Standard;
+            return;
+        }
+        
         _x3PowerRep = x3;
         _hozVerPowerRep = hozVer;
         _sonarPowerRep = sonar;
@@ -339,28 +346,23 @@ public class GameManager : MonoBehaviour
 
     private void CheckIfPowersAvailable()
     {
-        if(_x3PowerRep == 0 && _hozVerPowerRep == 0 && _sonarPowerRep == 0)
-        {
-            gameMode = GameMode.Standard;
-            return;
-        }
         
-        if (_x3PowerRep > 0 && _playerTurnCount % _x3PowerRep == 0)
+        if (_x3PowerRep > 1 && _playerTurnCount % _x3PowerRep == 0)
             UIM.FadeInPowerButton(1);
 
-        if (_hozVerPowerRep > 0 && _playerTurnCount % _hozVerPowerRep == 0)
+        if (_hozVerPowerRep > 1 && _playerTurnCount % _hozVerPowerRep == 0)
             UIM.FadeInPowerButton(2);
 
-        if (_sonarPowerRep > 0 && _playerTurnCount % _sonarPowerRep == 0)
+        if (_sonarPowerRep > 3 && _playerTurnCount % _sonarPowerRep == 0)
             UIM.FadeInPowerButton(4);
         
-        if (_x3PowerRep > 0 && _botTurnCount % _x3PowerRep == 0)
+        if (_x3PowerRep > 1 && _botTurnCount % _x3PowerRep == 0)
             shootingManager.SetAbilityForBot(1);
 
-        if (_hozVerPowerRep > 0 && _botTurnCount % _hozVerPowerRep == 0)
+        if (_hozVerPowerRep > 1 && _botTurnCount % _hozVerPowerRep == 0)
             shootingManager.SetAbilityForBot(2);
 
-        if (_sonarPowerRep > 0 && _botTurnCount % _sonarPowerRep == 0)
+        if (_sonarPowerRep > 3 && _botTurnCount % _sonarPowerRep == 0)
             shootingManager.SetAbilityForBot(4);
     }
 
