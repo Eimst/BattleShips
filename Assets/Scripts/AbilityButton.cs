@@ -28,7 +28,6 @@ public class AbilityButton : MonoBehaviour
         {
             if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("AbilityKey1"))))
             {
-                _gameManager.isKeyBindPressed = true;
                 myButton.onClick.Invoke();
                 _gameManager.PrepareBoardForKeyBindActivation();
             }
@@ -37,7 +36,6 @@ public class AbilityButton : MonoBehaviour
         {
             if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("AbilityKey2"))))
             {
-                _gameManager.isKeyBindPressed = true;
                 myButton.onClick.Invoke();
                 _gameManager.PrepareBoardForKeyBindActivation();
             }
@@ -46,7 +44,6 @@ public class AbilityButton : MonoBehaviour
         {
             if (Input.GetKeyDown((KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("AbilityKey3"))))
             {
-                _gameManager.isKeyBindPressed = true;
                 myButton.onClick.Invoke();
                 _gameManager.PrepareBoardForKeyBindActivation();
             }
@@ -56,6 +53,10 @@ public class AbilityButton : MonoBehaviour
     
     private void CallShootingManagerSetAbility()
     {
-        GameObject.FindObjectOfType<ShootingManager>().SetAbility(abilityNumber);
+        if(!_gameManager.isKeyBindPressed)
+        {
+            _gameManager.isKeyBindPressed = true;
+            GameObject.FindObjectOfType<ShootingManager>().SetAbility(abilityNumber);
+        }
     }
 }

@@ -289,7 +289,7 @@ public class ShootingManager : MonoBehaviour
             _renderer.enabled = true;
             Invoke("DisableRenderer", 0.8f);
         }
-        if (playerChosenAbility == ChosenAbility.x3)
+        else if (playerChosenAbility == ChosenAbility.x3)
         {
             _renderer = GameObject.Find("RedPower").GetComponent<Renderer>();
             GameObject.Find("RedPowerSound").GetComponent<AudioSource>().Play();
