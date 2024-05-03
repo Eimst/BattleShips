@@ -163,7 +163,7 @@ public class Field : MonoBehaviour
         }
         */
         int count = 0;
-        if (ability == ShootingManager.ChosenAbility.x3)
+        if (ability == ShootingManager.ChosenAbility.x3 || ability == ShootingManager.ChosenAbility.Sonar)
         {
             count = X3TileChanger(x, y, count);
         }
@@ -300,7 +300,6 @@ public class Field : MonoBehaviour
                         renderer.color = new Color(0.7f, 0.3f, 0.3f, 1); // Darken the sprite
                     }
                 }
-                
                 else 
                 {
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
@@ -318,8 +317,45 @@ public class Field : MonoBehaviour
             StartCoroutine(SonarTileChanger(x, y, count + 1));
 
     }
-    
-    
+
+    public IEnumerator SonarBotTileChanger(int x, int y, float delay, int count = 0)
+    {
+        if (count == 0)
+        {
+            //Debug.Log("count " + count);
+            yield return new WaitForSeconds(delay);
+        }
+
+        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+        {
+            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+            {
+                if (count == 0)
+                {
+                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
+                    if (renderer != null && shipsArray[i, j] > 0)
+                    {
+                        renderer.color = new Color(0.4125f, 0.7525f, 0.3845f, 1); // Darken the sprite
+                    }
+                }
+
+                else
+                {
+                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
+                    if (renderer != null && shipsArray[i, j] > 0)
+                    {
+                        renderer.color = new Color(1f, 1f, 1f, 1); // Darken the sprite
+                    }
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(1.5f);
+
+        if (count < 1)
+            StartCoroutine(SonarTileChanger(x, y, count + 1));
+    }
+
     public void MaskField()
     {
         for (int i = 0; i < fieldLength; i++)
