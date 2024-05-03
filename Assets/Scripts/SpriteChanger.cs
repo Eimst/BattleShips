@@ -7,8 +7,7 @@ public class SpriteChanger : MonoBehaviour
     public Sprite[] sprites; // Array to hold the sprites
     public int currentSpriteIndex = 0; // Index of the currently displayed sprite
     private SpriteRenderer spriteRenderer; // Reference to the SpriteRenderer component
-    public bool isRotated = false; // rotation of ship
-    public bool isNew = false; // is newly picked ship
+    public bool isRotated = false;
 
     void Start()
     {
@@ -38,7 +37,7 @@ public class SpriteChanger : MonoBehaviour
                 isRotated = true;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.Escape) && currentSpriteIndex > 0) // if Esc pressed remove sprite
+        else if (Input.GetKeyDown(KeyCode.Escape) && currentSpriteIndex > 0)
         {
             currentSpriteIndex = 0;
             ChangeSprite(currentSpriteIndex);
@@ -46,10 +45,9 @@ public class SpriteChanger : MonoBehaviour
         }
     }
 
-    // Changes sprite to given index
+    // Changes sprite
     public void ChangeSprite(int index)
     {
         spriteRenderer.sprite = sprites[index];
-        isNew = false;
     }
 }
