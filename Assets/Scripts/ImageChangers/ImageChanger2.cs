@@ -22,9 +22,11 @@ public class NewBehaviourScript1 : MonoBehaviour
     {
         Field field = FindObjectOfType<Field>();
         SpriteChanger script = FindObjectOfType<SpriteChanger>();
+        // finds if there is one ship taken
         int correc = script.currentSpriteIndex > 2 && script.currentSpriteIndex < 5 ? 1 : 0;
         if (field != null)
         {
+            // if there is one or more ships left shows button if not then hides it
             if (currentImageIndex < 1)
             {
                 if (field.shipsCount[1] - correc < 1)
@@ -44,11 +46,13 @@ public class NewBehaviourScript1 : MonoBehaviour
         }
     }
 
+    // changes mouse picked ship sprite
     public void ChangeSprite(int index)
     {
         imageComponent.sprite = images[index];
     }
 
+    // when button is clicked and where is ships left of this size changes sprite of mouse taken ship
     public void OnClick()
     {
         Field field = FindObjectOfType<Field>();
@@ -58,6 +62,7 @@ public class NewBehaviourScript1 : MonoBehaviour
             script.currentSpriteIndex = 3;
             script.ChangeSprite(3);
             script.isRotated = false;
+            script.isNew = true;
         }
     }
 }
