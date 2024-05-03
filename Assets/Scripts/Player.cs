@@ -5,6 +5,7 @@ public class Player : MonoBehaviour, IKillable
 {
     public Field playerFieldPrefab;
     private Field field;
+    private GameManager gameManager;
 
     public int remainingBoats = 20;
 
@@ -20,6 +21,7 @@ public class Player : MonoBehaviour, IKillable
         field = Instantiate(playerFieldPrefab, transform.position, Quaternion.identity);
         field.transform.SetParent(transform);
         field.CreateField();
+        gameManager = GetComponentInParent<GameManager>();
     }
 
 
@@ -55,11 +57,13 @@ public class Player : MonoBehaviour, IKillable
         Field.DestroyResult result = field.Destroy(x, y);
         if (result == Field.DestroyResult.Success)
         {
+            gameManager.GetBotInstance().SetHitShipStatus(x, y);
             remainingBoats--;
         }
         return result;
     }
 
+    
     public int[] GetShipsCount()
     {
         return field.ShipsCount();

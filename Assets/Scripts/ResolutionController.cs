@@ -8,6 +8,9 @@ using TMPro;
 public class ResolutionController : MonoBehaviour
 {
     public TMP_Dropdown resolutionDropdown;
+
+    public Toggle fullScreenToggle;
+    
     Resolution[] resolutions;
 
     // Start is called before the first frame update
@@ -35,7 +38,8 @@ public class ResolutionController : MonoBehaviour
     public void SetFullScreen(bool isFullScreen)
     {
         Screen.fullScreen = isFullScreen;
-        PlayerPrefs.SetInt("FullscreenPreference", System.Convert.ToInt32(Screen.fullScreen));
+        PlayerPrefs.SetInt("FullscreenPreference", isFullScreen ? 1 : 0);
+        
     }
 
     public void SetResolution(int resolutionIndex)
@@ -51,8 +55,20 @@ public class ResolutionController : MonoBehaviour
         else
             resolutionDropdown.value = currentResolutionIndex;
         if (PlayerPrefs.HasKey("FullscreenPreference"))
+        {
             Screen.fullScreen = System.Convert.ToBoolean(PlayerPrefs.GetInt("FullscreenPreference"));
+            if (PlayerPrefs.GetInt("FullscreenPreference") == 0)
+                fullScreenToggle.isOn = false;
+            else
+                fullScreenToggle.isOn = true;
+        }
+
         else
+        {
             Screen.fullScreen = true;
+            fullScreenToggle.isOn = true;
+            PlayerPrefs.SetInt("FullscreenPreference", 1);
+        }
+            
     }
 }

@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\BackgroundScrolling.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger2.cs" />
     <Compile Include="Assets\Scripts\AudioManager.cs" />
+    <Compile Include="Assets\Scripts\ShowScrollBarValues.cs" />
     <Compile Include="Assets\Scripts\BgScroll.cs" />
     <Compile Include="Assets\Scripts\KeyBind.cs" />
     <Compile Include="Assets\Scripts\CursorChanger.cs" />
