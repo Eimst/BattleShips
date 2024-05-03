@@ -20,7 +20,7 @@ public class AudioController : MonoBehaviour
 
     private void HandleSliderValueChanged(float value)
     {
-        var _volumeValue = Mathf.Log10(value) * _multiplier;
+        _volumeValue = Mathf.Log10(value) * _multiplier;
         mixer.SetFloat(volumeParameter, _volumeValue);
     }
 
