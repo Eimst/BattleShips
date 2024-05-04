@@ -339,62 +339,87 @@ public class ShootingManager : MonoBehaviour
         switch (chosenAbility)
         {
             case ChosenAbility.Horizontal:
-                for (int i = 0; i < 10; i++)
-                {
-                    if (gameManager.isThereNoShipLeft()) { break; }
-                    if(isPlayer)
-                        Destroy(i+" "+y, gameManager.GetBotInstance());
-                    else
-                    {
-                        Destroy(i + " " + y, gameManager.GetPlayerInstance());
-                        isBotTurnHandled = false;
-                    }
-                }
-                OnTurnChange?.Invoke(!isPlayer);
+                HorizontalAbilityUsed(y, isPlayer);
                 break;
             case ChosenAbility.Vertical:
-                for (int i = 0; i < 10; i++)
-                {
-                    if (gameManager.isThereNoShipLeft()) { break; }
-                    if(isPlayer)
-                        Debug.Log(Destroy(x + " " + i, gameManager.GetBotInstance()));
-                    else
-                    {
-                        Destroy(x + " " + i, gameManager.GetPlayerInstance());
-                    }
-                }
-                OnTurnChange?.Invoke(!isPlayer);
+                VerticalAbilityUsed(x, isPlayer);
                 break;
             case ChosenAbility.x3:
-                for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
-                {
-                    for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
-                    {
-                        if (gameManager.isThereNoShipLeft()) { break; }
-
-                        if (isPlayer)
-                            Debug.Log(Destroy(i + " " + j, gameManager.GetBotInstance()));
-                        else
-                        {
-                            Destroy(i + " " + j, gameManager.GetPlayerInstance());
-                        }
-                            
-                    }
-                }
-                OnTurnChange?.Invoke(!isPlayer);
+                x3AbilityUsed(x, y, isPlayer);
                 break;
             case ChosenAbility.Sonar:
-                // Impliment Sonar Ability
-                if(!isPlayer)
-                {
-                    gameManager.ShowToPlayerWhichTilesBotDetectedWithSonar(x, y);
-                    OnTurnChange?.Invoke(!isPlayer);
-                }
+                SonarAbilityUsed(x, y, isPlayer, 2.3f);
                 break;
         }
         gameManager.SendMessage("SpawnText");
     }
 
+    private void HorizontalAbilityUsed(int y, bool isPlayer)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            if (gameManager.isThereNoShipLeft()) { break; }
+            if (isPlayer)
+                Destroy(i + " " + y, gameManager.GetBotInstance());
+            else
+            {
+                Destroy(i + " " + y, gameManager.GetPlayerInstance());
+                isBotTurnHandled = false;
+            }
+        }
+        OnTurnChange?.Invoke(!isPlayer);
+    }
+
+    private void VerticalAbilityUsed(int x, bool isPlayer)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            if (gameManager.isThereNoShipLeft()) { break; }
+            if (isPlayer)
+                Debug.Log(Destroy(x + " " + i, gameManager.GetBotInstance()));
+            else
+            {
+                Destroy(x + " " + i, gameManager.GetPlayerInstance());
+            }
+        }
+        OnTurnChange?.Invoke(!isPlayer);
+    }
+
+    private void x3AbilityUsed(int x, int y, bool isPlayer)
+    {
+        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
+        {
+            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
+            {
+                if (gameManager.isThereNoShipLeft()) { break; }
+
+                if (isPlayer)
+                    Debug.Log(Destroy(i + " " + j, gameManager.GetBotInstance()));
+                else
+                {
+                    Destroy(i + " " + j, gameManager.GetPlayerInstance());
+                }
+
+            }
+        }
+        OnTurnChange?.Invoke(!isPlayer);
+    }
+
+    private void SonarAbilityUsed(int x, int y, bool isPlayer, float delay)
+    {
+        if (!isPlayer)
+        {
+            gameManager.GetPlayerInstance().GetField().PlaySonarAnimation(x, y);
+            gameManager.ShowToPlayerWhichTilesBotDetectedWithSonar(x, y);
+        }
+        else
+        {
+            gameManager.GetBotInstance().GetField().PlaySonarAnimation(x, y);
+            Debug.Log("d>" + delay);
+            gameManager.ShowToPlayerWhichTilesPlayerDetectedWithSonar(x, y, delay);
+        }
+        OnTurnChange?.Invoke(!isPlayer);
+    }
 
     public void SetLastHoveredTile()
     {

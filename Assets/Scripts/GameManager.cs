@@ -61,7 +61,8 @@ public class GameManager : MonoBehaviour
     private int _sonarPowerRep = 8;
 
     private bool _disappear;
-    
+
+    private bool endIsNotLaunched = true;
 
     void Awake()
     {
@@ -136,11 +137,21 @@ public class GameManager : MonoBehaviour
                 //Debug.Log(playerFieldInstance.GetRemainingBoats());
                 if (playerFieldInstance.GetRemainingBoats() == 0)
                 {
-                    botFieldInstance.GetField().ShowBotShips();
-                    StartCoroutine(LoadSceneWithDelay("DefeatScene", 6f));
+                    if (endIsNotLaunched)
+                    {
+                        botFieldInstance.GetField().ShowBotShips();
+                        StartCoroutine(LoadSceneWithDelay("DefeatScene", 6f));
+                        endIsNotLaunched = false;
+                    }
                 }
                 else
-                    StartCoroutine(LoadSceneWithDelay("VictoryScene", 1f));
+                {
+                    if (endIsNotLaunched)
+                    {
+                        StartCoroutine(LoadSceneWithDelay("VictoryScene", 0.75f));
+                        endIsNotLaunched = false;
+                    }
+                }
                 break;
                  
         }
@@ -382,6 +393,10 @@ public class GameManager : MonoBehaviour
         StartCoroutine(playerFieldInstance.GetField().SonarTileChanger(x, y));
     }
 
+    public void ShowToPlayerWhichTilesPlayerDetectedWithSonar(int x, int y, float delay)
+    {
+        StartCoroutine(botFieldInstance.GetField().SonarBotTileChanger(x, y, delay));
+    }
 
     public void PrepareBoardForKeyBindActivation()
     {
