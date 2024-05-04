@@ -284,48 +284,14 @@ public class Field : MonoBehaviour
 
         return ships;
     }
+    
 
-
-    public IEnumerator SonarTileChanger(int x, int y, int count = 0)
+    public IEnumerator SonarTileChanger(int x, int y, GameManager gameManager, float delay, bool isPlayer, int count = 0)
     {
         
-        for (int i = x - 1 < 0 ? 0 : x - 1; i < (x + 2 > 10 ? 10 : x + 2); i++)
-        {
-            for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
-            {
-                if (count == 0)
-                {
-                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
-                    if (renderer != null)
-                    {
-                        
-                        renderer.color = new Color(0.7f, 0.3f, 0.3f, 1); // Darken the sprite
-                    }
-                }
-                else 
-                {
-                    SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
-                    if (renderer != null)
-                    {
-                        renderer.color = new Color(1f, 1f, 1f, 1); // Darken the sprite
-                    }
-                }
-            }
-        }
-
-        yield return new WaitForSeconds(2.5f);
-
-        if (count < 1)
-            StartCoroutine(SonarTileChanger(x, y, count + 1));
-
-        
-    }
-
-    public IEnumerator SonarBotTileChanger(int x, int y, float delay, int count = 0)
-    {
         if (count == 0)
         {
-            //Debug.Log("count " + count);
+            gameManager.isAnimationDone = false;
             yield return new WaitForSeconds(delay);
         }
 
@@ -338,7 +304,12 @@ public class Field : MonoBehaviour
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
                     if (renderer != null && shipsArray[i, j] > 0)
                     {
-                        renderer.color = new Color(0.4125f, 0.7525f, 0.3845f, 1); // Darken the sprite
+                        if(isPlayer)
+                            renderer.color = new Color(0.4125f, 0.7525f, 0.3845f, 1); // Darken the sprite
+                        else
+                        {
+                            renderer.color = new Color(0.7f, 0.3f, 0.3f, 1);
+                        }
                     }
                 }
 
@@ -352,11 +323,13 @@ public class Field : MonoBehaviour
                 }
             }
         }
-
-        yield return new WaitForSeconds(1.5f);
-
+        
         if (count < 1)
-            StartCoroutine(SonarTileChanger(x, y, count + 1));
+        {
+            yield return new WaitForSeconds(1.5f);
+            gameManager.isAnimationDone = true;
+            StartCoroutine(SonarTileChanger(x, y, gameManager, 0, isPlayer, count + 1));
+        }
     }
 
     public void MaskField()
@@ -587,7 +560,7 @@ public class Field : MonoBehaviour
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
         {
             bulletInstance.transform.Translate(Vector3.right * 0.1f);
-            yield return new WaitForSeconds(0.004f);
+            yield return new WaitForSeconds(0.003f);
         }
         Destroy(bulletInstance);
         if (shipsArray[x1, y1] == 0)
