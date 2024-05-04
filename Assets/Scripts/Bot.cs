@@ -478,7 +478,7 @@ public class Bot : MonoBehaviour, IKillable
         string coordinates = "";
         foreach(KeyValuePair<string, double> heat in heatList)
         {
-            if(heat.Value > maxHeat)
+            if(heat.Value >= maxHeat)
             {
                 maxHeat = heat.Value;
                 coordinates = heat.Key;
