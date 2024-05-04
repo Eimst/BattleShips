@@ -699,17 +699,25 @@ public class Bot : MonoBehaviour, IKillable
     
     // With Ability ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /// <summary>
+    /// Determines the best position for the shot based on the given abilities.
+    /// </summary>
+    /// <param name="abilities"></param>
+    /// <returns></returns>
     private string CalculateBestPositionForShot(List<ShootingManager.ChosenAbility> abilities)
     {
         string[] x3 = new string[2];
         string[] hozVer = new string[3];
         
+        // Check if x3 ability is available and calculate coordinates if so
         if(abilities.Contains(ShootingManager.ChosenAbility.x3))
             x3 = PlaceSliderX3();
         
+        // Check if Horizontal ability is available and calculate coordinates if so
         if(abilities.Contains(ShootingManager.ChosenAbility.Horizontal))
             hozVer = SpecialAbiHoz();
 
+        // Determine which ability to use based on calculated coordinates
         string coord = DetermineWhichAbilityToUse(x3, hozVer);
 
         if (coord.Length > 0)
@@ -717,6 +725,7 @@ public class Bot : MonoBehaviour, IKillable
 
         string coordSonar = PlaceSliderX3()[0];
 
+        // Retrieve sonar result from game manager
         _detectedShips = gameManager.ReturnSonarResultFromPlayerBoard(coordSonar, ref botVision);
         
 
@@ -725,23 +734,35 @@ public class Bot : MonoBehaviour, IKillable
     }
 
 
+    /// <summary>
+    /// Determines which ability to use based on the calculated coordinates for x3 and Horizontal/Vertical abilities.
+    /// </summary>
+    /// <param name="x3"></param>
+    /// <param name="hozVer"></param>
+    /// <returns></returns>
     private string DetermineWhichAbilityToUse(string[] x3, string[] hozVer)
     {
+        // If neither Horizontal nor x3 ability is available, return empty string
         if (hozVer[0] == null && x3[0] == null)
             return "";
         
+        // If x3 ability is available and Horizontal is not or x3 has higher value, choose x3
         if ((x3[0] != null && hozVer[0] == null) || (x3[0] != null && hozVer[0] != null && double.Parse(x3[1]) > double.Parse(hozVer[1])))
         {
             _shootingManager.botChosenAbility = ShootingManager.ChosenAbility.x3;
             return x3[0];
         }
-        
+        // Choose Horizontal or Vertical ability based on the calculated values
         _shootingManager.botChosenAbility = hozVer[2].Equals("1") ? ShootingManager.ChosenAbility.Horizontal : ShootingManager.ChosenAbility.Vertical;
         
         return hozVer[0];
     }
 
 
+    /// <summary>
+    /// Calculates the best position for the Horizontal ability.
+    /// </summary>
+    /// <returns></returns>
     private string[] SpecialAbiHoz()
     {
         // Hoz
@@ -761,7 +782,7 @@ public class Bot : MonoBehaviour, IKillable
                 coordHoz = 0+ " " + i;
             }
         }
-        // Ver
+        // Find best position for Vertical ability
         string[] vertical = SpecialAbiVer(max);
 
         if (vertical[0].Length > 0)
@@ -771,6 +792,11 @@ public class Bot : MonoBehaviour, IKillable
     }
 
     
+    /// <summary>
+    /// Calculates the best position for the Vertical ability.
+    /// </summary>
+    /// <param name="max"></param>
+    /// <returns></returns>
     private string[] SpecialAbiVer(double max)
     {
         string coord = "";
@@ -792,6 +818,10 @@ public class Bot : MonoBehaviour, IKillable
     }
     
     
+    /// <summary>
+    /// Calculates the best position for the x3 ability.
+    /// </summary>
+    /// <returns></returns>
     private string[] PlaceSliderX3()
     {
         double max = 0;
@@ -813,6 +843,13 @@ public class Bot : MonoBehaviour, IKillable
 
     }
 
+    
+    /// <summary>
+    /// Calculates the ability value for a given position for the x3 ability.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
     private double AbilityX3(int x, int y)
     {
         double sum = 0;
@@ -828,12 +865,17 @@ public class Bot : MonoBehaviour, IKillable
     }
     
     
-    
+    /// <summary>
+    /// pplies shot with special ability based on the given abilities.
+    /// </summary>
+    /// <param name="abilities"></param>
+    /// <returns></returns>
     public string ApplyShotWithSpecialAbility(List<ShootingManager.ChosenAbility> abilities)
     {
         gameManager.UpdateBotVision();
         RecalculateHeatMap();
         
+        // Calculate best position for shot and return it
         return CalculateBestPositionForShot(abilities);
 
     }
@@ -842,6 +884,7 @@ public class Bot : MonoBehaviour, IKillable
     {
         Stack<string> last = new Stack<string>();
         last.Push(lastHit);
+        // If only one ship remains and it's the same ship as the last hit, no special ability is needed
         if (shipsRemaining.Count == 1 && shipsRemaining.Values.First() == 1 && IsTheSameShip(last))
         {
             return false;

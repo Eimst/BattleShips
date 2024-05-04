@@ -358,7 +358,9 @@ public class GameManager : MonoBehaviour
         botFieldInstance.UpdateBotVision(playerFieldInstance.GetField().GetBoardVision());
     }
 
-
+    /// <summary>
+    /// Checks if powers available for bot or player
+    /// </summary>
     private void CheckIfPowersAvailable()
     {
         
@@ -382,12 +384,25 @@ public class GameManager : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Returns the sonar results from the player board.
+    /// </summary>
+    /// <param name="coord"></param>
+    /// <param name="vision"></param>
+    /// <returns></returns>
     public Stack<String> ReturnSonarResultFromPlayerBoard(string coord, ref int[,] vision)
     {
         return playerFieldInstance.GetField().ReturnSonarResults(coord, ref vision);
     }
 
 
+    /// <summary>
+    /// Initiates the sonar effect animation to show detected ships.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="delay"></param>
+    /// <param name="isPlayer"></param>
     public void ShowDetectedShipsWithSonar(int x, int y, float delay, bool isPlayer)
     {
         if(isPlayer)
@@ -396,7 +411,9 @@ public class GameManager : MonoBehaviour
             StartCoroutine(playerFieldInstance.GetField().SonarTileChanger(x, y, this, delay, isPlayer));
     }
     
-
+    /// <summary>
+    /// Prepares the game board for key bind activation.
+    /// </summary>
     public void PrepareBoardForKeyBindActivation()
     {
         Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -406,6 +423,7 @@ public class GameManager : MonoBehaviour
         {
             GameObject currentTile = hit.collider.gameObject;
             botFieldInstance.GetField().ChangeSprite(currentTile);
+            // Reset cursor and last hovered tile for shooting manager
             shootingManager.SetCursorToDefault();
             shootingManager.SetLastHoveredTile();
         }

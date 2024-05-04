@@ -131,7 +131,7 @@ public class Field : MonoBehaviour
     {
         int x = int.Parse(coordinates.name.Split(' ')[0]);
         int y = int.Parse(coordinates.name.Split(' ')[1]);
-        return field[x, y].GetComponent<Chunks>().index == 0;
+        return field[x, y].GetComponent<Chunks>().index == 0 && shipsArray[x, y] >= 0;
     }
 
 
@@ -140,6 +140,7 @@ public class Field : MonoBehaviour
         int x = int.Parse(coordinates.name.Split(' ')[0]);
         int y = int.Parse(coordinates.name.Split(' ')[1]);
 
+        
         if (field[x, y].GetComponent<Chunks>().index == 20)
         {
             field[x, y].GetComponent<Chunks>().index = 0;
@@ -156,13 +157,7 @@ public class Field : MonoBehaviour
     {
         int x = int.Parse(coordinates.name.Split(' ')[0]);
         int y = int.Parse(coordinates.name.Split(' ')[1]);
-        /*
-        if(field[x, y].GetComponent<Chunks>().index != 0 && field[x, y].GetComponent<Chunks>().index != 20
-            || shipsArray[x, y] < 0)
-        {
-            return false;
-        }
-        */
+
         int count = 0;
         if (ability == ShootingManager.ChosenAbility.x3 || ability == ShootingManager.ChosenAbility.Sonar)
         {
@@ -176,7 +171,7 @@ public class Field : MonoBehaviour
         {
             count = VerHozTileChanger(x, y, true, count);
         }
-        return count > 1;
+        return count > 0;
     }
 
 
@@ -185,34 +180,21 @@ public class Field : MonoBehaviour
         
         int xOrig = x;
         int yOrig = y;
-
-        int xPrev = 0;
-        int yPrev = 0;
+        
         for (int i = 0; i <= 9; i++)
         {
             x = isHoz ? i : x;
             y = isHoz ? y : i;
             
-            if (field[x, y].GetComponent<Chunks>().index == 20 || field[x, y].GetComponent<Chunks>().index == 22)
+            if (field[x, y].GetComponent<Chunks>().index == 20)
             {
                 field[x, y].GetComponent<Chunks>().index = 0;
                 count++;
             }
             else if (shipsArray[x, y] >= 0 && field[x, y].GetComponent<Chunks>().index == 0)
             {
-                if(count == 0)
-                {
-                    field[x, y].GetComponent<Chunks>().index = 22;
-                    xPrev = x;
-                    yPrev = y;
-                }
-                else if(count == 1)
-                {
-                    field[x, y].GetComponent<Chunks>().index = 20;
-                    field[xPrev, yPrev].GetComponent<Chunks>().index = 20;
-                }
-                else
-                    field[x, y].GetComponent<Chunks>().index = 20;
+                
+                field[x, y].GetComponent<Chunks>().index = 20;
                 count++;
             }
         }
@@ -234,7 +216,7 @@ public class Field : MonoBehaviour
             for (int j = yStart; j <= yEnd; j++)
             {
                 
-                if (field[i, j].GetComponent<Chunks>().index == 20 || field[i, j].GetComponent<Chunks>().index == 22)
+                if (field[i, j].GetComponent<Chunks>().index == 20 )
                 {
                     field[i, j].GetComponent<Chunks>().index = 0;
                     count++;
@@ -242,19 +224,8 @@ public class Field : MonoBehaviour
 
                 else if (shipsArray[i, j] >= 0 && field[i, j].GetComponent<Chunks>().index == 0)
                 {
-                    if (count == 0)
-                    {
-                        xPrev = i;
-                        yPrev = j;
-                        field[i, j].GetComponent<Chunks>().index = 22;
-                    }
-                    else if(count == 1)
-                    {
-                        field[i, j].GetComponent<Chunks>().index = 20;
-                        field[xPrev, yPrev].GetComponent<Chunks>().index = 20;
-                    }
-                    else
-                        field[i, j].GetComponent<Chunks>().index = 20;
+                    
+                    field[i, j].GetComponent<Chunks>().index = 20;
                     count++;
                 }
             }
@@ -263,6 +234,12 @@ public class Field : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Returns the coordinates of detected ships around the specified coordinate and updates the vision.
+    /// </summary>
+    /// <param name="coord"></param>
+    /// <param name="vision"></param>
+    /// <returns></returns>
     public Stack<string> ReturnSonarResults(string coord, ref int[,] vision)
     {
         int x = int.Parse(coord.Split(' ')[0]);
@@ -273,10 +250,12 @@ public class Field : MonoBehaviour
         {
             for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
             {
+                // If ship is detected, add its coordinates to the stack
                 if (shipsArray[i, j] > 0)
                 {
                     ships.Push(i + " " + j);
                 }
+                // If no ship is detected, update vision
                 else if(shipsArray[i, j] == 0)
                     vision[i, j] = 1;
             }
@@ -286,6 +265,16 @@ public class Field : MonoBehaviour
     }
     
 
+    /// <summary>
+    /// Changes the appearance of tiles for the sonar effect animation.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="gameManager"></param>
+    /// <param name="delay"></param>
+    /// <param name="isPlayer"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
     public IEnumerator SonarTileChanger(int x, int y, GameManager gameManager, float delay, bool isPlayer, int count = 0)
     {
         
@@ -299,6 +288,7 @@ public class Field : MonoBehaviour
         {
             for (int j = y - 1 < 0 ? 0 : y - 1; j < (y + 2 > 10 ? 10 : y + 2); j++)
             {
+                // Change tile appearance based on ship detection and animation count
                 if (count == 0)
                 {
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
@@ -325,6 +315,7 @@ public class Field : MonoBehaviour
             }
         }
         
+        // Initiate recursive call for additional animation frames
         if (count < 1)
         {
             yield return new WaitForSeconds(1.5f);
@@ -560,8 +551,8 @@ public class Field : MonoBehaviour
         bulletInstance.transform.Rotate(0, 0, -90);
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
         {
-            bulletInstance.transform.Translate(Vector3.right * 0.1f);
-            yield return new WaitForSeconds(0.003f);
+            bulletInstance.transform.Translate(Vector3.right * 0.07f);
+            yield return new WaitForSeconds(0.00005f);
         }
         Destroy(bulletInstance);
         if (shipsArray[x1, y1] == 0)
