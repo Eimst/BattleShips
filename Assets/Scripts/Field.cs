@@ -14,6 +14,7 @@ public class Field : MonoBehaviour
     public GameObject water;
     public GameObject fire;
     public GameObject explosion;
+    public GameObject sonar;
 
     public List<GameObject> squaresOnFire;
     public int currOnFire = 0;
@@ -297,6 +298,7 @@ public class Field : MonoBehaviour
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
                     if (renderer != null)
                     {
+                        
                         renderer.color = new Color(0.7f, 0.3f, 0.3f, 1); // Darken the sprite
                     }
                 }
@@ -316,6 +318,7 @@ public class Field : MonoBehaviour
         if (count < 1)
             StartCoroutine(SonarTileChanger(x, y, count + 1));
 
+        
     }
 
     public IEnumerator SonarBotTileChanger(int x, int y, float delay, int count = 0)
@@ -1187,6 +1190,17 @@ public class Field : MonoBehaviour
             field[part[0], part[1]].GetComponent<Chunks>().index = part[2];
         }
         IndicatedTiles.Clear();
+    }
+
+    public void PlaySonarAnimation(int x, int y)
+    {
+        Vector3 startPos = transform.position;
+        Renderer sonarRenderer = sonar.GetComponent<Renderer>();
+        sonarRenderer.sortingOrder = 30;
+        sonar.transform.localScale = new Vector3(1f, 1f, 1f);
+        GameObject.Find("ScannerSound").GetComponent<AudioSource>().Play();
+        GameObject sonarInstance = Instantiate(sonar, new Vector3(startPos.x + x + 1, startPos.y - y - 1, 0), Quaternion.identity);
+        Destroy(sonarInstance, 2.3f);
     }
 
     public int[] ShipsCount()

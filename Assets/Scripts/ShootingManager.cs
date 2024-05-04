@@ -348,7 +348,7 @@ public class ShootingManager : MonoBehaviour
                 x3AbilityUsed(x, y, isPlayer);
                 break;
             case ChosenAbility.Sonar:
-                SonarAbilityUsed(x, y, isPlayer, 4f);
+                SonarAbilityUsed(x, y, isPlayer, 2.3f);
                 break;
         }
         gameManager.SendMessage("SpawnText");
@@ -409,10 +409,12 @@ public class ShootingManager : MonoBehaviour
     {
         if (!isPlayer)
         {
+            gameManager.GetPlayerInstance().GetField().PlaySonarAnimation(x, y);
             gameManager.ShowToPlayerWhichTilesBotDetectedWithSonar(x, y);
         }
         else
         {
+            gameManager.GetBotInstance().GetField().PlaySonarAnimation(x, y);
             Debug.Log("d>" + delay);
             gameManager.ShowToPlayerWhichTilesPlayerDetectedWithSonar(x, y, delay);
         }
