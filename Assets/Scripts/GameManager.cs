@@ -388,15 +388,14 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void ShowToPlayerWhichTilesBotDetectedWithSonar(int x, int y)
+    public void ShowDetectedShipsWithSonar(int x, int y, float delay, bool isPlayer)
     {
-        StartCoroutine(playerFieldInstance.GetField().SonarTileChanger(x, y));
+        if(isPlayer)
+            StartCoroutine(botFieldInstance.GetField().SonarTileChanger(x, y, this, delay, isPlayer));
+        else
+            StartCoroutine(playerFieldInstance.GetField().SonarTileChanger(x, y, this, delay, isPlayer));
     }
-
-    public void ShowToPlayerWhichTilesPlayerDetectedWithSonar(int x, int y, float delay)
-    {
-        StartCoroutine(botFieldInstance.GetField().SonarBotTileChanger(x, y, delay));
-    }
+    
 
     public void PrepareBoardForKeyBindActivation()
     {

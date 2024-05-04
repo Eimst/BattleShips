@@ -153,6 +153,7 @@ public class ShootingManager : MonoBehaviour
                             // shooting with ability below
                             SpecialAbilityUsed(playerChosenAbility, currentTile.name, true);
                             playerChosenAbility = ChosenAbility.None;
+                            lastHoveredTile = null;
                         }
                         else
                         {
@@ -165,6 +166,7 @@ public class ShootingManager : MonoBehaviour
                         cursor.ChangeToAttack(false);
                         gameManager.GetBotInstance().GetField().ChangeSprite(lastHoveredTile);
                         StateHandler(Destroy(currentTile.name, gameManager.GetBotInstance()), true);
+                        
                     } 
                 }
             }
@@ -407,17 +409,14 @@ public class ShootingManager : MonoBehaviour
 
     private void SonarAbilityUsed(int x, int y, bool isPlayer, float delay)
     {
-        if (!isPlayer)
-        {
+        if(!isPlayer)
             gameManager.GetPlayerInstance().GetField().PlaySonarAnimation(x, y);
-            gameManager.ShowToPlayerWhichTilesBotDetectedWithSonar(x, y);
-        }
         else
         {
             gameManager.GetBotInstance().GetField().PlaySonarAnimation(x, y);
-            Debug.Log("d>" + delay);
-            gameManager.ShowToPlayerWhichTilesPlayerDetectedWithSonar(x, y, delay);
         }
+        gameManager.ShowDetectedShipsWithSonar(x, y, delay, isPlayer);
+        
         OnTurnChange?.Invoke(!isPlayer);
     }
 
