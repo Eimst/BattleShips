@@ -304,7 +304,8 @@ public class Field : MonoBehaviour
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
                     if (renderer != null && shipsArray[i, j] > 0)
                     {
-                        if(isPlayer)
+                        GameObject.Find("SonarSound").GetComponent<AudioSource>().Play();
+                        if (isPlayer)
                             renderer.color = new Color(0.4125f, 0.7525f, 0.3845f, 1); // Darken the sprite
                         else
                         {
