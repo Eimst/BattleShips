@@ -9,6 +9,9 @@ public class KeyBind : MonoBehaviour
     public TextMeshProUGUI buttonLabel1;
     public TextMeshProUGUI buttonLabel2;
     public TextMeshProUGUI buttonLabel3;
+    /// <summary>
+    /// gets keybinds for abilities from player prefs or puts "no key" if player prefs are empty
+    /// </summary>
     void Start()
     {
         buttonLabel1.text = PlayerPrefs.GetString("AbilityKey1");
@@ -21,7 +24,9 @@ public class KeyBind : MonoBehaviour
         if (PlayerPrefs.GetString("AbilityKey3").Equals(""))
             buttonLabel3.text = "No key";
     }
-
+    /// <summary>
+    /// sets user preferred keybind to ability buttons and saves them to player prefs
+    /// </summary>
     void Update()
     {
         if (buttonLabel1.text.Equals("Press key"))
@@ -112,6 +117,11 @@ public class KeyBind : MonoBehaviour
             PlayerPrefs.Save();
         }
     }
+    /// <summary>
+    /// disables mouse left key if possible and returns true 
+    /// </summary>
+    /// <param name="label">label of keybind button</param>
+    /// <returns>true if mouse left key was disabled</returns>
     public bool DisableLeftClickKey(ref TextMeshProUGUI label)
     {
         if (label.text.Equals("Mouse0"))
@@ -121,18 +131,30 @@ public class KeyBind : MonoBehaviour
         }
         return false;
     }
+    /// <summary>
+    /// prepares ability1 button to change key
+    /// </summary>
     public void ChangeKey1()
     {
         buttonLabel1.text = "Press key";
     }
+    /// <summary>
+    /// prepares ability1 button to change key
+    /// </summary>
     public void ChangeKey2()
     {
         buttonLabel2.text = "Press key";
     }
+    /// <summary>
+    /// prepares ability1 button to change key
+    /// </summary>
     public void ChangeKey3()
     {
         buttonLabel3.text = "Press key";
     }
+    /// <summary>
+    /// resets all abilities' keybinds to "no key"
+    /// </summary>
     public void ResetBinds()
     {
         buttonLabel1.text = "No key";

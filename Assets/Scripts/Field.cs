@@ -209,8 +209,6 @@ public class Field : MonoBehaviour
         int yStart = y - 1 < 0 ? 0 : y - 1;
         int yEnd = y + 1 > 9 ? 9 : y + 1;
 
-        int xPrev = 0;
-        int yPrev = 0;
         for (int i = xStart; i <= xEnd; i++)
         {
             for (int j = yStart; j <= yEnd; j++)
@@ -1157,6 +1155,11 @@ public class Field : MonoBehaviour
         IndicatedTiles.Clear();
     }
 
+    /// <summary>
+    /// plays sonar animation when sonar is used in chosen field position
+    /// </summary>
+    /// <param name="x">x coordinate of field</param>
+    /// <param name="y">y coordinate of field</param>
     public void PlaySonarAnimation(int x, int y)
     {
         Vector3 startPos = transform.position;
