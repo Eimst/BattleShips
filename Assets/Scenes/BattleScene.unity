@@ -626,7 +626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltipText: {fileID: 1944040102}
-  tooltipMessage: 
+  tooltipDuration: 1
 --- !u!1 &68464909
 GameObject:
   m_ObjectHideFlags: 0
@@ -2988,7 +2988,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltipText: {fileID: 709449937}
-  tooltipMessage: 
+  tooltipDuration: 1
 --- !u!1 &472018559
 GameObject:
   m_ObjectHideFlags: 0
@@ -7181,7 +7181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltipText: {fileID: 810747758}
-  tooltipMessage: 
+  tooltipDuration: 1
 --- !u!1 &1323052425
 GameObject:
   m_ObjectHideFlags: 0
