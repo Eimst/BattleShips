@@ -23,10 +23,13 @@ public class UIManager : MonoBehaviour
     public GameObject powersPanel;
     
     public Button x3;
+    public TextMeshProUGUI x3Tooltip;
 
     public Button hozVer;
-    
+    public TextMeshProUGUI hozVerTooltip;
+
     public Button sonar;
+    public TextMeshProUGUI sonarTooltip;
 
     private GameManager _gameManager;
 
@@ -198,16 +201,16 @@ public class UIManager : MonoBehaviour
     public void FadeOutPowerButton(float duration = 1f)
     {
         if(x3.IsActive())
-            StartCoroutine(FadeOutPowerCoroutine(duration, x3));
+            StartCoroutine(FadeOutPowerCoroutine(duration, x3, x3Tooltip));
         
         if(hozVer.IsActive())
-            StartCoroutine(FadeOutPowerCoroutine(duration, hozVer));
+            StartCoroutine(FadeOutPowerCoroutine(duration, hozVer, hozVerTooltip));
         
         if(sonar.IsActive())
-            StartCoroutine(FadeOutPowerCoroutine(duration, sonar));
+            StartCoroutine(FadeOutPowerCoroutine(duration, sonar, sonarTooltip));
     }
     
-    private IEnumerator FadeOutPowerCoroutine(float duration, Button button)
+    private IEnumerator FadeOutPowerCoroutine(float duration, Button button, TextMeshProUGUI toolTip)
     {
         Image backgroundImage = button.GetComponent<Image>();
 
@@ -219,7 +222,8 @@ public class UIManager : MonoBehaviour
             backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, alpha);
             yield return null;
         }
-         //  backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, 0f);
+        //  backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, 0f);
+        toolTip.gameObject.SetActive(false);
         button.gameObject.SetActive(false);
     }
     

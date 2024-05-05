@@ -83,6 +83,8 @@
     <Compile Include="Assets\Scripts\BackgroundMovement.cs" />
     <Compile Include="Assets\Scripts\Bot.cs" />
     <Compile Include="Assets\Scripts\AudioController.cs" />
+    <Compile Include="Assets\Scripts\DestroyTextIfButtonInactive.cs" />
+    <Compile Include="Assets\Scripts\TextFieldDeactivate.cs" />
     <Compile Include="Assets\Scripts\ResolutionController.cs" />
     <Compile Include="Assets\Scripts\BackgroundScrolling.cs" />
     <Compile Include="Assets\Scripts\ImageChangers\ImageChanger2.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="Assets\Scripts\KeyBind.cs" />
     <Compile Include="Assets\Scripts\CursorChanger.cs" />
     <Compile Include="Assets\Scripts\SpriteChanger.cs" />
+    <Compile Include="Assets\Scripts\HideAfterDelay.cs" />
     <Compile Include="Assets\Scripts\PowerIconHover.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\DisableRenderer.cs" />
