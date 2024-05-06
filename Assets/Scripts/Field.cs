@@ -1180,7 +1180,7 @@ public class Field : MonoBehaviour
         }
         blinkdelay = 0.35f;
         blinkCount = 4;
-        blinkIndex = 21;
+        blinkIndex = 23;
         Starts = true;
     }
 
