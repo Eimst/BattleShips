@@ -178,11 +178,12 @@ public class UIManager : MonoBehaviour
     private IEnumerator FadeInPowerCoroutine(float duration, Button button)
     {
      
-        button.gameObject.SetActive(true); // Set the button active but transparent
+        //button.gameObject.SetActive(true); // Set the button active but transparent
         Image backgroundImage = button.GetComponent<Image>();
         backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, 0f); 
 
         yield return new WaitUntil(() => _gameManager.currentState == GameManager.GameState.PlayerTurn && _gameManager.isAnimationDone);
+        button.gameObject.SetActive(true);
         float elapsed = 0f;
         while (elapsed < duration)
         {
