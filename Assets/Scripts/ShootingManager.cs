@@ -74,7 +74,8 @@ public class ShootingManager : MonoBehaviour
 
     public void PlayerShoot()
     {
-        PlayerMouseTrajectory();
+        if(gameManager.isAnimationDone)
+            PlayerMouseTrajectory();
     }
    
 
@@ -204,10 +205,11 @@ public class ShootingManager : MonoBehaviour
         else
         {
             Debug.Log("BotHasAbility");
+            yield return new WaitForSeconds(1.6f);
             string coordinates = gameManager.GetBotInstance().ApplyShotWithSpecialAbility(availableAbilitiesBot);
             UIM.FadeInTextBotAb(0.3f, botChosenAbility);
             
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1.5f);
             SpecialAbilityUsed(botChosenAbility, coordinates, false);
             botChosenAbility = ChosenAbility.None;
             availableAbilitiesBot.Clear();
@@ -384,6 +386,7 @@ public class ShootingManager : MonoBehaviour
                 Destroy(x + " " + i, gameManager.GetPlayerInstance());
             }
         }
+        
         OnTurnChange?.Invoke(!isPlayer);
     }
 
@@ -430,4 +433,5 @@ public class ShootingManager : MonoBehaviour
     {
         cursor.ChangeToAttack(false);
     }
+    
 }
