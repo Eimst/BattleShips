@@ -43,6 +43,9 @@ public class Field : MonoBehaviour
 
     private bool Starts = false;
     private float timer = 0f;
+    public int blinkCount = 0;
+    int blinkIndex = 0;
+    float blinkdelay = 0;
     private ArrayList blinkingShipsArray;
     private ArrayList IndicatedTiles;
 
@@ -916,6 +919,9 @@ public class Field : MonoBehaviour
                 }
             }
         }
+        blinkdelay = 0.75f;
+        blinkCount = 500;
+        blinkIndex = 0;
         Starts = true;
     }
 
@@ -1146,6 +1152,38 @@ public class Field : MonoBehaviour
         }
     }
 
+    public void IndicateWhenPutOnWrongPlace(int x, int y, int size, bool isRotated)
+    {
+        if (Starts) { return; }
+        blinkingShipsArray = new ArrayList();
+        if (isRotated)
+        {
+            for (int i = y; i <= y + size; i++)
+            {
+                int[] newArr = new int[3];
+                newArr[0] = x;
+                newArr[1] = i;
+                newArr[2] = field[x, i].GetComponent<Chunks>().index;
+                blinkingShipsArray.Add(newArr);
+            }
+        }
+        else
+        {
+            for (int i = x; i <= x + size; i++)
+            {
+                int[] newArr = new int[3];
+                newArr[0] = i;
+                newArr[1] = y;
+                newArr[2] = field[i, y].GetComponent<Chunks>().index;
+                blinkingShipsArray.Add(newArr);
+            }
+        }
+        blinkdelay = 0.35f;
+        blinkCount = 4;
+        blinkIndex = 21;
+        Starts = true;
+    }
+
     public void StopIndication()
     {
         foreach (int[] part in IndicatedTiles)
@@ -1188,11 +1226,13 @@ public class Field : MonoBehaviour
         if (Starts)
         {
             timer += Time.deltaTime;
-            if (timer > 0.75f)
+            if (timer > blinkdelay)
             {
                 //Debug.Log("GG");
-                Blink(0);
+                Blink(blinkIndex);
                 timer = 0f;
+                blinkCount--;
+                if (blinkCount == 0) Starts = false;
             }
         }
     }
