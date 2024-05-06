@@ -56,7 +56,7 @@ public class NewBehaviourScript : MonoBehaviour
     public void OnClick()
     {
         Field field = FindObjectOfType<Field>();
-        if (field.shipsCount[0] > 0)
+        if (field.shipsCount[0] > 0 && field.blinkCount == 0)
         {
             SpriteChanger script = FindObjectOfType<SpriteChanger>();
             script.currentSpriteIndex = 1;

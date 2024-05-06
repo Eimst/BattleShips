@@ -184,13 +184,19 @@ public class GameManager : MonoBehaviour
 
     public void GeneratePosition()
     {
-        playerFieldInstance.RandomPositionGenerator();
+        if (playerFieldInstance.GetField().blinkCount == 0)
+        {
+            playerFieldInstance.RandomPositionGenerator();
+        }
     }
 
 
     public void ResetField()
     {
-        playerFieldInstance.ResetField();
+        if (playerFieldInstance.GetField().blinkCount == 0)
+        {
+            playerFieldInstance.ResetField();
+        }
     }
 
 

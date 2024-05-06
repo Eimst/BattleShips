@@ -36,6 +36,9 @@ public class Mouse : MonoBehaviour
                 }
                 else
                 {
+                    IndicateWhenPutOnWrongPlace(x, y, script.currentSpriteIndex, script.isRotated);
+                    script.currentSpriteIndex = 0;
+                    script.ChangeSprite(0);
                     savedX = -1;
                     savedY = -1;
                     savedPos = false;
@@ -118,6 +121,22 @@ public class Mouse : MonoBehaviour
         return done; // returns if action was succesful
     }
 
+    private void IndicateWhenPutOnWrongPlace(int x, int y, int spriteIndex, bool isRotated)
+    {
+        int size = (spriteIndex + 1) / 2 - 1; // calculates size of ship
+        Field field = FindObjectOfType<Field>();
+        if (isRotated)
+        {
+            field.StopIndication();
+            field.IndicateWhenPutOnWrongPlace(x, y, size, isRotated);
+        }
+        else
+        {
+            field.StopIndication();
+            field.IndicateWhenPutOnWrongPlace(x, y, size, isRotated);
+        }
+    }
+
     /// <summary>
     /// Method find if ship is hovering on field. And returns coordinates.
     /// </summary>
@@ -167,6 +186,9 @@ public class Mouse : MonoBehaviour
         int size = 0;
         bool isVert = false;
 
+        //returns if indicating wrong place
+        if (field.blinkCount != 0) return;
+
         // checks if clicked tiles have ship. If tiles have ship removes clicked ship from field
         // and returns size - the size of that ship, isVert - direction of that ship ( true is vertical )
         if (field.DespawnShip(x, y, ref size, ref isVert))
@@ -200,6 +222,14 @@ public class Mouse : MonoBehaviour
         {
             field.Indicate(x, y, (spriteIndex + 1) / 2, spriteIndex % 2 == 0, true); // indicates illegal position
         }
+    }
+
+    public void onClick()
+    {
+        SpriteChanger script = FindObjectOfType<SpriteChanger>();
+        script.currentSpriteIndex = 0;
+        script.ChangeSprite(0);
+        script.isRotated = false;
     }
 
     //Changes mouse coordinates to world coordinates

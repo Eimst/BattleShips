@@ -56,7 +56,7 @@ public class ImageChanger3 : MonoBehaviour
     public void OnClick()
     {
         Field field = FindObjectOfType<Field>();
-        if (field.shipsCount[2] > 0)
+        if (field.shipsCount[2] > 0 && field.blinkCount == 0 )
         {
             SpriteChanger script = FindObjectOfType<SpriteChanger>();
             script.currentSpriteIndex = 5;
