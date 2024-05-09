@@ -33,6 +33,12 @@ public class UIManager : MonoBehaviour
 
     private GameManager _gameManager;
 
+    public TextMeshProUGUI x3CoolDown;
+
+    public TextMeshProUGUI sonarCoolDown;
+
+    public TextMeshProUGUI horCoolDown;
+
 
     private void Awake()
     {
@@ -145,6 +151,7 @@ public class UIManager : MonoBehaviour
     public void AddSpecialPower()
     {
         powersPanel.SetActive(true);
+        
     }
     
     public void ShowRemainingShips(bool bot, string text)
@@ -155,7 +162,7 @@ public class UIManager : MonoBehaviour
     }
     
     
-    
+    /*
     public void FadeInPowerButton(int ability, float duration = 0.3f)
     {
         switch (ability)
@@ -227,7 +234,147 @@ public class UIManager : MonoBehaviour
         toolTip.gameObject.SetActive(false);
         button.gameObject.SetActive(false);
     }
-    
+    */
    
+    
+    private void FadeCoolDown(int x3C, int sonarC, int horC, float duration = 0.4f)
+    {
+        if (x3C == 0)
+            StartCoroutine(FadeOutTextCool(x3CoolDown, x3,0.6f));
+
+        if (sonarC == 0) 
+            StartCoroutine(FadeOutTextCool(sonarCoolDown, sonar, 0.6f));
+        
+        if(horC == 0)
+            StartCoroutine(FadeOutTextCool(horCoolDown, hozVer,0.6f));
+    }
+    
+    
+    public void UpdateCoolDown(int x3C, int sonarC, int horC)
+    {
+        StartCoroutine(WaitUntilTurn(x3C, sonarC, horC));
+    }
+
+    private IEnumerator WaitUntilTurn(int x3C, int sonarC, int horC)
+    {
+        yield return new WaitUntil(() => _gameManager.isAnimationDone);
+        if (x3C != 0) 
+            x3CoolDown.text = x3C.ToString();
+        if (sonarC != 0) 
+            sonarCoolDown.text = sonarC.ToString();
+        if(horC != 0)
+            horCoolDown.text = horC.ToString();
+        FadeCoolDown(x3C, sonarC, horC);
+    }
+
+    private IEnumerator FadeInCool(TextMeshProUGUI text, float duration)
+    {
+        yield return new WaitUntil(() => !text.text.Equals("0"));
+        text.gameObject.SetActive(true);
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            text.color = new Color(text.color.r, text.color.g, text.color.b, alpha);
+            yield return null;
+        }
+        text.color = new Color(text.color.r, text.color.g, text.color.b, 1f);
+    }
+    
+    
+    private IEnumerator FadeOutTextCool(TextMeshProUGUI text, Button button, float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.SmoothStep(1f, 0f, elapsed / duration);
+            text.color = new Color(text.color.r, text.color.g, text.color.b, alpha);
+            yield return null;
+        }
+        text.color = new Color(text.color.r, text.color.g, text.color.b, 0f);
+        text.text = "0";
+        text.gameObject.SetActive(false);
+        StartCoroutine(PulseButtonCoroutine(button, 0.4f));
+        StartCoroutine(FadeInCool(text, duration));
+    }
+
+    private IEnumerator PulseButtonCoroutine(Button button, float durationPerPulse)
+    {
+        _gameManager.buttonIsPulsing = true;
+        yield return new WaitUntil(() => _gameManager.currentState == GameManager.GameState.PlayerTurn && _gameManager.isAnimationDone);
+        Image backgroundImage = button.GetComponent<Image>();
+        Color originalColor = backgroundImage.color;
+        RectTransform rectTransform = button.GetComponent<RectTransform>(); 
+        Vector3 originalScale = rectTransform.localScale; 
+        int pulseCount = 0;
+       
+
+        while (pulseCount < 3)
+        {
+            if (_gameManager.isKeyBindPressed)
+            {
+                _gameManager.buttonIsPulsing = false;
+                break;
+            }
+            float elapsed = 0f;
+            while (elapsed < durationPerPulse)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.SmoothStep(1f, 0.5f, elapsed / durationPerPulse);
+                float decreaseRedBlue = Mathf.Lerp(1f, 0.2f, elapsed / durationPerPulse); // More significant decrease in red and blue
+                float scale = Mathf.Lerp(1f, 0.9f, elapsed / durationPerPulse); 
+                backgroundImage.color = new Color(decreaseRedBlue, originalColor.g, decreaseRedBlue, alpha);
+                rectTransform.localScale = originalScale * scale; 
+                yield return null;
+            }
+
+            elapsed = 0f; // Reset elapsed time for the fade-in
+            while (elapsed < durationPerPulse)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.SmoothStep(0.5f, 1f, elapsed / durationPerPulse);
+                float increaseRedBlue = Mathf.Lerp(0.2f, 1f, elapsed / durationPerPulse); // Increase red and blue back
+                float scale = Mathf.Lerp(0.9f, 1f, elapsed / durationPerPulse); 
+                backgroundImage.color = new Color(increaseRedBlue, originalColor.g, increaseRedBlue, alpha);
+                rectTransform.localScale = originalScale * scale; 
+                yield return null;
+            }
+
+            pulseCount++; // Increment the pulse counter after a complete fade out and fade in
+        }
+
+        _gameManager.buttonIsPulsing = false;
+        // Optionally set alpha to 1f explicitly to ensure it ends fully visible
+        backgroundImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f);
+        rectTransform.localScale = originalScale;
+    }
+
+    public void MakeButtonInactive(string power)
+    {
+        Button button;
+        TextMeshProUGUI text;
+        if (power.Equals("x3"))
+        {
+            button = x3;
+            text = x3CoolDown;
+        }
+        else if (power.Equals("hor"))
+        {
+            button = hozVer;
+            text = horCoolDown;
+        }
+        else
+        {
+            button = sonar;
+            text = sonarCoolDown;
+        }
+        text.gameObject.SetActive(false);
+        button.GetComponent<Image>().color = new Color(0.4f, 0.4f, 0.4f , 0.8f);
+        RectTransform rectTransform = button.GetComponent<RectTransform>(); 
+        Vector3 originalScale = rectTransform.localScale; 
+        rectTransform.localScale = originalScale * 0.9f; 
+    }
 
 }

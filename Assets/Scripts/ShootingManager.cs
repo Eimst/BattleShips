@@ -74,8 +74,10 @@ public class ShootingManager : MonoBehaviour
 
     public void PlayerShoot()
     {
-        if(gameManager.isAnimationDone)
+        if(gameManager.isAnimationDone && !gameManager.buttonIsPulsing)
             PlayerMouseTrajectory();
+        if (gameManager.buttonIsPulsing)
+            lastHoveredTile = null;
     }
    
 
@@ -237,7 +239,6 @@ public class ShootingManager : MonoBehaviour
             case DestroyResult.Failure:
                 if (isPlayer)
                 {
-                    UIM.FadeOutPowerButton();
                     OnTurnChange?.Invoke(false);
                 }
                 else
@@ -280,7 +281,7 @@ public class ShootingManager : MonoBehaviour
 
     public void SetAbility(int abilityIndex)
     {
-        if(!gameManager.PermissionToUsePowers())
+        if(!gameManager.PermissionToUsePowers((ChosenAbility)abilityIndex))
             return;
         
         Debug.Log("Called " + abilityIndex);
@@ -386,6 +387,7 @@ public class ShootingManager : MonoBehaviour
                 Destroy(x + " " + i, gameManager.GetPlayerInstance());
             }
         }
+        
         
         OnTurnChange?.Invoke(!isPlayer);
     }

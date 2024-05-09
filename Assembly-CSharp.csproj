@@ -60,6 +60,7 @@
     <Compile Include="Assets/Scripts/Chunks.cs" />
     <Compile Include="Assets/Scripts/ImageChangers/ImageChanger3.cs" />
     <Compile Include="Assets/Scripts/Mouse.cs" />
+    <Compile Include="Assets/Scripts/ShipPlacementError.cs" />
     <Compile Include="Assets/Scripts/ReturnToMenuButton.cs" />
     <Compile Include="Assets/Scripts/Player.cs" />
     <Compile Include="Assets/Scripts/GameManager.cs" />
