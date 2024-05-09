@@ -40,9 +40,9 @@ public class GameManager : MonoBehaviour
     public bool isAnimationDone { get; set; }
 
     private int _playerTurnCount;
-    
+
     private int _botTurnCount;
-    
+
     public bool isKeyBindPressed { get; set; }
 
     public enum GameMode
@@ -63,6 +63,8 @@ public class GameManager : MonoBehaviour
     private bool _disappear;
 
     private bool endIsNotLaunched = true;
+
+    public bool buttonIsPulsing { get; set; }
 
     void Awake()
     {
@@ -95,26 +97,29 @@ public class GameManager : MonoBehaviour
         isAnimationDone = true;
         _playerTurnCount = 1;
         _botTurnCount = 1;
+        buttonIsPulsing = false;
     }
 
 
     void Update()
     {
-
         if (UIM is not null)
         {
             int[] playerShips = playerFieldInstance.GetShipsCount();
             botFieldInstance.UpdatePlayerShipsCount(playerShips);
             string playerText = playerShips[3].ToString() + "        "
-                + playerShips[2].ToString() + "      " + playerShips[1].ToString() + "   " + playerShips[0].ToString();
+                                                          + playerShips[2].ToString() + "      " +
+                                                          playerShips[1].ToString() + "   " + playerShips[0].ToString();
             UIM.ShowRemainingShips(false, playerText);
             int[] botShips = botFieldInstance.GetShipsCount();
 
-            string botText = botShips[3].ToString() + "        " + 
-                botShips[2].ToString() + "      " + botShips[1].ToString() + "   " + botShips[0].ToString();
+            string botText = botShips[3].ToString() + "        " +
+                             botShips[2].ToString() + "      " + botShips[1].ToString() + "   " +
+                             botShips[0].ToString();
 
             UIM.ShowRemainingShips(true, botText);
         }
+
         if (!isAnimationDone)
             return;
 
@@ -130,10 +135,10 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.BotTurn:
-                shootingManager.BotShoot();   
+                shootingManager.BotShoot();
                 break;
 
-             case GameState.GameOver:
+            case GameState.GameOver:
                 //Debug.Log(playerFieldInstance.GetRemainingBoats());
                 if (playerFieldInstance.GetRemainingBoats() == 0)
                 {
@@ -152,29 +157,42 @@ public class GameManager : MonoBehaviour
                         endIsNotLaunched = false;
                     }
                 }
+
                 break;
-                 
         }
+
         previousState = currentState;
     }
-    
-    
-    
+
+
     public void SetPowersRep(int x3, int hozVer, int sonar)
     {
-        if(x3 == 1 && hozVer == 1 && sonar == 3)
+        if (x3 == 1 && hozVer == 1 && sonar == 3)
         {
             PlayerPrefs.SetInt("Mode", 0);
             gameMode = GameMode.Standard;
             return;
         }
-        
+        if(x3 == 1)
+            StartCoroutine(WaitForUIManager("x3"));
         _x3PowerRep = x3;
+        
+        if(hozVer == 1)
+            StartCoroutine(WaitForUIManager("hor"));
         _hozVerPowerRep = hozVer;
+        
+        if(sonar == 3)
+            StartCoroutine(WaitForUIManager("sonar"));
         _sonarPowerRep = sonar;
     }
 
-    
+    private IEnumerator WaitForUIManager(string text)
+    {
+        yield return new WaitUntil(() => UIM != null);
+        UIM.MakeButtonInactive(text);
+    }
+
+
     private void IsGameOver()
     {
         if (playerFieldInstance.GetRemainingBoats() == 0 || botFieldInstance.GetRemainingBoats() == 0)
@@ -205,22 +223,22 @@ public class GameManager : MonoBehaviour
         if (isPlayerTurn)
         {
             currentState = GameState.PlayerTurn;
-            
+
             if (gameMode == GameMode.Standard) return;
-            _botTurnCount++; 
+            _botTurnCount++;
         }
         else
         {
             isKeyBindPressed = false;
             currentState = GameState.BotTurn;
-            
+
             if (gameMode == GameMode.Standard) return;
-            _playerTurnCount++; 
+            _playerTurnCount++;
         }
-        CheckIfPowersAvailable();
+
+        CheckIfPowersAvailable(isPlayerTurn);
     }
 
-    
 
     private void SpawnText()
     {
@@ -233,8 +251,8 @@ public class GameManager : MonoBehaviour
             UIM.FadeOutTextPlayerTurn(0.4f);
         }
     }
-    
-    
+
+
     public bool isThereNoShipLeft()
     {
         return botFieldInstance.GetRemainingBoats() == 0;
@@ -251,7 +269,7 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name.Equals("BattleScene"))
@@ -263,11 +281,13 @@ public class GameManager : MonoBehaviour
                 botFieldInstance.transform.position = new Vector3(1, 6, 0);
                 botFieldInstance.gameObject.SetActive(true); // Activate bot
             }
+
             if (playerFieldInstance != null)
             {
                 // Set player's position to a different vector in the third scene
                 playerFieldInstance.transform.position = new Vector3(-11, 6, 0);
             }
+
             // this.mode = PlayerPrefs.GetInt("Mode") == 0 ? GameMode.Standard : GameMode.Special;
             currentState = Random.Range(0, 2) == 0 ? GameState.PlayerTurn : GameState.BotTurn;
             previousState = currentState == GameState.PlayerTurn ? GameState.BotTurn : GameState.PlayerTurn;
@@ -293,23 +313,45 @@ public class GameManager : MonoBehaviour
             {
                 UIM.AddSpecialPower();
                 gameMode = GameMode.Special;
-                CheckIfPowersAvailable();
+                CheckIfPowersAvailable(false);
             }
             else gameMode = GameMode.Standard;
+
             SpawnText();
-            
         }
     }
 
 
-
-    public bool PermissionToUsePowers()
+    public bool PermissionToUsePowers(ShootingManager.ChosenAbility ability)
     {
-        if(currentState == GameState.PlayerTurn && isAnimationDone)
+        if (currentState == GameState.PlayerTurn && isAnimationDone)
         {
+            if (ability == ShootingManager.ChosenAbility.x3 &&
+                (_x3PowerRep <= 1 || _playerTurnCount % _x3PowerRep != 0))
+            {
+                isKeyBindPressed = false;
+                return false;
+            }
+
+            if (ability == ShootingManager.ChosenAbility.Horizontal &&
+                (_hozVerPowerRep <= 1 || _playerTurnCount % _hozVerPowerRep != 0))
+            {
+                isKeyBindPressed = false;
+                return false;
+            }
+
+            if (ability == ShootingManager.ChosenAbility.Sonar &&
+                (_sonarPowerRep <= 3 || _playerTurnCount % _sonarPowerRep != 0))
+            {
+                isKeyBindPressed = false;
+                return false;
+            }
+
             StartCoroutine(StopGameUntilPowerAnimationFadesOut());
             return true;
         }
+
+        isKeyBindPressed = false;
         return false;
     }
 
@@ -344,6 +386,11 @@ public class GameManager : MonoBehaviour
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
+        else
+        {
+            ShipPlacementError shipPlacementError = FindObjectOfType<ShipPlacementError>();
+            shipPlacementError.ShowError();
+        }
     }
 
 
@@ -367,26 +414,42 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Checks if powers available for bot or player
     /// </summary>
-    private void CheckIfPowersAvailable()
+    private void CheckIfPowersAvailable(bool isPlayer)
     {
+        int x3Count;
+        if (_x3PowerRep <= 1)
+            x3Count = -1;
+        else
+            x3Count = _x3PowerRep - (_playerTurnCount % _x3PowerRep == 0 ? _x3PowerRep : _playerTurnCount % _x3PowerRep);
         
-        if (_x3PowerRep > 1 && _playerTurnCount % _x3PowerRep == 0)
-            UIM.FadeInPowerButton(1);
+        int sonarCount;
+        if (_sonarPowerRep <= 3)
+            sonarCount = -1;
+        else 
+            sonarCount = _sonarPowerRep - (_playerTurnCount % _sonarPowerRep == 0 ? _sonarPowerRep : 
+            _playerTurnCount % _sonarPowerRep);
 
-        if (_hozVerPowerRep > 1 && _playerTurnCount % _hozVerPowerRep == 0)
-            UIM.FadeInPowerButton(2);
-
-        if (_sonarPowerRep > 3 && _playerTurnCount % _sonarPowerRep == 0)
-            UIM.FadeInPowerButton(4);
+        int horCount;
+        if (_hozVerPowerRep <= 1)
+            horCount = -1;
+        else
+            horCount = _hozVerPowerRep - (_playerTurnCount % _hozVerPowerRep == 0 ? _hozVerPowerRep
+            : _playerTurnCount % _hozVerPowerRep);
         
-        if (_x3PowerRep > 1 && _botTurnCount % _x3PowerRep == 0)
-            shootingManager.SetAbilityForBot(1);
+        
+        if (!isPlayer)
+            UIM.UpdateCoolDown(x3Count, sonarCount, horCount);
+        else
+        {
+            if (_x3PowerRep > 1 && _botTurnCount % _x3PowerRep == 0)
+                shootingManager.SetAbilityForBot(1);
 
-        if (_hozVerPowerRep > 1 && _botTurnCount % _hozVerPowerRep == 0)
-            shootingManager.SetAbilityForBot(2);
+            if (_hozVerPowerRep > 1 && _botTurnCount % _hozVerPowerRep == 0)
+                shootingManager.SetAbilityForBot(2);
 
-        if (_sonarPowerRep > 3 && _botTurnCount % _sonarPowerRep == 0)
-            shootingManager.SetAbilityForBot(4);
+            if (_sonarPowerRep > 3 && _botTurnCount % _sonarPowerRep == 0)
+                shootingManager.SetAbilityForBot(4);
+        }
     }
 
 
@@ -411,17 +474,19 @@ public class GameManager : MonoBehaviour
     /// <param name="isPlayer"></param>
     public void ShowDetectedShipsWithSonar(int x, int y, float delay, bool isPlayer)
     {
-        if(isPlayer)
+        if (isPlayer)
             StartCoroutine(botFieldInstance.GetField().SonarTileChanger(x, y, this, delay, isPlayer));
         else
             StartCoroutine(playerFieldInstance.GetField().SonarTileChanger(x, y, this, delay, isPlayer));
     }
-    
+
     /// <summary>
     /// Prepares the game board for key bind activation.
     /// </summary>
     public void PrepareBoardForKeyBindActivation()
     {
+        if (buttonIsPulsing)
+            return;
         Vector2 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(rayPos, Vector2.zero);
         if (hit.collider.transform.position.x >= 2 && hit.collider.transform.position.x <= 12 &&
@@ -443,6 +508,4 @@ public class GameManager : MonoBehaviour
             shootingManager.OnTurnChange -= HandleTurnChange;
         }
     }
-
 }
-
