@@ -34,6 +34,7 @@ public class Field : MonoBehaviour
 
     public int[] shipsCount;
 
+    private bool[,] isShot;
     public enum DestroyResult
     {
         Success,
@@ -77,6 +78,8 @@ public class Field : MonoBehaviour
                 }
             }
         }
+
+        isShot = new bool[10, 10];
         shipsCount = new int[] { 4, 3, 2, 1 };
         letters = new GameObject[fieldLength];
         numbers = new GameObject[fieldLength];
@@ -293,7 +296,7 @@ public class Field : MonoBehaviour
                 if (count == 0)
                 {
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
-                    if (renderer != null && shipsArray[i, j] > 0)
+                    if (renderer != null && shipsArray[i, j] > 0 && !isShot[i, j])
                     {
                         GameObject.Find("SonarSound").GetComponent<AudioSource>().Play();
                         if (isPlayer)
@@ -308,7 +311,7 @@ public class Field : MonoBehaviour
                 else
                 {
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
-                    if (renderer != null && shipsArray[i, j] > 0)
+                    if (renderer != null && shipsArray[i, j] > 0 && !isShot[i, j])
                     {
                         renderer.color = new Color(1f, 1f, 1f, 1); // Darken the sprite
                     }
@@ -605,6 +608,7 @@ public class Field : MonoBehaviour
 
         else 
         {
+            isShot[x1, y1] = true;
             Renderer bulletRenderer = bullet.GetComponent<Renderer>();
             bulletRenderer.sortingOrder = 40;
             bullet.transform.localScale = new Vector3(1f, 1f, 1f);
@@ -617,10 +621,12 @@ public class Field : MonoBehaviour
             {
                 return DestroyResult.Failure;
             }
+            
             return DestroyResult.Success;
         }
-            
     }
+    
+    
     public bool IsAllShipDestroyed(int shipNum, int x, int y)
     {
         for (int i = 0; i < fieldLength; i++)
