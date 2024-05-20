@@ -41,6 +41,7 @@ public class Field : MonoBehaviour
         IllegalMove
     }
 
+    private bool[,] isHit;
     private bool Starts = false;
     private float timer = 0f;
     public int blinkCount = 0;
@@ -77,6 +78,8 @@ public class Field : MonoBehaviour
                 }
             }
         }
+
+        isHit = new bool[10, 10];
         shipsCount = new int[] { 4, 3, 2, 1 };
         letters = new GameObject[fieldLength];
         numbers = new GameObject[fieldLength];
@@ -293,7 +296,7 @@ public class Field : MonoBehaviour
                 if (count == 0)
                 {
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
-                    if (renderer != null && shipsArray[i, j] > 0)
+                    if (renderer != null && shipsArray[i, j] > 0 && !isHit[i, j])
                     {
                         GameObject.Find("SonarSound").GetComponent<AudioSource>().Play();
                         if (isPlayer)
@@ -308,7 +311,7 @@ public class Field : MonoBehaviour
                 else
                 {
                     SpriteRenderer renderer = field[i, j].GetComponent<SpriteRenderer>();
-                    if (renderer != null && shipsArray[i, j] > 0)
+                    if (renderer != null && shipsArray[i, j] > 0 && !isHit[i, j])
                     {
                         renderer.color = new Color(1f, 1f, 1f, 1); // Darken the sprite
                     }
@@ -603,8 +606,9 @@ public class Field : MonoBehaviour
         if (shipsArray[x1, y1] < 0)
             return DestroyResult.IllegalMove;
 
-        else 
+        else
         {
+            isHit[x1, y1] = true;
             Renderer bulletRenderer = bullet.GetComponent<Renderer>();
             bulletRenderer.sortingOrder = 40;
             bullet.transform.localScale = new Vector3(1f, 1f, 1f);
