@@ -491,7 +491,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: {x: -1, y: 0.3, z: 0}
-  speed: 1000
+  speed: 2000
 --- !u!95 &65178683
 Animator:
   serializedVersion: 5
@@ -2297,7 +2297,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: {x: -1, y: 0.3, z: 0}
-  speed: 1000
+  speed: 2000
 --- !u!95 &415107238
 Animator:
   serializedVersion: 5
@@ -4756,7 +4756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: {x: -1, y: 0.3, z: 0}
-  speed: 1000
+  speed: 2000
 --- !u!95 &910838267
 Animator:
   serializedVersion: 5
@@ -6012,7 +6012,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: {x: -1, y: 0.3, z: 0}
-  speed: 1000
+  speed: 2000
 --- !u!95 &1253041754
 Animator:
   serializedVersion: 5
@@ -7686,7 +7686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: {x: -1, y: 0.3, z: 0}
-  speed: 1000
+  speed: 2000
 --- !u!95 &1785085845
 Animator:
   serializedVersion: 5
@@ -8034,7 +8034,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: {x: -1, y: 0.3, z: 0}
-  speed: 1000
+  speed: 2000
 --- !u!95 &1837855095
 Animator:
   serializedVersion: 5

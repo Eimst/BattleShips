@@ -555,8 +555,8 @@ public class Field : MonoBehaviour
         bulletInstance.transform.Rotate(0, 0, -90);
         while (bulletInstance.transform.position.y > startPos.y - 1 - y1)
         {
-            bulletInstance.transform.Translate(Vector3.right * 0.07f);
-            yield return new WaitForSeconds(0.00005f);
+            bulletInstance.transform.Translate(Vector3.right * 0.1f);
+            yield return null;
         }
         Destroy(bulletInstance);
         if (shipsArray[x1, y1] == 0)
@@ -1205,7 +1205,7 @@ public class Field : MonoBehaviour
     {
         Vector3 startPos = transform.position;
         Renderer sonarRenderer = sonar.GetComponent<Renderer>();
-        sonarRenderer.sortingOrder = 30;
+        sonarRenderer.sortingOrder = 50;
         sonar.transform.localScale = new Vector3(1f, 1f, 1f);
         GameObject.Find("ScannerSound").GetComponent<AudioSource>().Play();
         GameObject sonarInstance = Instantiate(sonar, new Vector3(startPos.x + x + 1, startPos.y - y - 1, 0), Quaternion.identity);
